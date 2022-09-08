@@ -1,0 +1,15 @@
+Package: bertopic
+Title: bertopic port
+Version: 0.1.0001
+Encoding: UTF-8
+Authors@R: c(person("Alex", "Bresler", role = c("aut", "cre"), email = "abresler@asbcllc.com"))
+Maintainer: Alex Bresler <abresler@asbcllc.com>
+Description: R port of the python scikit-learn module
+Depends: R (>= 3.2.0)
+License: AGPL
+URL: https://github.com/abresler/bertopic
+BugReports: https://github.com/abresler/bertopic/issues
+LazyData: true
+Suggests: testthat
+RoxygenNote: 7.2.1
+Imports: purrr, reticulate, tibble, dplyr, glue, stringr, asbtools

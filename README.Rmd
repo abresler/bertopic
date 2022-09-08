@@ -1,0 +1,17 @@
+---
+output: rmarkdown::github_document
+---
+
+### Installation
+
+```{r eval=FALSE}
+devtools::install_github("abresler/bertopic")
+```
+
+```{r message=FALSE, warning=FALSE, error=FALSE}
+options(width=120)
+```
+
+### About
+
+### [R port of BERTopic](https://maartengr.github.io/BERTopic/index.html) 
