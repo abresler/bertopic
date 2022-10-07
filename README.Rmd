@@ -14,4 +14,4 @@ options(width=120)
 
 ### About
 
-### [R port of BERTopic](https://maartengr.github.io/BERTopic/index.html) 
+### [R port of BERTopic](https://maartengr.github.io/BERTopic/index.html)
