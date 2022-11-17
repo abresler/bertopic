@@ -1,5 +1,6 @@
 library(dplyr)
 library(tidyverse)
+library(bertopic)
 import_bertopic()
 st <- reticulate::import("sentence_transformers")
 st$SentenceTransformer()
