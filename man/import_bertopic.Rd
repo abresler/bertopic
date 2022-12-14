@@ -4,7 +4,7 @@
 \alias{import_bertopic}
 \title{Import Bert Topic}
 \usage{
-import_bertopic(assign_to_environment = T)
+import_bertopic(assign_to_environment = T, path = NULL)
 }
 \arguments{
 \item{assign_to_environment}{if \code{TRUE} assigns to environment}
@@ -14,4 +14,8 @@ python object
 }
 \description{
 \href{https://maartengr.github.io/BERTopic}{BERTopic API from python}
+}
+\examples{
+library(bertopic)
+import_bertopic()
 }

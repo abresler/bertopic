@@ -4,7 +4,28 @@
 \alias{bert_topic}
 \title{Initiate BERT Topic Model}
 \usage{
-bert_topic()
+bert_topic(
+  language = "english",
+  top_n_words = 10L,
+  n_gram_range = list(1L, 3L),
+  min_topic_size = 10L,
+  nr_topics = NULL,
+  low_memory = F,
+  exclude_stop_words = T,
+  extra_stop_words = NULL,
+  calculate_probabilities = T,
+  stop_words = NULL,
+  diversity = NULL,
+  seed_topic_list = NULL,
+  verbose = T,
+  umap_model = NULL,
+  hdbscan_model = NULL,
+  vectorizer_model = NULL,
+  ctfidf_model = NULL
+)
+}
+\arguments{
+\item{stop_words}{}
 }
 \value{
 python object
@@ -18,8 +39,8 @@ Functions for unsupervised clustering algorithms.
 \examples{
 import_bertopic()
 data <- sklearn::sk_datasets()
-docs <- data$fetch_20newsgroups(subset = 'all', remove = c('headers', 'footers', 'quotes'))
-docs <- docs["data"]
+docs_all <- data$fetch_20newsgroups(subset = 'all', remove = c('headers', 'footers', 'quotes'))
+docs <- docs_all["data"]
 tm <- bert_topic()
 topic_model <- tm$fit_transform(documents = docs)
 

@@ -1,17 +1,36 @@
 
+
+
 # topics ------------------------------------------------------------------
 
+#' Select Correct Python
+#'
+#' @param path
+#'
+#' @return
+#' @export
+#'
+#' @examples
+select_correct_python <-
+  function(path = "/usr/local/bin/python3") {
+    if (length(path) == 0) {
+      return(invisible())
+    }
+    reticulate::use_python(python = path)
+  }
 
 .bert_similar_term_topics <-
-  function(topic_model,term = NULL, top_n_terms = 10L){
-
+  function(topic_model,
+           term = NULL,
+           top_n_terms = 10L) {
     if (length(term) == 0) {
       "Enter search term" |> message()
       return(invisible())
     }
-    similar_topics <- topic_model$find_topics(search_term = term, top_n = as.integer(top_n_terms))
+    similar_topics <-
+      topic_model$find_topics(search_term = term, top_n = as.integer(top_n_terms))
 
-    tibble(topic = similar_topics[[1]], score = similar_topics[[2]] |> flatten_dbl()) |>
+    tibble(topic_bert = similar_topics[[1]], score = similar_topics[[2]] |> flatten_dbl()) |>
       mutate(term) |>
       select(term, everything())
 
@@ -29,17 +48,21 @@
 #'
 #' @examples
 bert_similar_terms_topics <-
-  function(topic_model,terms = NULL, top_n_terms = 10L,
-           nest_data = F, return_message = T){
-
+  function(topic_model,
+           terms = NULL,
+           top_n_terms = 10L,
+           nest_data = F,
+           return_message = T) {
     data <-
       terms |>
-      map_dfr(function(x){
+      map_dfr(function(x) {
         if (return_message) {
           glue::glue("Finding {top_n_terms} similar term topic embeddings for {x}") |> message()
         }
 
-        .bert_similar_term_topics(topic_model = topic_model, term = x, top_n_terms = top_n_terms)
+        .bert_similar_term_topics(topic_model = topic_model,
+                                  term = x,
+                                  top_n_terms = top_n_terms)
       })
 
 
@@ -63,14 +86,21 @@ bert_similar_terms_topics <-
 #'
 #' @examples
 bert_topic_info <-
-  function(topic_model, topic_number = NULL){
-  df <-
-    topic_model$get_topic_info(topic = topic_number)
-  tbl_topics <- df |> janitor::clean_names() |> as_tibble()
-  tbl_topics |>
-    mutate(name = name |> str_replace("\\_", "\\+")) |>
-    separate(name, into = c("remove", "name_topic"), sep = "\\+") |>
-    select(-remove)
+  function(topic_model, topic_number = NULL) {
+    df <-
+      topic_model$get_topic_info(topic = topic_number)
+    tbl_topics <-
+      df |> janitor::clean_names() |> as_tibble() |>
+      rename(topic_bert = topic)
+    data <-
+      tbl_topics |>
+      mutate(name = name |> str_replace("\\_", "\\+")) |>
+      separate(name,
+               into = c("remove", "name_topic"),
+               sep = "\\+") |>
+      select(-remove)
+
+    data
   }
 
 #' Generate BERT Topic Labels
@@ -85,18 +115,21 @@ bert_topic_info <-
 #'
 #' @examples
 bert_topic_labels <-
-  function(topic_model,number_words = 4L, separator = "_", word_length =  NULL) {
-  topic_labels <- topic_model$generate_topic_labels(
-    nr_words = as.integer(number_words),
-    separator = separator,
-    topic_prefix = F,
-    word_length = word_length
-  )
+  function(topic_model,
+           number_words = 4L,
+           separator = "_",
+           word_length =  NULL) {
+    topic_labels <- topic_model$generate_topic_labels(
+      nr_words = as.integer(number_words),
+      separator = separator,
+      topic_prefix = F,
+      word_length = word_length
+    )
 
-  tibble(topic_labels) |>
-    mutate(topic = 1:n() - 2) |>
-    select(topic, everything())
-}
+    tibble(topic_labels) |>
+      mutate(topic_bert = 1:n() - 2) |>
+      select(topic_bert, everything())
+  }
 
 
 
@@ -111,11 +144,315 @@ bert_topic_labels <-
 #'
 #' @examples
 bert_topic_count <-
-  function(topic_model, topic_number = NULL){
+  function(topic_model, topic_number = NULL) {
     topic_model$get_topic_freq(topic = topic_number) |>
-      janitor::clean_names() |> as_tibble()
+      janitor::clean_names() |> as_tibble() |>
+      rename(topic_bert = topic)
 
   }
+
+#' Topic's Representative Documents
+#'
+#' @param topic_model
+#' @param topic_number
+#'
+#' @return
+#' @export
+#'
+#' @examples
+bert_representative_documents <-
+  function(topic_model,
+           topic_number = NULL,
+           include_labels = T,
+           label_words = 5L) {
+    if (length(topic_number) != 0) {
+      rep_docs <-
+        topic_model$get_representative_docs(topic = as.integer(topic_number))
+      data <-
+        tibble(text = rep_docs) |>
+        mutate(topic_bert = topic_number) |>
+        select(topic_bert, everything())
+      return(data)
+    }
+    rep_docs <-
+      topic_model$get_representative_docs(topic = topic_number)
+    data <- seq_along(rep_docs) |>
+      map_dfr(function(x) {
+        topic_no <- names(rep_docs[x]) |> readr::parse_number()
+        tibble(text = rep_docs[[x]]) |>
+          mutate(topic_bert = topic_no) |>
+          select(topic_bert, everything())
+      }) |>
+      arrange(topic_bert)
+
+    if (include_labels) {
+      data <- data |>
+        left_join(bert_topic_labels(
+          topic_model = topic_model,
+          number_words = as.integer(label_words)
+        ),
+        by = "topic_bert") |>
+        select(topic_bert, topic_labels, everything())
+    }
+
+
+    data
+  }
+
+#' Returns keywords for the topics
+#'
+#' @param topic_model
+#'
+#' @return
+#' @export
+#'
+#' @examples
+bert_topics_keywords <-
+  function(topic_model)  {
+    topics <- topic_model$get_topics()
+    seq_along(topics) |>
+      map_dfr(function(x) {
+        topic_number <- names(topics)[[x]] |> readr::parse_number()
+        all_values <- topics[[x]] |> unlist()
+        word <- all_values[c(T, F)]
+        score <- all_values[c(F, T)] |> readr::parse_number()
+        tibble(word, score) |>
+          mutate(topic = topic_number,
+                 length_ngram = word |> str_count("\\ ")) |>
+          select(topic, everything())
+      })
+  }
+
+#' Extract Berttopics from output
+#'
+#' @param obj
+#' @param docs
+#' @param id_columns
+#' @param sort_by_topic
+#' @param text_column
+#' @param include_labels
+#' @param label_words
+#'
+#' @return
+#' @export
+#'
+#' @examples
+extract_bert_topics <-
+  function(obj,
+           docs = NULL,
+           id_columns = NULL,
+           text_column = NULL,
+           topic_model = NULL,
+           include_labels = T,
+           label_words = 4L,
+           arrange_topics = F) {
+    topics <-
+      obj[[1]]
+
+    tbl_prob <-
+      obj[[2]] |> as_tibble() |> janitor::clean_names() |>
+      select(v1) |>
+      rename(pct_probabilty_topic_bert = v1)
+
+    data <-
+      tbl_prob |>
+      mutate(topic_bert = topics)
+
+    if (length(docs) == 0) {
+      return(data)
+    }
+
+    data <- tibble(id = names(docs), text = docs)
+
+    if (length(id_columns) > 0) {
+      data <-
+        data |>
+        separate(id,
+                 into = id_columns,
+                 sep = "\\|",
+                 convert = T)
+    }
+
+    if (length(text_column)) {
+      data <- data |>
+        rename(UQ(text_column) := text)
+    }
+
+    data <-
+      tbl_prob |>
+      mutate(topic_bert = topics) |>
+      bind_cols(data) |>
+      select(topic_bert, names(data), everything())
+
+    if (include_labels) {
+      data <-
+        data |>
+        left_join(
+          bert_topic_labels(
+          topic_model = topic_model,
+          number_words = as.integer(label_words)
+        ),
+        by = "topic_bert") |>
+        select(topic_bert, topic_labels, everything())
+    }
+
+    if (arrange_topics) {
+      data <- data |>
+        arrange(topic_bert, desc(pct_probabilty_topic_bert))
+    }
+
+
+    data
+  }
+
+# text --------------------------------------------------------------------
+
+#' Pull Text and Name It for bertopic
+#'
+#' @param data
+#' @param id_columns
+#' @param text_column
+#'
+#' @return
+#' @export
+#'
+#' @examples
+tbl_bert_text_features <-
+  function(data,
+           id_columns = NULL,
+           text_column = NULL) {
+    if (length(id_columns) == 0) {
+      id <- glue("id {1:nrow(data)}") |> as.character()
+      data <-
+        data |>
+        mutate(id) |>
+        select(id, everything())
+    }
+
+    if (length(id_columns) > 0) {
+      data <-
+        tidyr::unite(
+          data = data,
+          col = "id",
+          all_of(id_columns),
+          sep = "|",
+          remove = F
+        ) |>
+        select(id, everything())
+    }
+    ids <- data |> pull(id)
+    texts <- data |> pull(text_column)
+    names(texts) <- ids
+    texts
+  }
+
+
+# embeddings --------------------------------------------------------------
+
+bert_embeddings <-
+  function(embeddings,
+           docs = NULL,
+           id_columns = NULL,
+           text_column = NULL) {
+    data <- as_tibble(embeddings) |> janitor::clean_names()
+
+    if (length(docs) == 0) {
+      data <- data |>
+        mutate(id = 1:n()) |>
+        select(id, everything())
+
+      return(data)
+    }
+    df_features <- tibble(id = names(docs), text = docs)
+
+    if (length(id_columns) > 0) {
+      df_features <-
+        df_features |>
+        separate(id,
+                 into = id_columns,
+                 sep = "\\|",
+                 convert = T)
+    }
+
+    if (length(text_column)) {
+      df_features <-
+        df_features |>
+        rename(UQ(text_column) := text)
+    }
+    data <-
+      df_features |>
+      bind_cols(data)
+
+    data
+  }
+
+
+#' Extract UMAP from Object
+#'
+#' @param obj
+#' @param data
+#'
+#' @return
+#' @export
+#'
+#' @examples
+extract_bert_umap <-
+  function(obj, data = NULL, number_zeros =4) {
+    df_umap <-
+      obj$umap_model$embedding_ |> as_tibble()
+    dims <- 1:ncol(df_umap) |> asbtools::pad_zeros(number_zeros = number_zeros)
+
+    df_umap <-
+      df_umap |> setNames(glue::glue("umap_{dims}"))
+
+    pct_dbscan_prob = obj$hdbscan_model$outlier_scores_ |> as.numeric()
+
+    df_map <- df_umap |>
+      mutate(pct_dbscan_prob)
+
+    if (length(data) == 0) {
+      return(df_umap)
+    }
+
+    if (nrow(data) != nrow(df_umap))
+      return(df_umap)
+
+    data |>
+      bind_cols(df_umap)
+
+  }
+
+
+# vector_stuff ------------------------------------------------------------
+
+#' Extract Document Word Coutns
+#'
+#' @param obj
+#'
+#' @return
+#' @export
+#'
+#' @examples
+extract_document_word_counts <-
+  function(obj, filter_zero = T) {
+  X <- obj$vectorizer_model$fit_transform(bap_docs) |> as.matrix()
+
+  X <-
+    X |> as_tibble() |> setNames(obj$vectorizer_model$get_feature_names()) |> mutate(number_document = 1:n()) |>
+    gather(word, count, -number_document, na.rm = T) |>
+    arrange(number_document, desc(count))
+
+  if (filter_zero) {
+    X <-
+      X |>
+      filter(count > 0)
+  }
+
+  X
+
+}
+
+# vuz ---------------------------------------------------------------------
 
 #' Write a BERT Visualization
 #'
@@ -129,21 +466,30 @@ bert_topic_count <-
 #'
 #' @examples
 write_bert_viz <-
-  function(viz, base_path = NULL, viz_name = NULL, browse_url = T) {
-   oldwd <- getwd()
-   setwd("~")
+  function(viz,
+           base_path = NULL,
+           viz_name = NULL,
+           browse_url = T) {
 
-   final_path <- stringr::str_c(base_path, viz_name, sep = "/")
-   asbtools::build_folders(paths = final_path)
-   file_name <- glue:::glue("{final_path}/index.html")
+    if (length(base_path) == 0) {
+      viz$show()
+      return(invisible())
+    }
+    oldwd <- getwd()
+    setwd("~")
 
-   viz$write_html(file_name)
+    final_path <- stringr::str_c(base_path, viz_name, sep = "/")
+    asbtools::build_folders(paths = final_path)
+    file_name <- glue:::glue("{final_path}/index.html")
 
-   if (browse_url) {
-     file_name |> browseURL()
-   }
-   if (getwd() != oldwd) {
-     setwd(oldwd)
-   }
-   return(invisible())
+    viz$write_html(file_name)
+
+    if (browse_url) {
+      file_name |> browseURL()
+    }
+    if (getwd() != oldwd) {
+      setwd(oldwd)
+    }
+    return(invisible())
   }
+

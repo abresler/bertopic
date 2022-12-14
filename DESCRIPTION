@@ -11,5 +11,5 @@ URL: https://github.com/abresler/bertopic
 BugReports: https://github.com/abresler/bertopic/issues
 LazyData: true
 Suggests: testthat
-RoxygenNote: 7.2.1
-Imports: purrr, reticulate, tibble, dplyr, glue, stringr, asbtools
+RoxygenNote: 7.2.3
+Imports: purrr, reticulate, tibble, dplyr, glue, stringr, asbtools, janitor
