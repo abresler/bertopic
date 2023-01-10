@@ -7,25 +7,32 @@
 bert_topic(
   language = "english",
   top_n_words = 10L,
+  use_key_phrase_vectorizer = F,
+  is_lower_case = T,
   n_gram_range = list(1L, 3L),
+  keyphrase_ngram_range = list(1L, 1L),
   min_topic_size = 10L,
+  umap_model = NULL,
+  hdbscan_model = NULL,
+  vectorizer_model = NULL,
+  embedding_model = NULL,
+  ctfidf_model = NULL,
   nr_topics = NULL,
   low_memory = F,
   exclude_stop_words = T,
   extra_stop_words = NULL,
   calculate_probabilities = T,
-  stop_words = NULL,
   diversity = NULL,
+  min_df = 1L,
+  max_df = 1L,
+  pos_pattern = "<J.*>*<N.*>+",
   seed_topic_list = NULL,
   verbose = T,
-  umap_model = NULL,
-  hdbscan_model = NULL,
-  vectorizer_model = NULL,
-  ctfidf_model = NULL
+  vocabulary = NULL
 )
 }
 \arguments{
-\item{stop_words}{}
+\item{vocabulary}{}
 }
 \value{
 python object

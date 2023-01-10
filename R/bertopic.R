@@ -1,5 +1,8 @@
 # https://scikit-learn.org/0.15/index.html
 
+# stopwords ---------------------------------------------------------------
+
+
 #' bert
 #'
 #' @return
@@ -11,6 +14,14 @@ bert_base_stop_words <-
     c('between', 'nevertheless', 'so', 'is', 'me', 'should', 'throughout', 'someone', 'hereupon', 'than', 'cannot', 'such', 'amount', 'nobody', 'hereafter', 'noone', 'under', 'or', 'five', 'name', 'whereas', 'neither', 'everywhere', 'somewhere', 'top', 'de', 'hereby', 'seem', 'have', 'before', 'eg', 'yourself', 'thin', 'across', 'though', 'this', 'except', 'very', 'nothing', 'become', 'once', 'herein', 'among', 'ie', 'one', 'nowhere', 'via', 'hers', 'see', 'thick', 'why', 'ourselves', 'whether', 'behind', 'anything', 'call', 'latterly', 'wherein', 'either', 'herself', 'amoungst', 'each', 'whenever', 'some', 'alone', 'could', 'less', 'per', 'everyone', 'bottom', 'do', 'thereafter', 'also', 'give', 'although', 'becomes', 'an', 'thru', 'to', 'however', 'there', 'which', 'cry', 'move', 'along', 'due', 'from', 'are', 'upon', 'put', 'within', 'beside', 'her', 'twenty', 'how', 'ever', 'yourselves', 'moreover', 'ltd', 'too', 'after', 'whence', 'other', 're', 'others', 'seeming', 'many', 'a', 'two', 'thereby', 'thence', 'again', 'those', 'mostly', 'further', 'whereafter', 'whereupon', 'least', 'myself', 'no', 'onto', 'besides', 'all', 'she', 'several', 'etc', 'whole', 'else', 'next', 'done', 'serious', 'six', 'hence', 'twelve', 'ten', 'mill', 'through', 'them', 'even', 'detail', 'therein', 'show', 'itself', 'un', 'you', 'your', 'thereupon', 'above', 'seemed', 'con', 'part', 'otherwise', 'made', 'he', 'whither', 'ours', 'any', 'until', 'three', 'anyone', 'latter', 'might', 'last', 'since', 'same', 'below', 'where', 'well', 'of', 'rather', 'more', 'up', 'few', 'during', 'anywhere', 'into', 'system', 'who', 'becoming', 'not', 'front', 'third', 'elsewhere', 'fire', 'perhaps', 'side', 'both', 'toward', 'afterwards', 'fill', 'another', 'in', 'four', 'anyhow', 'against', 'amongst', 'themselves', 'namely', 'his', 'much', 'being', 'take', 'towards', 'empty', 'eight', 'full', 'found', 'formerly', 'and', 'enough', 'sometime', 'mine', 'be', 'fifty', 'but', 'get', 'had', 'by', 'been', 'sixty', 'then', 'must', 'only', 'back', 'couldnt', 'cant', 'they', 'yours', 'has', 'together', 'down', 'please', 'inc', 'while', 'every', 'still', 'may', 'whoever', 'it', 'nor', 'meanwhile', 'became', 'on', 'first', 'about', 'am', 'him', 'keep', 'was', 'my', 'forty', 'co', 'hasnt', 'beforehand', 'out', 'sincere', 'if', 'often', 'over', 'were', 'thus', 'now', 'anyway', 'because', 'describe', 'here', 'already', 'himself', 'around', 'yet', 'somehow', 'that', 'what', 'therefore', 'as', 'never', 'former', 'whose', 'will', 'bill', 'whatever', 'would', 'go', 'none', 'beyond', 'off', 'fifteen', 'at', 'nine', 'can', 'most', 'find', 'hundred', 'without', 'we', 'their', 'indeed', 'almost', 'whereby', 'its', 'with', 'something', 'everything', 'i', 'eleven', 'the', 'interest', 'our', 'for', 'own', 'whom', 'these', 'always', 'wherever', 'us', 'seems', 'sometimes', 'when')
   }
 
+#' Bertopic Stopwords
+#'
+#' @param extra_stop_words
+#'
+#' @return
+#' @export
+#'
+#' @examples
 bert_stop_words <-
   function(extra_stop_words = NULL) {
     stopwords <- bert_base_stop_words()
@@ -24,6 +35,9 @@ bert_stop_words <-
 
     stopwords
   }
+
+# import ------------------------------------------------------------------
+
 
 #' Import Bert Topic
 #'
@@ -49,6 +63,11 @@ import_bertopic <-
     bertopic
   }
 
+
+# stup --------------------------------------------------------------------
+
+
+
 #' Initiate BERT Topic Model
 #'
 #' Functions for unsupervised clustering algorithms.
@@ -72,8 +91,15 @@ import_bertopic <-
 #' @param vectorizer_model
 #' @param ctfidf_model
 #' @param exclude_stop_words
+#' @param use_key_phrase_vectorizer
+#' @param is_lower_case
+#' @param embedding_model
 #' @param extra_stop_words
-#' @param stop_words
+#' @param min_df
+#' @param max_df
+#' @param pos_pattern
+#' @param keyphrase_ngram_range
+#' @param vocabulary
 #'
 #' @return python object
 #' @export
@@ -91,38 +117,61 @@ import_bertopic <-
 bert_topic <-
   function(language = "english",
            top_n_words = 10L,
+           use_key_phrase_vectorizer = F,
+           is_lower_case = T,
            n_gram_range = list(1L, 3L),
+           keyphrase_ngram_range = list(1L, 1L),
            min_topic_size = 10L,
+           umap_model = NULL,
+           hdbscan_model = NULL,
+           vectorizer_model = NULL,
+           embedding_model = NULL,
+           ctfidf_model = NULL,
            nr_topics = NULL,
            low_memory = F,
            exclude_stop_words = T,
            extra_stop_words = NULL,
            calculate_probabilities = T,
-           stop_words = NULL,
            diversity = NULL,
+           min_df = 1L,
+           max_df = 1L,
+           pos_pattern = "<J.*>*<N.*>+",
            seed_topic_list = NULL,
            verbose = T,
-           umap_model = NULL,
-           hdbscan_model = NULL,
-           vectorizer_model = NULL,
-           ctfidf_model = NULL) {
+           vocabulary = NULL) {
     bertopic <- import_bertopic(assign_to_environment = F)
 
-    if (exclude_stop_words) {
-      sk <- reticulate::import("sklearn")
-      nltk <- reticulate::import("nltk.corpus")
-      sw_eng <-
-        nltk$stopwords$words('english')
-
-      all_stop <- bert_stop_words(extra_stop_words = c(sw_eng, extra_stop_words))
-
-      text <- sk$feature_extraction$text
-      CountVectorizer <- text$CountVectorizer
-
-      # vectorizer_model <- CountVectorizer(stop_words = "english")
-      vectorizer_model <- CountVectorizer(stop_words = all_stop)
-
+    if (length(n_gram_range) > 0) {
+      n_gram_range <- reticulate::tuple(n_gram_range)
     }
+
+    if (use_key_phrase_vectorizer) {
+      "Using keyphrase vectorizer" |> message()
+      vectorizer_model <-
+        keyphrase_vectorizer(
+          min_df = min_df,
+          max_df =  max_df,
+          exclude_stop_words = exclude_stop_words,
+          language = language,
+          pos_pattern = pos_pattern,
+          extra_stop_words = extra_stop_words
+        )
+    }
+
+    if (!use_key_phrase_vectorizer & length(vectorizer_model) == 0) {
+      "Using sklearn vectorizer" |> message()
+      vectorizer_model <-
+        sklearn_vectorizer(
+          min_df = min_df,
+          max_df =  max_df,
+          ngram_range = n_gram_range,
+          vocabulary = vocabulary,
+          language = language,
+          exclude_stop_words = exclude_stop_words,
+          extra_stop_words = extra_stop_words
+        )
+    }
+
 
     obj <-
       bertopic$BERTopic(
@@ -139,7 +188,8 @@ bert_topic <-
         umap_model = umap_model,
         hdbscan_model = hdbscan_model,
         vectorizer_model = vectorizer_model,
-        ctfidf_model = ctfidf_model
+        ctfidf_model = ctfidf_model,
+        embedding_model = embedding_model
       )
 
     # Fix ngramrange

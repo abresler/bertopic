@@ -165,6 +165,7 @@ ctfidf_model = ClassTfidfTransformer()
 
 # bap ---------------------------------------------------------------------
 setwd("~")
+library(tidyverse)
 tbl_bap  <-
   "Desktop/based_musings/_data/bapsim/bap_quotes.csv" |> read_csv()
 bap_docs <-
@@ -177,9 +178,9 @@ tm_bap <-
     min_topic_size = 3,
     calculate_probabilities = T,
     nr_topics = "auto",
+    use_key_phrase_vectorizer = F,
     exclude_stop_words = T,
-    diversity = .25,
-    extra_stop_words = c("turd", "fuck")
+    extra_stop_words =  c()
   )
 
 topic_model_bap <- tm_bap$fit_transform(documents = bap_docs)
@@ -197,10 +198,15 @@ tbl_bap_bert <-
     arrange_topics = T
   )
 
+
 bap_prob <- tm_bap$hierarchical_topics(docs = bap_docs)
 
 embeddings_bap <-
   tm_bap$embedding_model$embed(documents = bap_docs, verbose = T)
+
+t(embeddings_bap) |>
+  as_tibble() |>
+  asbviz::hc_xy(x = "V1", y = "V2")
 
 
 tbl_umap <-
@@ -209,6 +215,10 @@ tbl_umap <-
     glue::glue("umap_{readr::parse_number(x)}")
   })) |>
   asbviz::hc_xy(x = "umap_1", y = "umap_2")
+
+
+# viz ---------------------------------------------------------------------
+
 
 viz <- tm_bap$visualize_hierarchical_documents(
   docs = bap_docs,
@@ -240,6 +250,8 @@ bap_embeddings <- bap_embeddings |>
 
 bap_umap <-
   extract_bert_umap(tm_bap, data = tbl_bap_bert)
+
+tbl_bap_docs <- bert_topic_documents(obj = tm_bap, bap_docs, document_name = "quote")
 
 bap_umap |> hc_xy(
   x = "umap_0001",
@@ -403,3 +415,27 @@ vect$vocabulary_ |> flatten_df() |> gather(word, index) |>
 vect$get_feature_names()
 
 X |> as_tibble() |> t() |> View()
+
+
+# new ---------------------------------------------------------------------
+str(tm_bap)
+
+ad <- tm_bap$approximate_distribution(documents = bap_docs, calculate_tokens = TRUE)
+
+tbl_info <- tm_bap$get_document_info(docs = bap_docs) |> janitor::clean_names() |> as_tibble()
+tbl_info |> arrange(probability)
+
+ad[[1]]
+
+df <- tm_bap$visualize_approximate_distribution(document = bap_docs[[1]], topic_token_distribution = ad[[2]][[1]])
+df$template_html$render
+ad[[1]] |> as_tibble() |> mutate(number_quote = 1:n()) |>
+  select(number_quote, everything()) |>
+  View()
+
+tm_bap$topic_mapper_$get_mappings()
+
+kb <- keybert_model()
+
+tbl_bap_keybert <-
+  keybert_keywords(obj = kb, docs = bap_docs)

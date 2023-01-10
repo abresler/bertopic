@@ -1,4 +1,193 @@
 
+# stopwords ---------------------------------------------------------------
+
+
+#' NLTK Stopwords
+#'
+#' @param language language defaults to `english`
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' dictionary_nltk_stopwords()
+dictionary_nltk_stopwords <-
+  function(language = "english") {
+    nltk <- reticulate::import("nltk.corpus")
+    sw_eng <-
+      nltk$stopwords$words(language)
+    sw_eng
+  }
+
+#' Stopword List Generator
+#'
+#' @param language
+#' @param is_lower_case
+#' @param extra_stop_words
+#'
+#' @return
+#' @export
+#'
+#' @examples
+bert_stopwords <-
+  function(language = "english",
+           is_lower_case = T,
+           extra_stop_words = NULL) {
+    sw <-
+      dictionary_nltk_stopwords(language = language)
+    if (length(extra_stop_words) > 0) {
+      extra_stop_words <- case_when(
+        is_lower_case ~ str_to_lower(extra_stop_words),
+        TRUE ~ extra_stop_words
+      )
+
+      sw <- c(sw, extra_stop_words) |> unique()
+    }
+
+    sw
+  }
+
+
+# nltk --------------------------------------------------------------------
+
+#' import NLTK
+#'
+#' @param assign_to_environment
+#' @param path
+#'
+#' @return
+#' @export
+#'
+#' @examples
+import_nltk <-
+  function(assign_to_environment = T,
+           path = NULL) {
+    select_correct_python(path = path)
+    nltk <- reticulate::import("nltk")
+    ! 'nltk' %>% exists() & assign_to_environment
+    if (assign_to_environment) {
+      assign('nltk', nltk, envir = .GlobalEnv)
+    }
+    nltk
+  }
+
+
+#' Import NLTK Corpus
+#'
+#' @param assign_to_environment
+#' @param path
+#'
+#' @return
+#' @export
+#'
+#' @examples
+import_nltk_corpus <-
+  function(assign_to_environment = T,
+           path = NULL) {
+    select_correct_python(path = path)
+    nltk_corpus <- reticulate::import("nltk.corpus")
+    ! 'nltk_corpus' %>% exists() & assign_to_environment
+    if (assign_to_environment) {
+      assign('nltk_corpus', nltk_corpus, envir = .GlobalEnv)
+    }
+    nltk_corpus
+  }
+
+
+# sklearn -----------------------------------------------------------------
+
+
+
+#' Import Scikit Learn
+#'
+#' @param assign_to_environment
+#' @param path
+#'
+#' @return
+#' @export
+#'
+#' @examples
+import_sklearn <-
+  function(assign_to_environment = T,
+           path = NULL) {
+    select_correct_python(path = path)
+    sklearn <- reticulate::import("sklearn")
+    ! 'sklearn' %>% exists() & assign_to_environment
+    if (assign_to_environment) {
+      assign('sklearn', nltk_corpus, envir = .GlobalEnv)
+    }
+    sklearn
+  }
+
+#' SKLearn Word Vectorizer
+#'
+#' @param obj
+#' @param language
+#' @param ngram_range list The lower and upper boundary of the range of n-values for different word n-grams or char n-grams to be extracted. All values of n such such that min_n <= n <= max_n will be used. For example an ngram_range of (1, 1) means only unigrams, (1, 2) means unigrams and bigrams, and (2, 2) means only bigrams. Only applies if analyzer is not callab
+#' @param analyzer Remove accents and perform other character normalization during the preprocessing step. ‘ascii’ is a fast method that only works on characters that have a direct ASCII mapping. ‘unicode’ is a slightly slower method that works on any characters. None (default) does nothing.
+#' @param strip_accents
+#' @param exclude_stop_words if `TRUE` excludes stopwords
+#' @param extra_stop_words if `TRUE` other stopwords to exclude
+
+#' @param token_pattern  Regular expression denoting what constitutes a “token”, only used if analyzer == 'word'. The default regexp select tokens of 2 or more alphanumeric characters (punctuation is completely ignored and always treated as a token separator).
+#' @param is_lower_case if `TRUE` all to lower case
+#' @param max_df During fitting ignore keyphrases that have a document frequency strictly higher than the given threshold. Default `NULL`
+#' @param min_df During fitting ignore keyphrases that have a document frequency strictly lower than the given threshold. This value is also called cut-off in the literature.  Default `NULL`
+#' @param max_features  If not None, build a vocabulary that only consider the top max_features ordered by term frequency across the corpus.
+#' @param binary If True, all non zero counts are set to 1. This is useful for discrete probabilistic models that model binary events rather than integer counts.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' vectorizer_model <- sklearn_vectorizer(ngram_range = list(1L, 3L))
+#' docs <- c('This is the first document.', 'This document is the second document.', 'And this is the third one.', 'Is this the first document?')
+#' vectorizer_model$fit_transform(raw_documents = docs)
+#'vectorizer_model$get_feature_names_out()
+sklearn_vectorizer <-
+  function(obj = NULL,
+           language = "english",
+           ngram_range = list(1L, 1L),
+           analyzer = "word",
+           strip_accents = NULL,
+           exclude_stop_words = T,
+           extra_stop_words = NULL,
+           token_pattern = "(?u)\\b\\w\\w+\\b",
+           vocabulary = NULL,
+           is_lower_case = TRUE,
+           max_df = 1,
+           min_df = 1,
+           max_features = NULL,
+           binary = FALSE
+  )  {
+    if (length(obj) == 0) {
+      obj <- import_sklearn(assign_to_environment = F)
+    }
+
+    vectorizer_model <-
+      obj$feature_extraction$text$CountVectorizer()
+
+
+    vectorizer_model$lowercase <- is_lower_case
+    vectorizer_model$max_df <- as.integer(max_df)
+    vectorizer_model$min_df <- as.integer(min_df)
+    vectorizer_model$binary <- binary
+    vectorizer_model$strip_accents <- strip_accents
+    vectorizer_model$token_pattern <- token_pattern
+    vectorizer_model$analyzer <- analyzer
+    vectorizer_model$ngram_range <- reticulate::tuple(ngram_range)
+    vectorizer_model$max_features <- max_features
+    vectorizer_model$vocabulary <- vocabulary
+
+    if (exclude_stop_words) {
+      all_stop <- bert_stopwords(language = language, is_lower_case = is_lower_case, extra_stop_words = extra_stop_words)
+      vectorizer_model$stop_words <- all_stop
+
+    }
+
+    vectorizer_model
+  }
+
 
 
 # topics ------------------------------------------------------------------
@@ -346,9 +535,44 @@ tbl_bert_text_features <-
     texts
   }
 
+#' Bertopic Documents
+#'
+#' @param obj
+#' @param docs
+#' @param document_name
+#'
+#' @return
+#' @export
+#'
+#' @examples
+bert_topic_documents <-
+  function(obj, docs, document_name = NULL) {
+    data <- obj$get_document_info(docs = docs) |> as_tibble()
+    data <-
+      data |> setNames(c("document", "topic_bert", "topic_labels", "top_n_words", "pct_probabilty_topic_bert", "is_representative_document"))
+
+    if (length(document_name) >0) {
+      data <- data |>
+        rename(UQ(document_name) := document)
+    }
+
+    data
+  }
+
 
 # embeddings --------------------------------------------------------------
 
+#' Bert Embeddings
+#'
+#' @param embeddings
+#' @param docs
+#' @param id_columns
+#' @param text_column
+#'
+#' @return
+#' @export
+#'
+#' @examples
 bert_embeddings <-
   function(embeddings,
            docs = NULL,
