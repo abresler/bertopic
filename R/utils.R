@@ -624,7 +624,7 @@ extract_bert_umap <-
   function(obj, data = NULL, number_zeros =4) {
     df_umap <-
       obj$umap_model$embedding_ |> as_tibble()
-    dims <- 1:ncol(df_umap) |> asbtools::pad_zeros(number_zeros = number_zeros)
+    dims <- 1:ncol(df_umap) |> .pz(number_zeros = number_zeros)
 
     df_umap <-
       df_umap |> setNames(glue::glue("umap_{dims}"))
@@ -703,7 +703,7 @@ write_bert_viz <-
     setwd("~")
 
     final_path <- stringr::str_c(base_path, viz_name, sep = "/")
-    asbtools::build_folders(paths = final_path)
+    .bf(paths = final_path)
     file_name <- glue:::glue("{final_path}/index.html")
 
     viz$write_html(file_name)

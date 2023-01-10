@@ -10,6 +10,6 @@ License: AGPL
 URL: https://github.com/abresler/bertopic
 BugReports: https://github.com/abresler/bertopic/issues
 LazyData: true
-Suggests: testthat
+Suggests: testthat, asbtools
 RoxygenNote: 7.2.3
-Imports: purrr, reticulate, tibble, dplyr, glue, stringr, asbtools, janitor
+Imports: purrr, reticulate, tibble, dplyr, glue, stringr, janitor
