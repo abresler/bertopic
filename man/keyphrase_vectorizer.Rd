@@ -7,6 +7,7 @@
 keyphrase_vectorizer(
   obj = NULL,
   language = "english",
+  stopword_package_sources = NULL,
   exclude_stop_words = T,
   extra_stop_words = NULL,
   is_lower_case = TRUE,
@@ -24,6 +25,8 @@ keyphrase_vectorizer(
 \item{obj}{keyphrase modeule object}
 
 \item{language}{stop words language; default is `English`}
+
+\item{stopword_package_sources}{}
 
 \item{exclude_stop_words}{if `TRUE` excludes stopwords}
 
@@ -49,4 +52,5 @@ vectorizer_model <- keyphrase_vectorizer()
 docs <- c('This is the first document.', 'This document is the second document.', 'And this is the third one.', 'Is this the first document?')
 vectorizer_model$fit_transform(raw_documents = docs)
 vectorizer_model$get_feature_names_out()
+vectorizer_model$keyphrases
 }

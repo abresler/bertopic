@@ -7,6 +7,7 @@
 keyphrase_tf_idf(
   obj = NULL,
   language = "english",
+  stopword_package_sources = NULL,
   exclude_stop_words = T,
   extra_stop_words = NULL,
   is_lower_case = TRUE,
@@ -25,7 +26,7 @@ keyphrase_tf_idf(
 )
 }
 \arguments{
-\item{binary}{}
+\item{stopword_package_sources}{}
 }
 \description{
 Keyphrase TFIDF

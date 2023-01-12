@@ -20,6 +20,7 @@ bert_topic(
   nr_topics = NULL,
   low_memory = F,
   exclude_stop_words = T,
+  stopword_package_sources = NULL,
   extra_stop_words = NULL,
   calculate_probabilities = T,
   diversity = NULL,
@@ -32,7 +33,7 @@ bert_topic(
 )
 }
 \arguments{
-\item{vocabulary}{}
+\item{stopword_package_sources}{options if not `NULL` `c("snowball", "stopwords-iso", "smart", "nltk")`}
 }
 \value{
 python object

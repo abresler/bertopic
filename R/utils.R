@@ -1,4 +1,5 @@
 
+
 # stopwords ---------------------------------------------------------------
 
 
@@ -19,11 +20,34 @@ dictionary_nltk_stopwords <-
     sw_eng
   }
 
+#' Stopword Package Sources
+#'
+#' @param sources
+#'
+#' @return
+#' @export
+#'
+#' @examples
+stopwords_sources <-
+  function(sources = c("snowball",
+                       "stopwords-iso",
+                       "smart",
+                       "nltk")) {
+    1:length(sources) |>
+      map(function(x) {
+        out <- stopwords::stopwords(source = sources[x])
+        out
+      }) |>
+      flatten_chr() |>
+      unique()
+  }
+
 #' Stopword List Generator
 #'
 #' @param language
 #' @param is_lower_case
 #' @param extra_stop_words
+#' @param stopword_package_sources
 #'
 #' @return
 #' @export
@@ -32,161 +56,25 @@ dictionary_nltk_stopwords <-
 bert_stopwords <-
   function(language = "english",
            is_lower_case = T,
+           stopword_package_sources = NULL,
            extra_stop_words = NULL) {
     sw <-
       dictionary_nltk_stopwords(language = language)
     if (length(extra_stop_words) > 0) {
-      extra_stop_words <- case_when(
-        is_lower_case ~ str_to_lower(extra_stop_words),
-        TRUE ~ extra_stop_words
-      )
+      extra_stop_words <- case_when(is_lower_case ~ str_to_lower(extra_stop_words),
+                                    TRUE ~ extra_stop_words)
 
       sw <- c(sw, extra_stop_words) |> unique()
+    }
+
+    if (length(stopword_package_sources) > 0) {
+      sw_sources <- stopwords_sources(stopword_package_sources)
+      sw <- c(sw, sw_sources) |> unique()
     }
 
     sw
   }
 
-
-# nltk --------------------------------------------------------------------
-
-#' import NLTK
-#'
-#' @param assign_to_environment
-#' @param path
-#'
-#' @return
-#' @export
-#'
-#' @examples
-import_nltk <-
-  function(assign_to_environment = T,
-           path = NULL) {
-    select_correct_python(path = path)
-    nltk <- reticulate::import("nltk")
-    ! 'nltk' %>% exists() & assign_to_environment
-    if (assign_to_environment) {
-      assign('nltk', nltk, envir = .GlobalEnv)
-    }
-    nltk
-  }
-
-
-#' Import NLTK Corpus
-#'
-#' @param assign_to_environment
-#' @param path
-#'
-#' @return
-#' @export
-#'
-#' @examples
-import_nltk_corpus <-
-  function(assign_to_environment = T,
-           path = NULL) {
-    select_correct_python(path = path)
-    nltk_corpus <- reticulate::import("nltk.corpus")
-    ! 'nltk_corpus' %>% exists() & assign_to_environment
-    if (assign_to_environment) {
-      assign('nltk_corpus', nltk_corpus, envir = .GlobalEnv)
-    }
-    nltk_corpus
-  }
-
-
-# sklearn -----------------------------------------------------------------
-
-
-
-#' Import Scikit Learn
-#'
-#' @param assign_to_environment
-#' @param path
-#'
-#' @return
-#' @export
-#'
-#' @examples
-import_sklearn <-
-  function(assign_to_environment = T,
-           path = NULL) {
-    select_correct_python(path = path)
-    sklearn <- reticulate::import("sklearn")
-    ! 'sklearn' %>% exists() & assign_to_environment
-    if (assign_to_environment) {
-      assign('sklearn', nltk_corpus, envir = .GlobalEnv)
-    }
-    sklearn
-  }
-
-#' SKLearn Word Vectorizer
-#'
-#' @param obj
-#' @param language
-#' @param ngram_range list The lower and upper boundary of the range of n-values for different word n-grams or char n-grams to be extracted. All values of n such such that min_n <= n <= max_n will be used. For example an ngram_range of (1, 1) means only unigrams, (1, 2) means unigrams and bigrams, and (2, 2) means only bigrams. Only applies if analyzer is not callab
-#' @param analyzer Remove accents and perform other character normalization during the preprocessing step. ‘ascii’ is a fast method that only works on characters that have a direct ASCII mapping. ‘unicode’ is a slightly slower method that works on any characters. None (default) does nothing.
-#' @param strip_accents
-#' @param exclude_stop_words if `TRUE` excludes stopwords
-#' @param extra_stop_words if `TRUE` other stopwords to exclude
-
-#' @param token_pattern  Regular expression denoting what constitutes a “token”, only used if analyzer == 'word'. The default regexp select tokens of 2 or more alphanumeric characters (punctuation is completely ignored and always treated as a token separator).
-#' @param is_lower_case if `TRUE` all to lower case
-#' @param max_df During fitting ignore keyphrases that have a document frequency strictly higher than the given threshold. Default `NULL`
-#' @param min_df During fitting ignore keyphrases that have a document frequency strictly lower than the given threshold. This value is also called cut-off in the literature.  Default `NULL`
-#' @param max_features  If not None, build a vocabulary that only consider the top max_features ordered by term frequency across the corpus.
-#' @param binary If True, all non zero counts are set to 1. This is useful for discrete probabilistic models that model binary events rather than integer counts.
-#'
-#' @return
-#' @export
-#'
-#' @examples
-#' vectorizer_model <- sklearn_vectorizer(ngram_range = list(1L, 3L))
-#' docs <- c('This is the first document.', 'This document is the second document.', 'And this is the third one.', 'Is this the first document?')
-#' vectorizer_model$fit_transform(raw_documents = docs)
-#'vectorizer_model$get_feature_names_out()
-sklearn_vectorizer <-
-  function(obj = NULL,
-           language = "english",
-           ngram_range = list(1L, 1L),
-           analyzer = "word",
-           strip_accents = NULL,
-           exclude_stop_words = T,
-           extra_stop_words = NULL,
-           token_pattern = "(?u)\\b\\w\\w+\\b",
-           vocabulary = NULL,
-           is_lower_case = TRUE,
-           max_df = 1,
-           min_df = 1,
-           max_features = NULL,
-           binary = FALSE
-  )  {
-    if (length(obj) == 0) {
-      obj <- import_sklearn(assign_to_environment = F)
-    }
-
-    vectorizer_model <-
-      obj$feature_extraction$text$CountVectorizer()
-
-
-    vectorizer_model$lowercase <- is_lower_case
-    vectorizer_model$max_df <- as.integer(max_df)
-    vectorizer_model$min_df <- as.integer(min_df)
-    vectorizer_model$binary <- binary
-    vectorizer_model$strip_accents <- strip_accents
-    vectorizer_model$token_pattern <- token_pattern
-    vectorizer_model$analyzer <- analyzer
-    vectorizer_model$ngram_range <- reticulate::tuple(ngram_range)
-    vectorizer_model$max_features <- max_features
-    vectorizer_model$vocabulary <- vocabulary
-
-    if (exclude_stop_words) {
-      all_stop <- bert_stopwords(language = language, is_lower_case = is_lower_case, extra_stop_words = extra_stop_words)
-      vectorizer_model$stop_words <- all_stop
-
-    }
-
-    vectorizer_model
-  }
 
 
 
@@ -221,7 +109,8 @@ select_correct_python <-
 
     tibble(topic_bert = similar_topics[[1]], score = similar_topics[[2]] |> flatten_dbl()) |>
       mutate(term) |>
-      select(term, everything())
+      select(term, everything()) |>
+      mutate(is_outlier_bert_topic = topic_bert == -1)
 
   }
 
@@ -284,10 +173,12 @@ bert_topic_info <-
     data <-
       tbl_topics |>
       mutate(name = name |> str_replace("\\_", "\\+")) |>
-      separate(name,
+      tidyr::separate(name,
                into = c("remove", "name_topic"),
                sep = "\\+") |>
-      select(-remove)
+      select(-remove) |>
+      mutate(is_outlier_bert_topic = topic_bert == -1) |>
+      mutate_if(is.character, str_squish)
 
     data
   }
@@ -317,7 +208,9 @@ bert_topic_labels <-
 
     tibble(topic_labels) |>
       mutate(topic_bert = 1:n() - 2) |>
-      select(topic_bert, everything())
+      select(topic_bert, everything()) |>
+      mutate(is_outlier_bert_topic = topic_bert == -1) |>
+      mutate_if(is.character, str_squish)
   }
 
 
@@ -336,7 +229,8 @@ bert_topic_count <-
   function(topic_model, topic_number = NULL) {
     topic_model$get_topic_freq(topic = topic_number) |>
       janitor::clean_names() |> as_tibble() |>
-      rename(topic_bert = topic)
+      rename(topic_bert = topic) |>
+      mutate(is_outlier_bert_topic = topic_bert == -1)
 
   }
 
@@ -397,19 +291,27 @@ bert_representative_documents <-
 #'
 #' @examples
 bert_topics_keywords <-
-  function(topic_model)  {
+  function(topic_model, bert_topics = NULL)  {
     topics <- topic_model$get_topics()
-    seq_along(topics) |>
+    data <-
+      seq_along(topics) |>
       map_dfr(function(x) {
         topic_number <- names(topics)[[x]] |> readr::parse_number()
         all_values <- topics[[x]] |> unlist()
         word <- all_values[c(T, F)]
         score <- all_values[c(F, T)] |> readr::parse_number()
         tibble(word, score) |>
-          mutate(topic = topic_number,
+          mutate(topic_bert = topic_number,
                  length_ngram = word |> str_count("\\ ")) |>
-          select(topic, everything())
+          select(topic_bert, everything()) |>
+          mutate(is_outlier_bert_topic = topic_bert == -1)
       })
+
+    if (length(bert_topics) > 0) {
+      data <- data |> filter(topic_bert %in% bert_topics)
+    }
+
+    data
   }
 
 #' Extract Berttopics from output
@@ -476,8 +378,7 @@ extract_bert_topics <-
     if (include_labels) {
       data <-
         data |>
-        left_join(
-          bert_topic_labels(
+        left_join(bert_topic_labels(
           topic_model = topic_model,
           number_words = as.integer(label_words)
         ),
@@ -545,13 +446,22 @@ tbl_bert_text_features <-
 #' @export
 #'
 #' @examples
-bert_topic_documents <-
+bert_document_info <-
   function(obj, docs, document_name = NULL) {
     data <- obj$get_document_info(docs = docs) |> as_tibble()
     data <-
-      data |> setNames(c("document", "topic_bert", "topic_labels", "top_n_words", "pct_probabilty_topic_bert", "is_representative_document"))
+      data |> setNames(
+        c(
+          "document",
+          "topic_bert",
+          "topic_labels",
+          "top_n_words",
+          "pct_probabilty_topic_bert",
+          "is_representative_document"
+        )
+      )
 
-    if (length(document_name) >0) {
+    if (length(document_name) > 0) {
       data <- data |>
         rename(UQ(document_name) := document)
     }
@@ -621,7 +531,9 @@ bert_embeddings <-
 #'
 #' @examples
 extract_bert_umap <-
-  function(obj, data = NULL, number_zeros =4) {
+  function(obj,
+           data = NULL,
+           number_zeros = 4) {
     df_umap <-
       obj$umap_model$embedding_ |> as_tibble()
     dims <- 1:ncol(df_umap) |> .pz(number_zeros = number_zeros)
@@ -659,22 +571,22 @@ extract_bert_umap <-
 #' @examples
 extract_document_word_counts <-
   function(obj, filter_zero = T) {
-  X <- obj$vectorizer_model$fit_transform(bap_docs) |> as.matrix()
+    X <- obj$vectorizer_model$fit_transform(bap_docs) |> as.matrix()
 
-  X <-
-    X |> as_tibble() |> setNames(obj$vectorizer_model$get_feature_names()) |> mutate(number_document = 1:n()) |>
-    gather(word, count, -number_document, na.rm = T) |>
-    arrange(number_document, desc(count))
-
-  if (filter_zero) {
     X <-
-      X |>
-      filter(count > 0)
+      X |> as_tibble() |> setNames(obj$vectorizer_model$get_feature_names()) |> mutate(number_document = 1:n()) |>
+      gather(word, count, -number_document, na.rm = T) |>
+      arrange(number_document, desc(count))
+
+    if (filter_zero) {
+      X <-
+        X |>
+        filter(count > 0)
+    }
+
+    X
+
   }
-
-  X
-
-}
 
 # vuz ---------------------------------------------------------------------
 
@@ -694,7 +606,6 @@ write_bert_viz <-
            base_path = NULL,
            viz_name = NULL,
            browse_url = T) {
-
     if (length(base_path) == 0) {
       viz$show()
       return(invisible())
@@ -717,3 +628,27 @@ write_bert_viz <-
     return(invisible())
   }
 
+
+#' Covert Arry to Tibble
+#'
+#' @param data a matrix or array
+#' @param output_type output type for columns
+#' @param number_zeros padding for zeros.  Default `3`
+#'
+#' @return
+#' @export
+#'
+#' @examples
+tbl_array <-
+  function(data, output_type = NULL, number_zeros = 3) {
+    data <- as_tibble(data)
+
+    if (length(output_type) > 0) {
+      total_cols <- 1:ncol(data)
+      zeros <- .pz(total_cols, number_zeros = number_zeros)
+      array_names <- glue::glue("{output_type}_{zeros}") |> as.character()
+      data <- data |> setNames(array_names)
+    }
+
+    data
+  }

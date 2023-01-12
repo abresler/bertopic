@@ -8,7 +8,10 @@ keybert_keywords(
   docs = NULL,
   obj = NULL,
   model = "all-MiniLM-L6-v2",
+  stopword_package_sources = NULL,
+  extra_stop_words = NULL,
   exclude_stop_words = T,
+  assign_to_environment = T,
   keyphrase_ngram_range = list(1L, 1L),
   use_embeddings = F,
   use_key_phrase_vectorizer = T,
@@ -21,9 +24,8 @@ keybert_keywords(
   word_embeddings = NULL,
   candidates = NULL,
   use_yake_candidates = F,
-  stop_words = "english",
+  language = "english",
   is_lower_case = T,
-  extra_stop_words = NULL,
   min_df = 1L,
   max_df = 1L,
   pos_pattern = "<J.*>*<N.*>+",
@@ -33,7 +35,7 @@ keybert_keywords(
 )
 }
 \arguments{
-\item{vocabulary}{}
+\item{language}{}
 }
 \description{
 Keybert Keywords

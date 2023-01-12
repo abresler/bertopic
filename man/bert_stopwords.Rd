@@ -7,11 +7,12 @@
 bert_stopwords(
   language = "english",
   is_lower_case = T,
+  stopword_package_sources = NULL,
   extra_stop_words = NULL
 )
 }
 \arguments{
-\item{extra_stop_words}{}
+\item{stopword_package_sources}{}
 }
 \description{
 Stopword List Generator

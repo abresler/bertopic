@@ -9,6 +9,7 @@ sklearn_vectorizer(
   language = "english",
   ngram_range = list(1L, 1L),
   analyzer = "word",
+  stopword_package_sources = NULL,
   strip_accents = NULL,
   exclude_stop_words = T,
   extra_stop_words = NULL,

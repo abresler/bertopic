@@ -11,12 +11,12 @@ import_yake <-
   function(assign_to_environment = T,
            path = NULL) {
     select_correct_python(path = path)
-    yake <- reticulate::import("yake")
+    obj <- reticulate::import("yake")
     ! 'yake' %>% exists() & assign_to_environment
     if (assign_to_environment) {
-      assign('yake', yake, envir = .GlobalEnv)
+      assign('yake', obj, envir = .GlobalEnv)
     }
-    yake
+    obj
   }
 
 .ke_doc_extractor <-

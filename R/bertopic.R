@@ -55,12 +55,12 @@ import_bertopic <-
   function(assign_to_environment = T,
            path = NULL) {
     select_correct_python(path = path)
-    bertopic <- reticulate::import("bertopic")
+    obj <- reticulate::import("bertopic")
     ! 'bertopic' %>% exists() & assign_to_environment
     if (assign_to_environment) {
-      assign('bertopic', bertopic, envir = .GlobalEnv)
+      assign('bertopic', obj, envir = .GlobalEnv)
     }
-    bertopic
+    obj
   }
 
 
@@ -76,30 +76,34 @@ import_bertopic <-
 #' \item \href{https://maartengr.github.io/BERTopic/api/bertopic.html}berttopic}
 #' }
 #'
-#' @param verbose
-#' @param top_n_words
-#' @param language
-#' @param n_gram_range
-#' @param min_topic_size
-#' @param nr_topics
-#' @param low_memory
-#' @param calculate_probabilities
-#' @param diversity
-#' @param seed_topic_list
-#' @param umap_model
-#' @param hdbscan_model
-#' @param vectorizer_model
-#' @param ctfidf_model
-#' @param exclude_stop_words
-#' @param use_key_phrase_vectorizer
-#' @param is_lower_case
-#' @param embedding_model
+#' @param verbose if `TRUE` verbose output
+#' @param top_n_words The number of words per topic to extract. Setting this too high can negatively impact topic embeddings as topics are typically best represented by at most 10 words.  Default to `10L`
+#' @param language The main language used in your documents. The default sentence-transformers model for "english" is all-MiniLM-L6-v2. For a full overview of supported languages see bertopic.backend.languages. Select "multilingual" to load in the paraphrase-multilingual-MiniLM-L12-v2 sentence-tranformers model that supports 50+ languages. Default `english`
+#' @param n_gram_range The n-gram range for the CountVectorizer. Advised to keep high values between 1 and 3. More would likely lead to memory issues. NOTE: This param will not be used if you pass in your own CountVectorizer. Default to `list(1L, 1L)`
+#' @param min_topic_size The minimum size of the topic. Increasing this value will lead to a lower number of clusters/topics. NOTE: This param will not be used if you are not using HDBSCAN. Default 10
+#' @param nr_topics Specifying the number of topics will reduce the initial number of topics to the value specified. This reduction can take a while as each reduction in topics (-1) activates a c-TF-IDF calculation. If this is set to None, no reduction is applied. Use `auto` to automatically reduce topics using HDBSCAN.
+#' @param low_memory Sets UMAP low memory to True to make sure less memory is used. NOTE: This is only used in UMAP. For example, if you use PCA instead of UMAP this parameter will not be used. Default `FALSE`
+#' @param calculate_probabilities Whether to calculate the probabilities of all topics per document instead of the probability of the assigned topic per document. This could slow down the extraction of topics if you have many documents (> 100_000). Set this only to True if you have a low amount of documents or if you do not mind more computation time. NOTE: If false you cannot use the corresponding visualization method visualize_probabilities.  Default to `FALSE`
+#' @param diversity Whether to use MMR to diversify the resulting topic representations. If set to None, MMR will not be used. Accepted values lie between 0 and 1 with 0 being not at all diverse and 1 being very diverse. Default is `NULL`
+#' @param seed_topic_list A list of seed words per topic to converge around.  Default is `NULL`
+#' @param umap_model Pass in a UMAP model to be used instead of the default. NOTE: You can also pass in any dimensionality reduction algorithm as long as it has .fit and .transform functions.
+#' @param hdbscan_model Pass in a hdbscan.HDBSCAN model to be used instead of the default NOTE: You can also pass in any clustering algorithm as long as it has .fit and .predict functions along with the .labels_ variable. Default `NULL`
+#' @param vectorizer_model Pass in a custom CountVectorizer instead of the default model. Default `NULL`
+#' @param ctfidf_model Pass in a custom ClassTfidfTransformer instead of the default model. Default `NULL`
+#' @param exclude_stop_words if `TRUE` excludes base stop words
+#' @param use_key_phrase_vectorizer if `TRUE` uses a keyphrase vectorizer
+#' @param is_lower_case if `TRUE` is lowercase
+#' @param embedding_model type of embedding model - either an object or `NULL` options include \itemize{
+#' \item \href{https://www.sbert.net/docs/pretrained_models.html}sbert}
+#' } and it defaults to `all-MiniLM-L6-v2`
 #' @param extra_stop_words
-#' @param min_df
-#' @param max_df
-#' @param pos_pattern
+#' @param max_df During fitting ignore keyphrases that have a document frequency strictly higher than the given threshold. Default `1L`
+#' @param min_df During fitting ignore keyphrases that have a document frequency strictly lower than the given threshold. This value is also called cut-off in the literature.  Default `1L`
+#' @param pos_pattern Position patter for keyphrase.  Defaults to `pos_pattern = "<J.*>*<N.*>+",`
 #' @param keyphrase_ngram_range
 #' @param vocabulary
+#' @param stopword_package_sources options if not `NULL` `c("snowball", "stopwords-iso", "smart", "nltk")`
+#' @param use_sklearn_vectorizer
 #'
 #' @return python object
 #' @export
@@ -118,8 +122,9 @@ bert_topic <-
   function(language = "english",
            top_n_words = 10L,
            use_key_phrase_vectorizer = F,
+           use_sklearn_vectorizer = F,
            is_lower_case = T,
-           n_gram_range = list(1L, 3L),
+           n_gram_range = list(1L, 1L),
            keyphrase_ngram_range = list(1L, 1L),
            min_topic_size = 10L,
            umap_model = NULL,
@@ -130,6 +135,7 @@ bert_topic <-
            nr_topics = NULL,
            low_memory = F,
            exclude_stop_words = T,
+           stopword_package_sources = NULL,
            extra_stop_words = NULL,
            calculate_probabilities = T,
            diversity = NULL,
@@ -158,7 +164,7 @@ bert_topic <-
         )
     }
 
-    if (!use_key_phrase_vectorizer & length(vectorizer_model) == 0) {
+    if (!use_key_phrase_vectorizer & length(vectorizer_model) == 0 & use_sklearn_vectorizer) {
       "Using sklearn vectorizer" |> message()
       vectorizer_model <-
         sklearn_vectorizer(
@@ -170,6 +176,18 @@ bert_topic <-
           exclude_stop_words = exclude_stop_words,
           extra_stop_words = extra_stop_words
         )
+    }
+    uses_vectorizer <- use_sklearn_vectorizer | use_key_phrase_vectorizer
+    if (uses_vectorizer & exclude_stop_words) {
+      stop_words <-
+        bert_stopwords(
+          language = language,
+          is_lower_case = is_lower_case,
+          extra_stop_words = extra_stop_words,
+          stopword_package_sources = stopword_package_sources
+        )
+      vectorizer_model$stop_words <-
+        c(stop_words) |> unique()
     }
 
 
@@ -227,3 +245,100 @@ bert_plotting <-
     obj <- bertopic$plotting
     obj
   }
+
+
+# ctfidf ---------------------------------------------------------------
+
+
+#' Class TFIDF Transformer
+#'
+#' @param bm25_weighting Uses BM25-inspired idf-weighting procedure instead of the procedure as defined in the c-TF-IDF formula. It uses the following weighting scheme: log(1+((avg_nr_samples - df + 0.5) / (df+0.5))).  Defaults to `FALSE`
+#' @param reduce_frequent_words Takes the square root of the bag-of-words after normalizing the matrix. Helps to reduce the impact of words that appear too frequently. Defaults to `FALSE`
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' library(bertopic)
+#' transformer <- class_tfidf_transformer()
+#' transformer
+class_tfidf_transformer <-
+  function(bm25_weighting = F,
+         reduce_frequent_words = F) {
+  bertopic <- import_bertopic(assign_to_environment = F)
+  obj <- bertopic$vectorizers$ClassTfidfTransformer(bm25_weighting = bm25_weighting,
+                                                    reduce_frequent_words = reduce_frequent_words)
+  obj
+}
+
+#' An online variant of the CountVectorizer with updating vocabulary.
+#'
+#' @param decay  A value between [0, 1] to weight the percentage of frequencies the previous bag-of-words should be decreased. For example, a value of .1 will decrease the frequencies in the bag-of-words matrix with 10% at each iteration.  Default `NULL`
+#' @param delete_min_df  Delete words eat each iteration from its vocabulary that do not exceed a minimum frequency. This will keep the resulting bag-of-words matrix small such that it does not explode in size with increasing vocabulary. If decay is None then this equals min_df. Default `NULL`
+#' @param ... Other parameters 	inherited from: sklearn.feature_extraction.text.CountVectorizer In practice, this means that you can still use parameters from the original CountVectorizer, like stop_words and ngram_range.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' library(bertopic)
+#' online_count_vectorizer()
+#' obj <- online_count_vectorizer(stop_words="english")
+#' obj
+#'
+online_count_vectorizer <- function(decay = NULL,
+                                    delete_min_df = NULL,
+                                    ...) {
+  bertopic <- import_bertopic(assign_to_environment = F)
+  obj <- bertopic$vectorizers$OnlineCountVectorizer(decay = decay,
+                                                    delete_min_df = delete_min_df,...)
+  obj
+}
+
+
+#' Initiate an Empty Clusterer
+#'
+#' @return
+#' @export
+#'
+#' @examples
+base_clusterer <-
+  function() {
+  bertopic <- import_bertopic(assign_to_environment = F)
+  obj <- bertopic$cluster$BaseCluster
+  obj
+}
+
+
+#' The Base Embedder used for creating embedding models
+#'
+#' @param embedding_model The main embedding model to be used for extracting document and word embedding default `NULL`
+#' @param word_embedding_model  The embedding model used for extracting word embeddings only. If this model is selected, then the embedding_model is purely used for creating document embeddings. Default `NULL`
+#'
+#' @return
+#' @export
+#'
+#' @examples
+base_embedder <-
+  function(embedding_model = NULL, word_embedding_model = NULL) {
+    bertopic <- import_bertopic(assign_to_environment = F)
+    obj <- bertopic$backend$BaseEmbedder(embedding_model = embedding_model,word_embedding_model = word_embedding_model)
+
+    obj
+
+  }
+
+#' Combine a document- and word-level embedder
+#'
+#' @return
+#' @export
+#'
+#' @examples
+word_doc_embedder <-
+  function() {
+    bertopic <- import_bertopic(assign_to_environment = F)
+    obj <-
+      bertopic$backend$WordDocEmbedder
+    obj
+  }
+

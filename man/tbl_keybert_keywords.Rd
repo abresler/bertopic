@@ -37,7 +37,7 @@ tbl_keybert_keywords(
 )
 }
 \arguments{
-\item{nest_data}{}
+\item{stop_words}{}
 }
 \description{
 Join Keybert Keywords to data

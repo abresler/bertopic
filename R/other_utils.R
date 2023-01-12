@@ -1,3 +1,7 @@
+
+# utility_funcitons -------------------------------------------------------
+
+
 .pad_zeros <-
   function(x, number_zeros = 4) {
     zeros <-
@@ -20,7 +24,7 @@
 .pz <-
   function(x, number_zeros = 4) {
     x |> map_chr(list(function(var) {
-      .pad_zeros(x = var, number_zeros = 4)
+      .pad_zeros(x = var, number_zeros = number_zeros)
     }))
   }
 

@@ -1,14 +1,17 @@
 library(dplyr)
 library(tidyverse)
 library(bertopic)
-library(asbviz)
+library(asbviz) # personal package - wont work in examples for other people
+library(asbtools) # personal package - wont work in examples for other people
 
 # modules -----------------------------------------------------------------
 
 
 import_bertopic()
-st <- reticulate::import("sentence_transformers")
-st$SentenceTransformer()
+import_sentence_transformers()
+
+model_st <- sentence_transformer()
+model_roberta <- roberta_embeddings()
 
 
 data <- sklearn::sk_datasets()
@@ -23,10 +26,15 @@ docs <- docs["data"]
 
 # fit ---------------------------------------------------------------------
 
-tm <- bert_topic(verbose = T)
+tm <-
+  bert_topic(
+    verbose = T,
+    embedding_model = sentence_transformer(), # try  distilbert_embedding_transformer - e
+    low_memory = T
+  )
 
 
-topic_model <- tm$fit_transform(documents = docs)
+topic_model <- tm$fit_transform(documents = docs |> sample(10))
 
 # Embeddings
 embeddings <-

@@ -17,12 +17,12 @@ import_keybert <-
   function(assign_to_environment = T,
            path = NULL) {
     select_correct_python(path = path)
-    keybert <- reticulate::import("keybert")
+    obj <- reticulate::import("keybert")
     ! 'keybert' %>% exists() & assign_to_environment
     if (assign_to_environment) {
-      assign('keybert', keybert, envir = .GlobalEnv)
+      assign('keybert', obj, envir = .GlobalEnv)
     }
-    keybert
+    obj
   }
 
 
@@ -55,7 +55,6 @@ keybert_model <-
 #' @param docs
 #' @param candidates
 #' @param keyphrase_ngram_range
-#' @param stop_words
 #' @param min_df
 #' @param top_n_words
 #' @param use_maxsum
@@ -77,6 +76,9 @@ keybert_model <-
 #' @param use_embeddings
 #' @param pos_pattern
 #' @param vocabulary
+#' @param stopword_package_sources
+#' @param assign_to_environment
+#' @param language
 #'
 #' @return
 #' @export
@@ -97,7 +99,10 @@ keybert_keywords <-
   function(docs = NULL,
            obj = NULL,
            model = "all-MiniLM-L6-v2",
+           stopword_package_sources = NULL,
+           extra_stop_words = NULL,
            exclude_stop_words = T,
+           assign_to_environment = T,
            keyphrase_ngram_range = list(1L, 1L),
            use_embeddings = F,
            use_key_phrase_vectorizer = T,
@@ -110,9 +115,8 @@ keybert_keywords <-
            word_embeddings = NULL,
            candidates =  NULL,
            use_yake_candidates = F,
-           stop_words = 'english',
+           language = 'english',
            is_lower_case = T,
-           extra_stop_words = NULL,
            min_df = 1L,
            max_df = 1L,
            pos_pattern = "<J.*>*<N.*>+",
@@ -135,7 +139,7 @@ keybert_keywords <-
           max_df =  max_df,
           exclude_stop_words = exclude_stop_words,
           extra_stop_words = extra_stop_words,
-          language = stop_words,
+          language = language,
           pos_pattern = pos_pattern
         )
     }
@@ -148,7 +152,10 @@ keybert_keywords <-
           max_df =  max_df,
           ngram_range = keyphrase_ngram_range,
           vocabulary = vocabulary,
-          language = stop_words
+          language = language,
+          exclude_stop_words = exclude_stop_words,
+          extra_stop_words = extra_stop_words,
+
         )
     }
 
@@ -156,50 +163,58 @@ keybert_keywords <-
       candidates <-
         yake_keyword_extractor(docs = docs) |> pull(keyword_yake) |> unique()
     }
-
-    doc_length <- length(docs)
-
     if (exclude_stop_words) {
       stop_words <-
         bert_stopwords(
-          language = stop_words,
+          language = language,
           is_lower_case = is_lower_case,
-          extra_stop_words = extra_stop_words
+          extra_stop_words = extra_stop_words,
+          stopword_package_sources = stopword_package_sources
         )
-
+      vectorizer_model$stop_words <-
+        c(stop_words) |> unique()
     }
+
+    doc_length <- length(docs)
 
     if (use_embeddings) {
       out <- obj$extract_embeddings(
         docs = docs,
         candidates = candidates,
         keyphrase_ngram_range = reticulate::tuple(keyphrase_ngram_range),
-        stop_words = stop_words,
+        language = language,
         min_df = min_df,
-        vectorizer = candidates
+        vectorizer = vectorizer_model
       )
 
       doc_embeddings <- out[[1]]
       word_embeddings <- out[[2]]
     }
 
-    out <- obj$extract_keywords(
-      docs = docs,
-      candidates = candidates,
-      keyphrase_ngram_range = reticulate::tuple(keyphrase_ngram_range),
-      stop_words = stop_words,
-      top_n = as.integer(top_n_words),
-      min_df = min_df,
-      use_maxsum = use_maxsum,
-      word_embeddings = word_embeddings,
-      doc_embeddings = doc_embeddings,
-      seed_keywords = seed_keywords,
-      highlight = highlight,
-      vectorizer = vectorizer_model,
-      use_mmr = use_mmr,
-      diversity = diversity,
-      nr_candidates = nr_candidates
-    )
+
+
+    out <-
+      obj$extract_keywords(
+        docs = docs,
+        candidates = candidates,
+        keyphrase_ngram_range = reticulate::tuple(keyphrase_ngram_range),
+        stop_words = stop_words,
+        top_n = as.integer(top_n_words),
+        min_df = min_df,
+        use_maxsum = use_maxsum,
+        word_embeddings = word_embeddings,
+        doc_embeddings = doc_embeddings,
+        seed_keywords = seed_keywords,
+        highlight = highlight,
+        vectorizer = vectorizer_model,
+        use_mmr = use_mmr,
+        diversity = diversity,
+        nr_candidates = nr_candidates
+      )
+
+    if (assign_to_environment) {
+      assign('kb_keyword_extractor', obj, envir = .GlobalEnv)
+    }
 
     dat <- tbl_keybert_data(out = out)
 
@@ -219,6 +234,120 @@ keybert_keywords <-
 
   }
 
+#' Extract Embeddings from Documents
+#'
+#' @param docs
+#' @param obj
+#' @param model
+#' @param stopword_package_sources
+#' @param extra_stop_words
+#' @param exclude_stop_words
+#' @param assign_to_environment
+#' @param keyphrase_ngram_range
+#' @param use_key_phrase_vectorizer
+#' @param candidates
+#' @param language
+#' @param is_lower_case
+#' @param pos_pattern
+#' @param vocabulary
+#' @param use_yake_candidates
+#' @param min_df
+#' @param max_df
+#'
+#' @return
+#' @export
+#'
+#' @examples
+keybert_embeddings <-
+  function(docs = NULL,
+           obj = NULL,
+           model = "all-MiniLM-L6-v2",
+           stopword_package_sources = NULL,
+           extra_stop_words = NULL,
+           exclude_stop_words = T,
+           assign_to_environment = T,
+           keyphrase_ngram_range = list(1L, 1L),
+           use_key_phrase_vectorizer = T,
+           candidates =  NULL,
+           language = 'english',
+           is_lower_case = T,
+           pos_pattern = "<J.*>*<N.*>+",
+           vocabulary = NULL,
+           use_yake_candidates = F,
+           min_df = 1L,
+           max_df = 1L) {
+    if (length(docs) == 0) {
+      "Enter documents"
+    }
+    if (length(obj) == 0) {
+      obj <- keybert_model(model = model)
+    }
+    if (use_key_phrase_vectorizer) {
+      "Using keyphrase vectorizer" |> message()
+      use_embeddings <- F
+      vectorizer_model <-
+        keyphrase_vectorizer(
+          min_df = min_df,
+          max_df =  max_df,
+          exclude_stop_words = exclude_stop_words,
+          extra_stop_words = extra_stop_words,
+          language = language,
+          pos_pattern = pos_pattern
+        )
+    }
+
+    if (!use_key_phrase_vectorizer) {
+      "Using sklearn vectorizer" |> message()
+      vectorizer_model <-
+        sklearn_vectorizer(
+          min_df = min_df,
+          max_df =  max_df,
+          ngram_range = keyphrase_ngram_range,
+          vocabulary = vocabulary,
+          language = language,
+          exclude_stop_words = exclude_stop_words,
+          extra_stop_words = extra_stop_words,
+
+        )
+    }
+
+    if (use_yake_candidates) {
+      candidates <-
+        yake_keyword_extractor(docs = docs) |> pull(keyword_yake) |> unique()
+    }
+
+
+    if (exclude_stop_words) {
+      stop_words <-
+        bert_stopwords(
+          language = language,
+          is_lower_case = is_lower_case,
+          extra_stop_words = extra_stop_words,
+          stopword_package_sources = stopword_package_sources
+        )
+      vectorizer_model$stop_words <-
+        c(stop_words) |> unique()
+    }
+
+    if (!exclude_stop_words) {
+      stop_words <- NULL
+    }
+
+
+    out <- obj$extract_embeddings(
+      docs = docs,
+      candidates = candidates,
+      keyphrase_ngram_range = reticulate::tuple(keyphrase_ngram_range),
+      stop_words = stop_words,
+      min_df = min_df,
+      vectorizer = vectorizer_model
+    )
+
+    out
+
+
+  }
+
 #' Join Keybert Keywords to data
 #'
 #' @param data
@@ -232,7 +361,6 @@ keybert_keywords <-
 #' @param top_n_words
 #' @param candidates
 #' @param use_yake_candidates
-#' @param stop_words
 #' @param is_lower_case
 #' @param extra_stop_words
 #' @param min_df
@@ -250,41 +378,41 @@ keybert_keywords <-
 #' @param return_summary
 #' @param join_to_original_data
 #' @param nest_data
+#' @param stop_words
 #'
 #' @return
 #' @export
 #'
 #' @examples
 tbl_keybert_keywords <- function(data,
-         document_column = NULL,
-         obj = NULL,
-         model = "all-MiniLM-L6-v2",
-         exclude_stop_words = T,
-         keyphrase_ngram_range = list(1L, 1L),
-         use_embeddings = F,
-         use_key_phrase_vectorizer = T,
-         top_n_words = 5L,
-         candidates =  NULL,
-         use_yake_candidates = F,
-         stop_words = 'english',
-         is_lower_case = T,
-         extra_stop_words = NULL,
-         min_df = 1L,
-         max_df = 1L,
-         pos_pattern = "<J.*>*<N.*>+",
-         use_maxsum = FALSE,
-         use_mmr = T,
-         diversity = .5,
-         vocabulary = NULL,
-         nr_candidates = 20L,
-         seed_keywords = NULL,
-         doc_embeddings = NULL,
-         word_embeddings = NULL,
-         highlight = F,
-         return_summary = F,
-         join_to_original_data = F,
-         nest_data = F
-         ) {
+                                 document_column = NULL,
+                                 obj = NULL,
+                                 model = "all-MiniLM-L6-v2",
+                                 exclude_stop_words = T,
+                                 keyphrase_ngram_range = list(1L, 1L),
+                                 use_embeddings = F,
+                                 use_key_phrase_vectorizer = T,
+                                 top_n_words = 5L,
+                                 candidates =  NULL,
+                                 use_yake_candidates = F,
+                                 stop_words = 'english',
+                                 is_lower_case = T,
+                                 extra_stop_words = NULL,
+                                 min_df = 1L,
+                                 max_df = 1L,
+                                 pos_pattern = "<J.*>*<N.*>+",
+                                 use_maxsum = FALSE,
+                                 use_mmr = T,
+                                 diversity = .5,
+                                 vocabulary = NULL,
+                                 nr_candidates = 20L,
+                                 seed_keywords = NULL,
+                                 doc_embeddings = NULL,
+                                 word_embeddings = NULL,
+                                 highlight = F,
+                                 return_summary = F,
+                                 join_to_original_data = F,
+                                 nest_data = F) {
   if (length(document_column) == 0) {
     "Enter Document Column" |> message()
     return(data)
@@ -310,12 +438,12 @@ tbl_keybert_keywords <- function(data,
     top_n_words = top_n_words,
     candidates = candidates,
     use_yake_candidates = use_yake_candidates,
-    stop_words = stop_words,
+    language = language,
     is_lower_case = is_lower_case,
     extra_stop_words = extra_stop_words,
     min_df = min_df,
     max_df = max_df,
-    pos_pattern =pos_pattern,
+    pos_pattern = pos_pattern,
     use_maxsum = use_maxsum,
     use_mmr = use_mmr,
     diversity = diversity,
@@ -330,8 +458,10 @@ tbl_keybert_keywords <- function(data,
   if (return_summary) {
     df_keybert <-    df_keybert |>
       group_by(number_document) |>
-      summarise(score_keybert_mean = mean(score_keybert, na.rm =T),
-                keywords_keybert = unique(keyword_keybert) |> str_c(collapse = " | ")) |>
+      summarise(
+        score_keybert_mean = mean(score_keybert, na.rm = T),
+        keywords_keybert = unique(keyword_keybert) |> str_c(collapse = " | ")
+      ) |>
       ungroup()
     if (join_to_original_data) {
       df_keybert <-
