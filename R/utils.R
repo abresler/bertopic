@@ -1,4 +1,11 @@
 
+# tuple -------------------------------------------------------------------
+
+list_to_tuple <-
+  function(obj) {
+    reticulate::tuple(obj)
+  }
+
 
 # stopwords ---------------------------------------------------------------
 
@@ -107,7 +114,7 @@ select_correct_python <-
     similar_topics <-
       topic_model$find_topics(search_term = term, top_n = as.integer(top_n_terms))
 
-    tibble(topic_bert = similar_topics[[1]], score = similar_topics[[2]] |> flatten_dbl()) |>
+    tibble(topic_bert = similar_topics[[1]], score_c_tfidf = similar_topics[[2]] |> flatten_dbl()) |>
       mutate(term) |>
       select(term, everything()) |>
       mutate(is_outlier_bert_topic = topic_bert == -1)
@@ -142,6 +149,11 @@ bert_similar_terms_topics <-
                                   term = x,
                                   top_n_terms = top_n_terms)
       })
+
+    data <- data |>
+      left_join(
+        topic_model |> bert_topic_info(), by = c("topic_bert", "is_outlier_bert_topic")
+      )
 
 
     if (nest_data) {
@@ -285,6 +297,7 @@ bert_representative_documents <-
 #' Returns keywords for the topics
 #'
 #' @param topic_model
+#' @param bert_topics
 #'
 #' @return
 #' @export
@@ -300,7 +313,7 @@ bert_topics_keywords <-
         all_values <- topics[[x]] |> unlist()
         word <- all_values[c(T, F)]
         score <- all_values[c(F, T)] |> readr::parse_number()
-        tibble(word, score) |>
+        tibble(word, score_c_tfidf = score) |>
           mutate(topic_bert = topic_number,
                  length_ngram = word |> str_count("\\ ")) |>
           select(topic_bert, everything()) |>
@@ -652,3 +665,108 @@ tbl_array <-
 
     data
   }
+
+
+#' Title
+#'
+#' @param data
+#' @param topic_model
+#'
+#' @return
+#' @export
+#'
+#' @examples
+munge_bert_topics_over_time <-
+  function(data, topic_model = NULL) {
+    data <-
+      as_tibble(data) |>
+      janitor::clean_names() |>
+      setNames(c("topic_bert","words", "count", "date_time")) |>
+      mutate(date = as.Date(date_time))
+
+    if (length(topic_model) > 0) {
+      data <- data |>
+        left_join(
+          bert_topic_info(topic_model) |> select(-count), by = "topic_bert"
+        ) |>
+        select(matches("date|topic$"),topic_bert, everything())
+    }
+
+    data
+
+  }
+
+
+#' Munge Topics Per Class Output
+#'
+#' @param data
+#' @param class_name
+#' @param topic_model
+#'
+#' @return
+#' @export
+#'
+#' @examples
+munge_bert_topics_per_class <-
+  function(data, class_name = NULL, topic_model = NULL) {
+    data <-
+      as_tibble(data) |>
+      janitor::clean_names() |>
+      setNames(c("topic_bert","words", "count", "class"))
+
+    if (length(class_name) > 0) {
+      data <- data |>
+        rename(UQ(class_name) := class)
+    }
+
+    if (length(topic_model) > 0) {
+      data <- data |>
+        left_join(
+          bert_topic_info(topic_model) |> select(-count), by = "topic_bert"
+        ) |>
+        select(matches("date|topic$"),topic_bert, everything())
+    }
+
+    data
+
+  }
+
+#' Munge Document Topic Proability Distributions
+#'
+#' @param data
+#' @param topic_model
+#' @param return_wide
+#'
+#' @return
+#' @export
+#'
+#' @examples
+munge_bert_document_approximate_distributions <-
+  function(data, topic_model = NULL, return_wide = F) {
+    options(scipen = 999)
+    data <- data[[1]] |> as_tibble()
+    topic_number <- 1:ncol(data)-1
+    data <-
+      data |> setNames(str_c("topic_bert_", topic_number)) |>
+      mutate(number_document = 1:n()) |>
+      select(number_document, everything())
+
+    if (return_wide) {
+      return(data)
+    }
+
+    data <-
+      data |>
+      gather(topic_bert, pct_probability_topic_bert, -number_document) |>
+      mutate(topic_bert = readr::parse_number(topic_bert)) |>
+      filter(pct_probability_topic_bert != 0)
+
+    if (length(topic_model) > 0) {
+      data <- data |>
+        left_join(bert_topic_info(topic_model) |> select(-count), by = "topic_bert") |>
+        select(number_document, topic_bert, everything())
+    }
+
+    data
+  }
+
