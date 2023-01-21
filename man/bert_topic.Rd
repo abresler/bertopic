@@ -8,8 +8,9 @@ bert_topic(
   language = "english",
   top_n_words = 10L,
   use_key_phrase_vectorizer = F,
+  use_sklearn_vectorizer = F,
   is_lower_case = T,
-  n_gram_range = list(1L, 3L),
+  n_gram_range = list(1L, 1L),
   keyphrase_ngram_range = list(1L, 1L),
   min_topic_size = 10L,
   umap_model = NULL,
@@ -33,7 +34,49 @@ bert_topic(
 )
 }
 \arguments{
+\item{language}{The main language used in your documents. The default sentence-transformers model for "english" is all-MiniLM-L6-v2. For a full overview of supported languages see bertopic.backend.languages. Select "multilingual" to load in the paraphrase-multilingual-MiniLM-L12-v2 sentence-tranformers model that supports 50+ languages. Default `english`}
+
+\item{top_n_words}{The number of words per topic to extract. Setting this too high can negatively impact topic embeddings as topics are typically best represented by at most 10 words.  Default to `10L`}
+
+\item{use_key_phrase_vectorizer}{if `TRUE` uses a keyphrase vectorizer}
+
+\item{use_sklearn_vectorizer}{}
+
+\item{is_lower_case}{if `TRUE` is lowercase}
+
+\item{n_gram_range}{The n-gram range for the CountVectorizer. Advised to keep high values between 1 and 3. More would likely lead to memory issues. NOTE: This param will not be used if you pass in your own CountVectorizer. Default to `list(1L, 1L)`}
+
+\item{min_topic_size}{The minimum size of the topic. Increasing this value will lead to a lower number of clusters/topics. NOTE: This param will not be used if you are not using HDBSCAN. Default 10}
+
+\item{umap_model}{Pass in a UMAP model to be used instead of the default. NOTE: You can also pass in any dimensionality reduction algorithm as long as it has .fit and .transform functions.}
+
+\item{hdbscan_model}{Pass in a hdbscan.HDBSCAN model to be used instead of the default NOTE: You can also pass in any clustering algorithm as long as it has .fit and .predict functions along with the .labels_ variable. Default `NULL`}
+
+\item{vectorizer_model}{Pass in a custom CountVectorizer instead of the default model. Default `NULL`}
+
+\item{ctfidf_model}{Pass in a custom ClassTfidfTransformer instead of the default model. Default `NULL`}
+
+\item{nr_topics}{Specifying the number of topics will reduce the initial number of topics to the value specified. This reduction can take a while as each reduction in topics (-1) activates a c-TF-IDF calculation. If this is set to None, no reduction is applied. Use `auto` to automatically reduce topics using HDBSCAN.}
+
+\item{low_memory}{Sets UMAP low memory to True to make sure less memory is used. NOTE: This is only used in UMAP. For example, if you use PCA instead of UMAP this parameter will not be used. Default `FALSE`}
+
+\item{exclude_stop_words}{if `TRUE` excludes base stop words}
+
 \item{stopword_package_sources}{options if not `NULL` `c("snowball", "stopwords-iso", "smart", "nltk")`}
+
+\item{calculate_probabilities}{Whether to calculate the probabilities of all topics per document instead of the probability of the assigned topic per document. This could slow down the extraction of topics if you have many documents (> 100_000). Set this only to True if you have a low amount of documents or if you do not mind more computation time. NOTE: If false you cannot use the corresponding visualization method visualize_probabilities.  Default to `FALSE`}
+
+\item{diversity}{Whether to use MMR to diversify the resulting topic representations. If set to None, MMR will not be used. Accepted values lie between 0 and 1 with 0 being not at all diverse and 1 being very diverse. Default is `NULL`}
+
+\item{min_df}{During fitting ignore keyphrases that have a document frequency strictly lower than the given threshold. This value is also called cut-off in the literature.  Default `1L`}
+
+\item{max_df}{During fitting ignore keyphrases that have a document frequency strictly higher than the given threshold. Default `1L`}
+
+\item{pos_pattern}{Position patter for keyphrase.  Defaults to `pos_pattern = "<J.*>*<N.*>+",`}
+
+\item{seed_topic_list}{A list of seed words per topic to converge around.  Default is `NULL`}
+
+\item{verbose}{if `TRUE` verbose output}
 }
 \value{
 python object

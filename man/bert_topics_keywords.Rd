@@ -4,10 +4,10 @@
 \alias{bert_topics_keywords}
 \title{Returns keywords for the topics}
 \usage{
-bert_topics_keywords(topic_model)
+bert_topics_keywords(topic_model, bert_topics = NULL)
 }
 \arguments{
-\item{topic_model}{}
+\item{bert_topics}{}
 }
 \description{
 Returns keywords for the topics

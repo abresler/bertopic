@@ -17,6 +17,7 @@ tbl_keybert_keywords(
   candidates = NULL,
   use_yake_candidates = F,
   stop_words = "english",
+  language = "english",
   is_lower_case = T,
   extra_stop_words = NULL,
   min_df = 1L,
@@ -37,7 +38,7 @@ tbl_keybert_keywords(
 )
 }
 \arguments{
-\item{stop_words}{}
+\item{language}{}
 }
 \description{
 Join Keybert Keywords to data

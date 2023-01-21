@@ -26,7 +26,7 @@ keyphrase_vectorizer(
 
 \item{language}{stop words language; default is `English`}
 
-\item{stopword_package_sources}{}
+\item{stopword_package_sources}{list of stopwords sources from `stopwords` packages}
 
 \item{exclude_stop_words}{if `TRUE` excludes stopwords}
 
@@ -39,6 +39,8 @@ keyphrase_vectorizer(
 \item{min_df}{During fitting ignore keyphrases that have a document frequency strictly lower than the given threshold. This value is also called cut-off in the literature.  Default `NULL`}
 
 \item{workers}{How many workers to use for spaCy part-of-speech tagging. If set to -1, use all available worker threads of the machine. SpaCy uses the specified number of cores to tag documents with part-of-speech. Depending on the platform, starting many processes with multiprocessing can add a lot of overhead. In particular, the default start method spawn used in macOS/OS X (as of Python 3.8) and in Windows can be slow. Therefore, carefully consider whether this option is really necessary.}
+
+\item{pos_pattern}{Position Pattern defaults to `pos_pattern = "<J.*>*<N.*>+"`}
 
 \item{custom_pos_tagger}{A callable function which expects a list of strings in a ‘raw_documents’ parameter and returns a list of (word token, POS-tag) tuples. If this parameter is not None, the custom tagger function is used to tag words with parts-of-speech, while the spaCy pipeline is ignored.}
 

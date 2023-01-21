@@ -335,6 +335,10 @@ topic_model$reduce_topics(docs = news_docs, nr_topics = 30L)
 topic_model |> bert_topic_info() |> View()
 topic_model$topics_
 
+#'
+probs <- out[[2]]
+new_topics = topic_model.reduce_outliers(docs, topics, probabilities=probs, strategy="probabilities")
+
 
 # topic_representations ---------------------------------------------------
 

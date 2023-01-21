@@ -379,6 +379,7 @@ keybert_embeddings <-
 #' @param join_to_original_data
 #' @param nest_data
 #' @param stop_words
+#' @param language
 #'
 #' @return
 #' @export
@@ -396,6 +397,7 @@ tbl_keybert_keywords <- function(data,
                                  candidates =  NULL,
                                  use_yake_candidates = F,
                                  stop_words = 'english',
+                                 language = "english",
                                  is_lower_case = T,
                                  extra_stop_words = NULL,
                                  min_df = 1L,
