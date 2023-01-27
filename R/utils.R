@@ -1,4 +1,7 @@
 
+
+
+
 # tuple -------------------------------------------------------------------
 
 list_to_tuple <-
@@ -68,8 +71,9 @@ bert_stopwords <-
     sw <-
       dictionary_nltk_stopwords(language = language)
     if (length(extra_stop_words) > 0) {
-      extra_stop_words <- case_when(is_lower_case ~ str_to_lower(extra_stop_words),
-                                    TRUE ~ extra_stop_words)
+      extra_stop_words <-
+        case_when(is_lower_case ~ str_to_lower(extra_stop_words),
+                  TRUE ~ extra_stop_words)
 
       sw <- c(sw, extra_stop_words) |> unique()
     }
@@ -114,7 +118,8 @@ select_correct_python <-
     similar_topics <-
       topic_model$find_topics(search_term = term, top_n = as.integer(top_n_terms))
 
-    tibble(topic_bert = similar_topics[[1]], score_c_tfidf = similar_topics[[2]] |> flatten_dbl()) |>
+    tibble(topic_bert = similar_topics[[1]],
+           score_c_tfidf = similar_topics[[2]] |> flatten_dbl()) |>
       mutate(term) |>
       select(term, everything()) |>
       mutate(is_outlier_bert_topic = topic_bert == -1)
@@ -151,9 +156,8 @@ bert_similar_terms_topics <-
       })
 
     data <- data |>
-      left_join(
-        topic_model |> bert_topic_info(), by = c("topic_bert", "is_outlier_bert_topic")
-      )
+      left_join(topic_model |> bert_topic_info(),
+                by = c("topic_bert", "is_outlier_bert_topic"))
 
 
     if (nest_data) {
@@ -186,8 +190,8 @@ bert_topic_info <-
       tbl_topics |>
       mutate(name = name |> str_replace("\\_", "\\+")) |>
       tidyr::separate(name,
-               into = c("remove", "name_topic"),
-               sep = "\\+") |>
+                      into = c("remove", "name_topic"),
+                      sep = "\\+") |>
       select(-remove) |>
       mutate(is_outlier_bert_topic = topic_bert == -1) |>
       mutate_if(is.character, str_squish)
@@ -406,6 +410,93 @@ extract_bert_topics <-
 
 
     data
+  }
+
+#' Topics Per Structured Class
+#'
+#' @param topic_model
+#' @param docs
+#' @param classes
+#' @param global_tuning
+#'
+#' @return
+#' @export
+#'
+#' @examples
+bert_topic_per_class <-
+  function(topic_model,
+           docs = NULL,
+           classes = NULL,
+           global_tuning = TRUE) {
+    if (length(docs) == 0) {
+      stop("Enter Documents")
+    }
+
+    if (length(classes) == 0) {
+      stop("Enter Classes")
+    }
+
+    dat <-
+      topic_model$topics_per_class(docs = docs,
+                                   classes = classes,
+                                   global_tuning = global_tuning)
+
+    dat <-
+      as_tibble(dat)
+
+    dat <-
+      dat |> setNames(c("topic_bert", "top_words", "count", "class"))
+    dat <-
+      dat |> left_join(bert_topic_info(topic_model = topic_model) |>
+                         select(topic_bert, name_topic)
+
+                       ,
+                       by = "topic_bert") |>
+      select(topic_bert, name_topic, everything()) |>
+      arrange(desc(class), topic_bert)
+
+    dat
+  }
+
+#' Find Topics from Class via Tibble
+#'
+#' @param data
+#' @param topic_model
+#' @param document_name
+#' @param class_name
+#' @param global_tuning
+#'
+#' @return
+#' @export
+#'
+#' @examples
+tbl_bert_topic_per_class <-
+  function(data,
+           topic_model,
+           document_name = NULL,
+           class_name = NULL,
+           global_tuning = TRUE) {
+    if (length(topic_model) == 0) {
+      stop("Enter Topic Model")
+    }
+    if (length(document_name) == 0) {
+      stop("Enter Document Name Field")
+    }
+
+    if (length(class_name) == 0) {
+      stop("Enter Class Name Field")
+    }
+
+    dat <-
+      bert_topic_per_class(
+        topic_model = topic_model,
+        docs = data[[document_name]],
+        classes = data[[class_name]],
+        global_tuning = global_tuning
+      ) |>
+      rename(UQ(class_name) := class)
+
+    dat
   }
 
 # text --------------------------------------------------------------------
@@ -653,21 +744,117 @@ write_bert_viz <-
 #'
 #' @examples
 tbl_array <-
-  function(data, output_type = NULL, number_zeros = 3) {
+  function(data,
+           output_type = NULL,
+           number_zeros = 3) {
     data <- as_tibble(data)
 
     if (length(output_type) > 0) {
       total_cols <- 1:ncol(data)
       zeros <- .pz(total_cols, number_zeros = number_zeros)
-      array_names <- glue::glue("{output_type}_{zeros}") |> as.character()
+      array_names <-
+        glue::glue("{output_type}_{zeros}") |> as.character()
       data <- data |> setNames(array_names)
     }
 
     data
   }
 
+# Topics Over Time --------------------------------------------------------
 
-#' Title
+
+#' Extract Topcis Over Time
+#'
+#' @param obj
+#' @param docs
+#' @param timestamps
+#' @param nr_bins
+#' @param datetime_format
+#' @param evolution_tuning
+#' @param global_tuning
+#' @param return_tibble
+#'
+#' @return
+#' @export
+#'
+#' @examples
+bert_topics_over_time <-
+  function(obj,
+           docs = NULL,
+           timestamps = NULL,
+           nr_bins = NULL,
+           datetime_format =  NULL,
+           evolution_tuning = TRUE,
+           global_tuning = TRUE,
+           return_tibble = TRUE
+           ) {
+    if (length(docs) == 0) {
+      stop("Enter Documents")
+    }
+
+    if (length(timestamps) == 0)  {
+      stop("Enter timestamps")
+    }
+
+    if (length(nr_bins) > 0) {
+      nr_bins <- as.integer(nr_bins)
+    }
+
+    out <-  obj$topics_over_time(docs = docs,
+                         timestamps = timestamps,
+                         nr_bins = nr_bins,
+                         datetime_format = datetime_format,
+                         evolution_tuning = evolution_tuning,
+                         global_tuning = global_tuning)
+
+    if (return_tibble) {
+      out <- out |> munge_bert_topics_over_time(topic_model = obj)
+    }
+
+    out
+  }
+
+#' Extract BERT Topics Over Time from a Tibble
+#'
+#' @param data
+#' @param topic_model
+#' @param document_name
+#' @param time_feature
+#' @param nr_bins
+#' @param datetime_format
+#' @param evolution_tuning
+#' @param global_tuning
+#' @param return_tibble
+#'
+#' @return
+#' @export
+#'
+#' @examples
+tbl_bert_topics_over_time <-
+  function(data,
+           topic_model,
+           document_name = NULL,
+           time_feature = NULL,
+           nr_bins = NULL,
+           datetime_format =  NULL,
+           evolution_tuning = TRUE,
+           global_tuning = TRUE,
+           return_tibble = TRUE
+  ) {
+
+    dat <-
+      bert_topics_over_time(obj = topic_model,
+                          docs = data[[document_name]],
+                          timestamps = data[[time_feature]],
+                          nr_bins = nr_bins,
+                          datetime_format = datetime_format,
+                          evolution_tuning = evolution_tuning,
+                          global_tuning = global_tuning)
+
+    dat
+}
+
+#' Munge Topic Over Time
 #'
 #' @param data
 #' @param topic_model
@@ -681,15 +868,13 @@ munge_bert_topics_over_time <-
     data <-
       as_tibble(data) |>
       janitor::clean_names() |>
-      setNames(c("topic_bert","words", "count", "date_time")) |>
+      setNames(c("topic_bert", "words", "count", "date_time")) |>
       mutate(date = as.Date(date_time))
 
     if (length(topic_model) > 0) {
       data <- data |>
-        left_join(
-          bert_topic_info(topic_model) |> select(-count), by = "topic_bert"
-        ) |>
-        select(matches("date|topic$"),topic_bert, everything())
+        left_join(bert_topic_info(topic_model) |> select(-count), by = "topic_bert") |>
+        select(matches("date|topic$"), topic_bert, everything())
     }
 
     data
@@ -708,11 +893,13 @@ munge_bert_topics_over_time <-
 #'
 #' @examples
 munge_bert_topics_per_class <-
-  function(data, class_name = NULL, topic_model = NULL) {
+  function(data,
+           class_name = NULL,
+           topic_model = NULL) {
     data <-
       as_tibble(data) |>
       janitor::clean_names() |>
-      setNames(c("topic_bert","words", "count", "class"))
+      setNames(c("topic_bert", "words", "count", "class"))
 
     if (length(class_name) > 0) {
       data <- data |>
@@ -721,10 +908,8 @@ munge_bert_topics_per_class <-
 
     if (length(topic_model) > 0) {
       data <- data |>
-        left_join(
-          bert_topic_info(topic_model) |> select(-count), by = "topic_bert"
-        ) |>
-        select(matches("date|topic$"),topic_bert, everything())
+        left_join(bert_topic_info(topic_model) |> select(-count), by = "topic_bert") |>
+        select(matches("date|topic$"), topic_bert, everything())
     }
 
     data
@@ -742,14 +927,25 @@ munge_bert_topics_per_class <-
 #'
 #' @examples
 munge_bert_document_approximate_distributions <-
-  function(data, topic_model = NULL, return_wide = F) {
+  function(data,
+           topic_model = NULL,
+           return_wide = F) {
     options(scipen = 999)
     data <- data[[1]] |> as_tibble()
-    topic_number <- 1:ncol(data)-1
+    topic_number <- 1:ncol(data) - 1
     data <-
       data |> setNames(str_c("topic_bert_", topic_number)) |>
       mutate(number_document = 1:n()) |>
       select(number_document, everything())
+
+    if (length(topic_model) > 0) {
+      actual_topic_names <- topic_model |> bert_topic_info() |>
+        filter(topic_bert != -1) |>
+        mutate(topic = glue::glue("topic_bert_{topic_bert}_{name_topic}")) |>
+        pull(topic)
+      names(data)[!names(data) %in% c("number_document")] <-
+        actual_topic_names
+    }
 
     if (return_wide) {
       return(data)
@@ -757,16 +953,76 @@ munge_bert_document_approximate_distributions <-
 
     data <-
       data |>
-      gather(topic_bert, pct_probability_topic_bert, -number_document) |>
-      mutate(topic_bert = readr::parse_number(topic_bert)) |>
-      filter(pct_probability_topic_bert != 0)
+      gather(label_topic_bert,
+             pct_probability_topic_bert,
+             -number_document) |>
+      filter(pct_probability_topic_bert != 0) |>
+      mutate(label_topic_bert = label_topic_bert |> str_remove_all("topic_bert_") |> str_replace("\\_", "\\|")) |>
+      separate(
+        label_topic_bert,
+        into = c("topic_bert", "name_topic"),
+        sep = "\\|",
+        convert = T,
+        extra = "merge",
+        fill = "right",
+        remove = F
+      ) |>
+      arrange(number_document, desc(pct_probability_topic_bert))
 
-    if (length(topic_model) > 0) {
-      data <- data |>
-        left_join(bert_topic_info(topic_model) |> select(-count), by = "topic_bert") |>
-        select(number_document, topic_bert, everything())
-    }
 
     data
   }
 
+
+# transform ---------------------------------------------------------------
+
+
+#' Transform New Documents
+#'
+#' @param obj bertopic objects
+#' @param documents vector of documents
+#' @param embeddings if not `NULL` matrix or dataframe of embeddings
+#'
+#' @return
+#' @export
+#'
+#' @examples
+bert_transform_documents <-
+  function(obj,
+           documents = NULL,
+           embeddings = NULL) {
+    out <- obj$transform(documents = documents, embeddings = embeddings)
+
+    topic_bert <- out[[1]] |> unlist() |> as.numeric()
+    data <-
+      tibble(topic_bert, document = documents) |>
+      left_join(obj |> bert_topic_info(), by = "topic_bert")
+
+    data
+  }
+
+tbl_bert_transform_documents <-
+  function(data,
+           topic_model,
+           document_name = NULL,
+           embeddings = TRUE) {
+    if (length(topic_model) == 0) {
+      stop("Enter Topic Model")
+    }
+    if (length(document_name) == 0) {
+      stop("Enter Document Name Field")
+    }
+
+
+    dat <-
+      bert_transform_documents(obj = topic_model,
+                               documents = data[[document_name]],
+                               embeddings = embeddings) |>
+      rename(UQ(document_name) := document)
+
+    data <-
+      data |>
+      left_join(dat, by = document_name)
+
+    data
+  }

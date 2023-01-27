@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{munge_bert_topics_over_time}
 \alias{munge_bert_topics_over_time}
-\title{Title}
+\title{Munge Topic Over Time}
 \usage{
 munge_bert_topics_over_time(data, topic_model = NULL)
 }
@@ -10,5 +10,5 @@ munge_bert_topics_over_time(data, topic_model = NULL)
 \item{topic_model}{}
 }
 \description{
-Title
+Munge Topic Over Time
 }

@@ -1,12 +1,12 @@
 #' https://maartengr.github.io/BERTopic/getting_started/quickstart/quickstart.html
 
 library(tidyverse)
-# library(bertopic)
+library(bertopic)
 
 
 # Quick Start -------------------------------------------------------------
 
-
+bertopic <- import_bertopic()
 sklearn <- import_sklearn()
 data <- sklearn$datasets
 
@@ -16,6 +16,7 @@ docs <-
 docs
 labels <- docs["target_names"]
 number_label <- docs[["target"]]
+
 
 tbl_news_labels <-
   tibble(news_label = labels) |>
@@ -51,8 +52,11 @@ topic_model <-
 topic_model$get_params()
 
 #' Fit the bertopic model
-out <-
-  topic_model$fit_transform(documents = news_docs, embeddings = embeddings)
+# out <-
+#   topic_model$fit_transform(documents = news_docs, embeddings = embeddings) # similar topcis wont work with custom embeddings
+
+ out <-
+   topic_model$fit_transform(documents = news_docs)
 
 topic_model$get_params()
 
@@ -376,3 +380,209 @@ out_sim <- topic_model$find_topics("china", top_n=5L)
 topic_model$get_topic(topic = out_sim[[1]][1])
 
 bert_similar_terms_topics(topic_model = topic_model, c("china", "fraud"))
+
+bert_similar_terms_topics(topic_model = topic_model, c("motor", "poop", "shit"))
+
+
+# topic_distribution ----------------------------------------------------
+
+#' https://maartengr.github.io/BERTopic/getting_started/distribution/distribution.html
+
+topic_distr <-
+  topic_model$approximate_distribution(
+    news_docs,
+    window = 4L,
+    stride = 1L,
+    min_similarity = .1,
+    batch_size = 1000L,
+    padding = FALSE,
+    use_embedding_model = F,
+    calculate_tokens = F,
+    separator = " "
+  )
+
+tbl_news_topic_bert_wide <-
+  munge_bert_document_approximate_distributions(data = topic_distr,
+                                                return_wide = T,
+                                                topic_model = topic_model)
+
+tbl_news_topic_bert_wide |>
+  gather(bert_topic, prob, -number_document) |>
+  filter(number_document == 1) |>
+  filter(prob > 0) |>
+  asbviz::hc_xy(x = "bert_topic", y = "prob", type = "column", invert_chart = T)
+
+
+topic_distr_toks <-
+  topic_model$approximate_distribution(
+    news_docs,
+    window = 4L,
+    stride = 1L,
+    min_similarity = .1,
+    batch_size = 1000L,
+    padding = FALSE,
+    use_embedding_model = F,
+    calculate_tokens = T,
+    separator = " "
+  )
+topic_distr_toks[[1]] |> str()
+topic_distr_toks[[2]] |> str()
+topic_distr_toks[[2]][[4]] |> str()
+
+topic_distr_toks_08 <-
+  topic_model$approximate_distribution(
+    news_docs,
+    window = 8L,
+    stride = 1L,
+    min_similarity = .1,
+    batch_size = 1000L,
+    padding = FALSE,
+    use_embedding_model = F,
+    calculate_tokens = T,
+    separator = " "
+  )
+
+
+# topics_per_class --------------------------------------------------------
+
+topics_per_class =
+  topic_model$topics_per_class(news_docs, classes = tbl_news_docs$news_label)
+
+tbl_bert_topic_per_class(
+  data = tbl_news_docs,
+  topic_model = topic_model,
+  document_name = "document",
+  class_name = "news_label"
+)
+
+topic_model$visualize_topics_per_class(topics_per_class = as_tibble(topics_per_class), top_n_topics = 10L) |>
+  write_bert_viz()
+
+
+# Supervised Topic Modeling -----------------------------------------------
+#' Add Supervised Laels
+asbtools::python_modules("bertopic.dimensionality")
+asbtools::python_modules("sklearn.linear_model")
+empty_dimensionality_model <-
+  bertopic_dimensionality$BaseDimensionalityReduction()
+
+clf = sklearn_linear_model$LogisticRegression()
+ctfidf_model =
+  bertopic$vectorizers$ClassTfidfTransformer(reduce_frequent_words=TRUE)
+
+topic_model_with_y = bert_topic(
+  umap_model = empty_dimensionality_model,
+  hdbscan_model = clf,
+  ctfidf_model = ctfidf_model
+)
+
+out_with_y <-
+  topic_model_with_y$fit_transform(documents = docs["data"], y = docs['target'])
+topic_model_with_y |> bert_topic_info()
+
+tbl_supervised <-
+  topic_model_with_y |> bert_document_info(docs = news_docs, document_name = 'document') |>
+  mutate(label = tbl_news_docs$news_label)
+
+bert_transform_documents(obj = topic_model_with_y, documents = news_docs |> sample(5))
+
+tbl_sample_new <-
+  tbl_news_docs |> sample_n(5) |>
+  tbl_bert_transform_documents(
+    topic_model = topic_model_with_y,
+    document_name = "document",
+    embeddings = NULL
+  )
+
+
+# partial Supervised ------------------------------------------------------
+
+topic_model_with_y <- bert_topic()
+topic_model_with_y$fit(documents = tbl_news_docs$document, y = tbl_news_docs$number_label) # requires numeric input
+
+topic_model_with_y |> bert_topic_info()
+
+
+# dynamic_topic_modeling --------------------------------------------------
+
+# https://maartengr.github.io/BERTopic/getting_started/topicsovertime/topicsovertime.html#use_embedding_model
+
+trump_topic_model$topics_over_time(tweets, timestamps = tbl_trump_tweets$date, nr_bins =
+                                     20L)
+
+trump_topic_model |> bert_topics_over_time(docs = tweets, nr_bins = 20,
+                                           timestamps = tbl_trump_tweets$date)
+
+tbl_trump_tweets |> tbl_bert_topics_over_time(
+  topic_model = trump_topic_model,
+  document_name = "text",
+  time_feature = "date",
+  nr_bins = 20
+)
+
+trump_topic_model$visualize_topics_over_time(topics_over_time =
+  trump_topic_model |> bert_topics_over_time(
+    docs = tweets,
+    nr_bins = 20,
+    timestamps = tbl_trump_tweets$date,
+    return_tibble = F
+  ),
+  top_n_topics = 20L
+) |> write_bert_viz()
+
+
+# guided_topic_modeling ---------------------------------------------------
+
+
+drugs <- c("drug",
+           "cancer",
+           "drugs",
+           "doctor")
+computer <- c("windows", "drive", "dos", "file")
+
+space <- c("space", "launch", "orbit", "lunar")
+seeded_topics <- list(drugs, computer, space)
+
+
+topic_model_seeded <-
+  bert_topic(
+    calculate_probabilities = TRUE,
+    exclude_stop_words = TRUE,
+    vectorizer_model = NULL,
+    extra_stop_words = NULL,
+    use_key_phrase_vectorizer = FALSE,
+    n_gram_range = list(1L, 1L),
+    use_sklearn_vectorizer = F,
+    seed_topic_list = seeded_topics
+  )
+
+
+out <-
+  topic_model_seeded$fit_transform(documents = news_docs)
+
+topic_model_seeded |> bert_topic_info()
+topic_model_seeded |> bert_document_info(docs = news_docs)
+
+
+# Hierarchical Topic Modeling ---------------------------------------------
+
+
+hierarchical_topics =
+  topic_model$hierarchical_topics(docs = news_docs)
+
+topic_model$visualize_hierarchy(hierarchical_topics = hierarchical_topics) |> write_bert_viz()
+
+tree =
+  topic_model$get_topic_tree(hierarchical_topics, tight_layout = T)
+cat(tree, fill = T)
+
+#' Merge Topics
+
+topics_to_merge = list(1L, 2L)
+topic_model$merge_topics(docs = news_docs, topics_to_merge = topics_to_merge)
+
+multiple_topics <-
+  list(list(1, 2),
+       list(3, 4))
+
+topic_model$merge_topics(docs = news_docs, topics_to_merge = multiple_topics)
