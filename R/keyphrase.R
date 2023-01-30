@@ -82,7 +82,7 @@ keyphrase_vectorizer <-
     vectorizer_model$custom_pos_tagger <- custom_pos_tagger
     vectorizer_model$binary <- binary
 
-    if (exclude_stop_words) {
+    if (exclude_stop_words | length(extra_stop_words) > 0) {
       all_stop <-
         bert_stopwords(
           language = language,
@@ -91,7 +91,8 @@ keyphrase_vectorizer <-
           stopword_package_sources = stopword_package_sources
         )
       vectorizer_model$stop_words <- all_stop
-
+    } else {
+      vectorizer_model$stop_words <- NULL
     }
 
     vectorizer_model

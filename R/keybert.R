@@ -154,8 +154,7 @@ keybert_keywords <-
           vocabulary = vocabulary,
           language = language,
           exclude_stop_words = exclude_stop_words,
-          extra_stop_words = extra_stop_words,
-
+          extra_stop_words = extra_stop_words
         )
     }
 
@@ -190,8 +189,6 @@ keybert_keywords <-
       doc_embeddings <- out[[1]]
       word_embeddings <- out[[2]]
     }
-
-
 
     out <-
       obj$extract_keywords(
