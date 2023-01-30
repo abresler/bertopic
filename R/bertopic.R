@@ -210,6 +210,23 @@ bert_topic <-
         embedding_model = embedding_model
       )
 
+    remove_sw <- exclude_stop_words | length(stopword_package_sources) > 0 | length(extra_stop_words) > 0
+
+
+    if (remove_sw) {
+      "Generating stop-words" |> message()
+      stop_words <-
+        bert_stopwords(
+          language = language,
+          is_lower_case = is_lower_case,
+          extra_stop_words = extra_stop_words,
+          stopword_package_sources = stopword_package_sources
+        )
+
+      obj$vectorizer_model$stop_words <-
+        stop_words
+    }
+
     # Fix ngramrange
     obj$vectorizer_model$ngram_range <- n_gram_range
 
