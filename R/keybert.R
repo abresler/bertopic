@@ -461,7 +461,8 @@ tbl_keybert_keywords <- function(data,
         score_keybert_mean = mean(score_keybert, na.rm = T),
         keywords_keybert = unique(keyword_keybert) |> str_c(collapse = " | ")
       ) |>
-      ungroup()
+      ungroup() |>
+      mutate(count_keybert_keywords = keywords_keybert |> str_count("\\|") + 1)
     if (join_to_original_data) {
       df_keybert <-
         data |>
