@@ -12,6 +12,11 @@ hugging_face_transformers(
 )
 }
 \arguments{
+\item{model}{model name options
+\itemize{
+\item \href{https://huggingface.co/models}{hugging face models}
+}}
+
 \item{...}{}
 }
 \description{

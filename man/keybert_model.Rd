@@ -6,6 +6,11 @@
 \usage{
 keybert_model(keybert = NULL, model = "all-MiniLM-L6-v2")
 }
+\arguments{
+\item{model}{default is `all-MiniLM-L6-v2` you can pick any model from \itemize{
+\item \href{https://www.sbert.net/docs/pretrained_models.html}{sbert}
+}}
+}
 \description{
 Runs a keybert model
 }

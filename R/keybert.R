@@ -32,7 +32,7 @@ import_keybert <-
 #'
 #' @param keybert
 #' @param model default is `all-MiniLM-L6-v2` you can pick any model from \itemize{
-#' \item \href{https://www.sbert.net/docs/pretrained_models.html}sbert}
+#' \item \href{https://www.sbert.net/docs/pretrained_models.html}{sbert}
 #' }
 #'
 #' @return
@@ -52,35 +52,35 @@ keybert_model <-
 
 #' Keybert Keywords
 #'
-#' @param docs
-#' @param candidates
-#' @param keyphrase_ngram_range
-#' @param min_df
-#' @param top_n_words
-#' @param use_maxsum
-#' @param use_mmr
-#' @param diversity
-#' @param nr_candidates
-#' @param seed_keywords
-#' @param doc_embeddings
-#' @param word_embeddings
-#' @param obj
-#' @param model
-#' @param exclude_stop_words
-#' @param use_key_phrase_vectorizer
-#' @param use_yake_candidates
-#' @param is_lower_case
-#' @param extra_stop_words
-#' @param max_df
-#' @param highlight
-#' @param use_embeddings
-#' @param pos_pattern
-#' @param vocabulary
-#' @param stopword_package_sources
-#' @param assign_to_environment
-#' @param language
+#' @param docs The document(s) for which to extract keywords/keyphrases
+#' @param candidates Candidate keywords/keyphrases to use instead of extracting them from the document(s) NOTE: This is not used if you passed a vectorizer.
+#' @param keyphrase_ngram_range Length, in words, of the extracted keywords/keyphrases. NOTE: This is not used if you passed a vectorizer.
+#' @param min_df Minimum document frequency of a word across all documents if keywords for multiple documents need to be extracted. NOTE: This is not used if you passed a vectorizer.
+#' @param top_n_words Number of top words to return
+#' @param use_maxsum if `TRUE` Calculate Max Sum Distance for extraction of keywords We take the 2 x top_n most similar words/phrases to the document. Then, we take all top_n combinations from the 2 x top_n words and extract the combination that are the least similar to each other by cosine similarity. This is O(n^2) and therefore not advised if you use a large top_n.
+#' @param use_mmr if `TRUE` Calculate Maximal Marginal Relevance (MMR) between candidate keywords and the document. and default is `TRUE`
+#' @param diversity How diverse the select keywords/keyphrases are. Values between 0 and 1 with 0 being not diverse at all and 1 being most diverse. Default is `0.5`
+#' @param nr_candidates The number of candidates to consider default `20L`
+#' @param seed_keywords Seed keywords that may guide the extraction of keywords by steering the similarities towards the seeded keywords. Default `NULL`
+#' @param doc_embeddings The embeddings of each document. Default `NULL`
+#' @param word_embeddings Word embeddings to use if not `NULL`
+#' @param obj Keybert Object
+#' @param model Use a custom embedding model. The following backends are currently supported: * SentenceTransformers * 🤗 Transformers * Flair * Spacy * Gensim * USE (TF-Hub) You can also pass in a string that points to one of the following sentence-transformers models: * https://www.sbert.net/docs/pretrained_models.html
+#' @param exclude_stop_words if `TRUE` excludes stop words
+#' @param use_key_phrase_vectorizer if `TRUE` uses kephrase vectorizer
+#' @param use_yake_candidates if `TRUE` uses Yake Keyword Extractor.  Default  `FALSE`
+#' @param is_lower_case if  `TRUE` lower cases
+#' @param extra_stop_words vector of extra stop words
+#' @param max_df Maximum number of documents.  Default `1`
+#' @param highlight Whether to print the document and highlight its keywords/keyphrases. NOTE: This does not work if multiple documents are passed.
+#' @param use_embeddings if `TRUE` uses embeddings
+#' @param pos_pattern KeyphraseVectorizers extracts the part-of-speech tags from the documents and then applies a regex pattern to extract keyphrases that fit within that pattern. The default pattern is <J.*>*<N.*>+ which means that it extract keyphrases that have 0 or more adjectives followed by 1 or more nouns.
+#' @param vocabulary `SKLearn` vocabulary
+#' @param stopword_package_sources if not `NULL` c("snowball","stopword -iso", "smart", "nltk"))
+#' @param assign_to_environment if `TRUE` assigns objec to environment
+#' @param language Language to use.  Default `english`
 #'
-#' @return
+#' @return `tibble` of keywords
 #' @export
 #'
 #' @examples
@@ -347,36 +347,38 @@ keybert_embeddings <-
 
 #' Join Keybert Keywords to data
 #'
-#' @param data
-#' @param document_column
-#' @param obj
-#' @param model
-#' @param exclude_stop_words
-#' @param keyphrase_ngram_range
-#' @param use_embeddings
-#' @param use_key_phrase_vectorizer
-#' @param top_n_words
-#' @param candidates
-#' @param use_yake_candidates
-#' @param is_lower_case
-#' @param extra_stop_words
-#' @param min_df
-#' @param max_df
-#' @param pos_pattern
-#' @param use_maxsum
-#' @param use_mmr
-#' @param diversity
-#' @param vocabulary
-#' @param nr_candidates
-#' @param seed_keywords
-#' @param doc_embeddings
-#' @param word_embeddings
-#' @param highlight
-#' @param return_summary
-#' @param join_to_original_data
-#' @param nest_data
-#' @param stop_words
-#' @param language
+#' @param data `tibble` of text
+#' @param document_column name of `document` column
+#' @param candidates Candidate keywords/keyphrases to use instead of extracting them from the document(s) NOTE: This is not used if you passed a vectorizer.
+#' @param keyphrase_ngram_range Length, in words, of the extracted keywords/keyphrases. NOTE: This is not used if you passed a vectorizer.
+#' @param min_df Minimum document frequency of a word across all documents if keywords for multiple documents need to be extracted. NOTE: This is not used if you passed a vectorizer.
+#' @param top_n_words Number of top words to return
+#' @param use_maxsum if `TRUE` Calculate Max Sum Distance for extraction of keywords We take the 2 x top_n most similar words/phrases to the document. Then, we take all top_n combinations from the 2 x top_n words and extract the combination that are the least similar to each other by cosine similarity. This is O(n^2) and therefore not advised if you use a large top_n.
+#' @param use_mmr if `TRUE` Calculate Maximal Marginal Relevance (MMR) between candidate keywords and the document. and default is `TRUE`
+#' @param diversity How diverse the select keywords/keyphrases are. Values between 0 and 1 with 0 being not diverse at all and 1 being most diverse. Default is `0.5`
+#' @param nr_candidates The number of candidates to consider default `20L`
+#' @param seed_keywords Seed keywords that may guide the extraction of keywords by steering the similarities towards the seeded keywords. Default `NULL`
+#' @param doc_embeddings The embeddings of each document. Default `NULL`
+#' @param word_embeddings Word embeddings to use if not `NULL`
+#' @param obj Keybert Object
+#' @param model Use a custom embedding model. The following backends are currently supported: * SentenceTransformers * 🤗 Transformers * Flair * Spacy * Gensim * USE (TF-Hub) You can also pass in a string that points to one of the following sentence-transformers models: * https://www.sbert.net/docs/pretrained_models.html
+#' @param exclude_stop_words if `TRUE` excludes stop words
+#' @param use_key_phrase_vectorizer if `TRUE` uses kephrase vectorizer
+#' @param use_yake_candidates if `TRUE` uses Yake Keyword Extractor.  Default  `FALSE`
+#' @param is_lower_case if  `TRUE` lower cases
+#' @param extra_stop_words vector of extra stop words
+#' @param max_df Maximum number of documents.  Default `1`
+#' @param highlight Whether to print the document and highlight its keywords/keyphrases. NOTE: This does not work if multiple documents are passed.
+#' @param use_embeddings if `TRUE` uses embeddings
+#' @param pos_pattern KeyphraseVectorizers extracts the part-of-speech tags from the documents and then applies a regex pattern to extract keyphrases that fit within that pattern. The default pattern is <J.*>*<N.*>+ which means that it extract keyphrases that have 0 or more adjectives followed by 1 or more nouns.
+#' @param vocabulary `SKLearn` vocabulary
+#' @param language Language to use.  Default `english`
+#' @param stop_words Language for stopwords.  Default is `english`
+#' @param return_summary if `TRUE` returns concatanated list of matched keywords
+#' @param join_to_original_data if `TRUE` joins to original data
+#' @param nest_data if `TRUE` nests data
+#'
+#' @return `tibble` of keywords
 #'
 #' @return
 #' @export
@@ -462,11 +464,13 @@ tbl_keybert_keywords <- function(data,
         keywords_keybert = unique(keyword_keybert) |> str_c(collapse = " | ")
       ) |>
       ungroup() |>
-      mutate(count_keybert_keywords = keywords_keybert |> str_count("\\|") + 1)
+      mutate(count_keybert_keywords = keywords_keybert |> str_count("\\|") + 1,
+             has_keybert_keywords = TRUE)
     if (join_to_original_data) {
       df_keybert <-
         data |>
-        left_join(df_keybert, by = c("number_document"))
+        left_join(df_keybert, by = c("number_document")) |>
+        mutate(has_keybert_keywords = has_keybert_keywords |> coalesce(F))
     }
     return(df_keybert)
   }

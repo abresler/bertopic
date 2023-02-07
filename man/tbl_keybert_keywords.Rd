@@ -38,7 +38,68 @@ tbl_keybert_keywords(
 )
 }
 \arguments{
-\item{language}{}
+\item{data}{`tibble` of text}
+
+\item{document_column}{name of `document` column}
+
+\item{obj}{Keybert Object}
+
+\item{model}{Use a custom embedding model. The following backends are currently supported: * SentenceTransformers * 🤗 Transformers * Flair * Spacy * Gensim * USE (TF-Hub) You can also pass in a string that points to one of the following sentence-transformers models: * https://www.sbert.net/docs/pretrained_models.html}
+
+\item{exclude_stop_words}{if `TRUE` excludes stop words}
+
+\item{keyphrase_ngram_range}{Length, in words, of the extracted keywords/keyphrases. NOTE: This is not used if you passed a vectorizer.}
+
+\item{use_embeddings}{if `TRUE` uses embeddings}
+
+\item{use_key_phrase_vectorizer}{if `TRUE` uses kephrase vectorizer}
+
+\item{top_n_words}{Number of top words to return}
+
+\item{candidates}{Candidate keywords/keyphrases to use instead of extracting them from the document(s) NOTE: This is not used if you passed a vectorizer.}
+
+\item{use_yake_candidates}{if `TRUE` uses Yake Keyword Extractor.  Default  `FALSE`}
+
+\item{stop_words}{Language for stopwords.  Default is `english`}
+
+\item{language}{Language to use.  Default `english`}
+
+\item{is_lower_case}{if  `TRUE` lower cases}
+
+\item{extra_stop_words}{vector of extra stop words}
+
+\item{min_df}{Minimum document frequency of a word across all documents if keywords for multiple documents need to be extracted. NOTE: This is not used if you passed a vectorizer.}
+
+\item{max_df}{Maximum number of documents.  Default `1`}
+
+\item{pos_pattern}{KeyphraseVectorizers extracts the part-of-speech tags from the documents and then applies a regex pattern to extract keyphrases that fit within that pattern. The default pattern is <J.*>*<N.*>+ which means that it extract keyphrases that have 0 or more adjectives followed by 1 or more nouns.}
+
+\item{use_maxsum}{if `TRUE` Calculate Max Sum Distance for extraction of keywords We take the 2 x top_n most similar words/phrases to the document. Then, we take all top_n combinations from the 2 x top_n words and extract the combination that are the least similar to each other by cosine similarity. This is O(n^2) and therefore not advised if you use a large top_n.}
+
+\item{use_mmr}{if `TRUE` Calculate Maximal Marginal Relevance (MMR) between candidate keywords and the document. and default is `TRUE`}
+
+\item{diversity}{How diverse the select keywords/keyphrases are. Values between 0 and 1 with 0 being not diverse at all and 1 being most diverse. Default is `0.5`}
+
+\item{vocabulary}{`SKLearn` vocabulary}
+
+\item{nr_candidates}{The number of candidates to consider default `20L`}
+
+\item{seed_keywords}{Seed keywords that may guide the extraction of keywords by steering the similarities towards the seeded keywords. Default `NULL`}
+
+\item{doc_embeddings}{The embeddings of each document. Default `NULL`}
+
+\item{word_embeddings}{Word embeddings to use if not `NULL`}
+
+\item{highlight}{Whether to print the document and highlight its keywords/keyphrases. NOTE: This does not work if multiple documents are passed.}
+
+\item{return_summary}{if `TRUE` returns concatanated list of matched keywords}
+
+\item{join_to_original_data}{if `TRUE` joins to original data}
+
+\item{nest_data}{if `TRUE` nests data}
+}
+\value{
+`tibble` of keywords
 }
 \description{
 Join Keybert Keywords to data

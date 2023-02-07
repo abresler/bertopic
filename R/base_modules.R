@@ -254,7 +254,7 @@ import_hdbscan <-
 #' Import Gensim Module
 #'
 #' \itemize{
-#' \item \href{https://radimrehurek.com/gensim/}GENSIM}
+#' \item \href{https://radimrehurek.com/gensim/}{GENSIM}
 #' }
 #'
 #' @param assign_to_environment

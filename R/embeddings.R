@@ -69,7 +69,7 @@ import_sentence_transformers <-
 #'
 #' @param obj
 #' @param model_name transformer model name default `all-MiniLM-L6-v2` other options
-#' \item \href{https://www.sbert.net/docs/pretrained_models.html}sbert}
+#' \item \href{https://www.sbert.net/docs/pretrained_models.html}{sbert}
 #' } and it defaults to `all-MiniLM-L6-v2`
 #'
 #' @return
@@ -131,7 +131,9 @@ distilbert_embedding_transformer <-
 #' @param obj
 #' @param task
 #' @param model model name options
-#' \item \href{https://huggingface.co/models}hugging face models}
+#' \itemize{
+#' \item \href{https://huggingface.co/models}{hugging face models}
+#' }
 #' @param ...
 #'
 #' @return

@@ -33,7 +33,7 @@ import_keyphrase <-
 #' @param workers How many workers to use for spaCy part-of-speech tagging. If set to -1, use all available worker threads of the machine. SpaCy uses the specified number of cores to tag documents with part-of-speech. Depending on the platform, starting many processes with multiprocessing can add a lot of overhead. In particular, the default start method spawn used in macOS/OS X (as of Python 3.8) and in Windows can be slow. Therefore, carefully consider whether this option is really necessary.
 #' @param pos_pattern Position Pattern defaults to `pos_pattern = "<J.*>*<N.*>+"`
 #' @param spacy_pipeline A list of spaCy \itemize{
-#' \item \href{https://spacy.io/usage/processing-pipelines#built-in}Spacy Pipeline options}
+#' \item \href{https://spacy.io/usage/processing-pipelines#built-in}{Spacy Pipeline options}
 #' } components that should be excluded during the POS-tagging. Removing not needed pipeline components can sometimes make a big difference and improve loading and inference speed.
 #' @param custom_pos_tagger  A callable function which expects a list of strings in a ‘raw_documents’ parameter and returns a list of (word token, POS-tag) tuples. If this parameter is not None, the custom tagger function is used to tag words with parts-of-speech, while the spaCy pipeline is ignored.
 #' @param binary If True, all non zero counts are set to 1. This is useful for discrete probabilistic models that model binary events rather than integer counts.

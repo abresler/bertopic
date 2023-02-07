@@ -10,8 +10,327 @@
 #'
 #' @examples
 bert_base_stop_words <-
-  function(){
-    c('between', 'nevertheless', 'so', 'is', 'me', 'should', 'throughout', 'someone', 'hereupon', 'than', 'cannot', 'such', 'amount', 'nobody', 'hereafter', 'noone', 'under', 'or', 'five', 'name', 'whereas', 'neither', 'everywhere', 'somewhere', 'top', 'de', 'hereby', 'seem', 'have', 'before', 'eg', 'yourself', 'thin', 'across', 'though', 'this', 'except', 'very', 'nothing', 'become', 'once', 'herein', 'among', 'ie', 'one', 'nowhere', 'via', 'hers', 'see', 'thick', 'why', 'ourselves', 'whether', 'behind', 'anything', 'call', 'latterly', 'wherein', 'either', 'herself', 'amoungst', 'each', 'whenever', 'some', 'alone', 'could', 'less', 'per', 'everyone', 'bottom', 'do', 'thereafter', 'also', 'give', 'although', 'becomes', 'an', 'thru', 'to', 'however', 'there', 'which', 'cry', 'move', 'along', 'due', 'from', 'are', 'upon', 'put', 'within', 'beside', 'her', 'twenty', 'how', 'ever', 'yourselves', 'moreover', 'ltd', 'too', 'after', 'whence', 'other', 're', 'others', 'seeming', 'many', 'a', 'two', 'thereby', 'thence', 'again', 'those', 'mostly', 'further', 'whereafter', 'whereupon', 'least', 'myself', 'no', 'onto', 'besides', 'all', 'she', 'several', 'etc', 'whole', 'else', 'next', 'done', 'serious', 'six', 'hence', 'twelve', 'ten', 'mill', 'through', 'them', 'even', 'detail', 'therein', 'show', 'itself', 'un', 'you', 'your', 'thereupon', 'above', 'seemed', 'con', 'part', 'otherwise', 'made', 'he', 'whither', 'ours', 'any', 'until', 'three', 'anyone', 'latter', 'might', 'last', 'since', 'same', 'below', 'where', 'well', 'of', 'rather', 'more', 'up', 'few', 'during', 'anywhere', 'into', 'system', 'who', 'becoming', 'not', 'front', 'third', 'elsewhere', 'fire', 'perhaps', 'side', 'both', 'toward', 'afterwards', 'fill', 'another', 'in', 'four', 'anyhow', 'against', 'amongst', 'themselves', 'namely', 'his', 'much', 'being', 'take', 'towards', 'empty', 'eight', 'full', 'found', 'formerly', 'and', 'enough', 'sometime', 'mine', 'be', 'fifty', 'but', 'get', 'had', 'by', 'been', 'sixty', 'then', 'must', 'only', 'back', 'couldnt', 'cant', 'they', 'yours', 'has', 'together', 'down', 'please', 'inc', 'while', 'every', 'still', 'may', 'whoever', 'it', 'nor', 'meanwhile', 'became', 'on', 'first', 'about', 'am', 'him', 'keep', 'was', 'my', 'forty', 'co', 'hasnt', 'beforehand', 'out', 'sincere', 'if', 'often', 'over', 'were', 'thus', 'now', 'anyway', 'because', 'describe', 'here', 'already', 'himself', 'around', 'yet', 'somehow', 'that', 'what', 'therefore', 'as', 'never', 'former', 'whose', 'will', 'bill', 'whatever', 'would', 'go', 'none', 'beyond', 'off', 'fifteen', 'at', 'nine', 'can', 'most', 'find', 'hundred', 'without', 'we', 'their', 'indeed', 'almost', 'whereby', 'its', 'with', 'something', 'everything', 'i', 'eleven', 'the', 'interest', 'our', 'for', 'own', 'whom', 'these', 'always', 'wherever', 'us', 'seems', 'sometimes', 'when')
+  function() {
+    c(
+      'between',
+      'nevertheless',
+      'so',
+      'is',
+      'me',
+      'should',
+      'throughout',
+      'someone',
+      'hereupon',
+      'than',
+      'cannot',
+      'such',
+      'amount',
+      'nobody',
+      'hereafter',
+      'noone',
+      'under',
+      'or',
+      'five',
+      'name',
+      'whereas',
+      'neither',
+      'everywhere',
+      'somewhere',
+      'top',
+      'de',
+      'hereby',
+      'seem',
+      'have',
+      'before',
+      'eg',
+      'yourself',
+      'thin',
+      'across',
+      'though',
+      'this',
+      'except',
+      'very',
+      'nothing',
+      'become',
+      'once',
+      'herein',
+      'among',
+      'ie',
+      'one',
+      'nowhere',
+      'via',
+      'hers',
+      'see',
+      'thick',
+      'why',
+      'ourselves',
+      'whether',
+      'behind',
+      'anything',
+      'call',
+      'latterly',
+      'wherein',
+      'either',
+      'herself',
+      'amoungst',
+      'each',
+      'whenever',
+      'some',
+      'alone',
+      'could',
+      'less',
+      'per',
+      'everyone',
+      'bottom',
+      'do',
+      'thereafter',
+      'also',
+      'give',
+      'although',
+      'becomes',
+      'an',
+      'thru',
+      'to',
+      'however',
+      'there',
+      'which',
+      'cry',
+      'move',
+      'along',
+      'due',
+      'from',
+      'are',
+      'upon',
+      'put',
+      'within',
+      'beside',
+      'her',
+      'twenty',
+      'how',
+      'ever',
+      'yourselves',
+      'moreover',
+      'ltd',
+      'too',
+      'after',
+      'whence',
+      'other',
+      're',
+      'others',
+      'seeming',
+      'many',
+      'a',
+      'two',
+      'thereby',
+      'thence',
+      'again',
+      'those',
+      'mostly',
+      'further',
+      'whereafter',
+      'whereupon',
+      'least',
+      'myself',
+      'no',
+      'onto',
+      'besides',
+      'all',
+      'she',
+      'several',
+      'etc',
+      'whole',
+      'else',
+      'next',
+      'done',
+      'serious',
+      'six',
+      'hence',
+      'twelve',
+      'ten',
+      'mill',
+      'through',
+      'them',
+      'even',
+      'detail',
+      'therein',
+      'show',
+      'itself',
+      'un',
+      'you',
+      'your',
+      'thereupon',
+      'above',
+      'seemed',
+      'con',
+      'part',
+      'otherwise',
+      'made',
+      'he',
+      'whither',
+      'ours',
+      'any',
+      'until',
+      'three',
+      'anyone',
+      'latter',
+      'might',
+      'last',
+      'since',
+      'same',
+      'below',
+      'where',
+      'well',
+      'of',
+      'rather',
+      'more',
+      'up',
+      'few',
+      'during',
+      'anywhere',
+      'into',
+      'system',
+      'who',
+      'becoming',
+      'not',
+      'front',
+      'third',
+      'elsewhere',
+      'fire',
+      'perhaps',
+      'side',
+      'both',
+      'toward',
+      'afterwards',
+      'fill',
+      'another',
+      'in',
+      'four',
+      'anyhow',
+      'against',
+      'amongst',
+      'themselves',
+      'namely',
+      'his',
+      'much',
+      'being',
+      'take',
+      'towards',
+      'empty',
+      'eight',
+      'full',
+      'found',
+      'formerly',
+      'and',
+      'enough',
+      'sometime',
+      'mine',
+      'be',
+      'fifty',
+      'but',
+      'get',
+      'had',
+      'by',
+      'been',
+      'sixty',
+      'then',
+      'must',
+      'only',
+      'back',
+      'couldnt',
+      'cant',
+      'they',
+      'yours',
+      'has',
+      'together',
+      'down',
+      'please',
+      'inc',
+      'while',
+      'every',
+      'still',
+      'may',
+      'whoever',
+      'it',
+      'nor',
+      'meanwhile',
+      'became',
+      'on',
+      'first',
+      'about',
+      'am',
+      'him',
+      'keep',
+      'was',
+      'my',
+      'forty',
+      'co',
+      'hasnt',
+      'beforehand',
+      'out',
+      'sincere',
+      'if',
+      'often',
+      'over',
+      'were',
+      'thus',
+      'now',
+      'anyway',
+      'because',
+      'describe',
+      'here',
+      'already',
+      'himself',
+      'around',
+      'yet',
+      'somehow',
+      'that',
+      'what',
+      'therefore',
+      'as',
+      'never',
+      'former',
+      'whose',
+      'will',
+      'bill',
+      'whatever',
+      'would',
+      'go',
+      'none',
+      'beyond',
+      'off',
+      'fifteen',
+      'at',
+      'nine',
+      'can',
+      'most',
+      'find',
+      'hundred',
+      'without',
+      'we',
+      'their',
+      'indeed',
+      'almost',
+      'whereby',
+      'its',
+      'with',
+      'something',
+      'everything',
+      'i',
+      'eleven',
+      'the',
+      'interest',
+      'our',
+      'for',
+      'own',
+      'whom',
+      'these',
+      'always',
+      'wherever',
+      'us',
+      'seems',
+      'sometimes',
+      'when'
+    )
   }
 
 #' Bertopic Stopwords
@@ -73,7 +392,7 @@ import_bertopic <-
 #' Functions for unsupervised clustering algorithms.
 #'
 #' \itemize{
-#' \item \href{https://maartengr.github.io/BERTopic/api/bertopic.html}berttopic}
+#' \item \href{https://maartengr.github.io/BERTopic/api/bertopic.html}{berttopic}
 #' }
 #'
 #' @param verbose if `TRUE` verbose output
@@ -94,7 +413,7 @@ import_bertopic <-
 #' @param use_key_phrase_vectorizer if `TRUE` uses a keyphrase vectorizer
 #' @param is_lower_case if `TRUE` is lowercase
 #' @param embedding_model type of embedding model - either an object or `NULL` options include \itemize{
-#' \item \href{https://www.sbert.net/docs/pretrained_models.html}sbert}
+#' \item \href{https://www.sbert.net/docs/pretrained_models.html}{sbert}
 #' } and it defaults to `all-MiniLM-L6-v2`
 #' @param extra_stop_words
 #' @param max_df During fitting ignore keyphrases that have a document frequency strictly higher than the given threshold. Default `1L`
@@ -164,7 +483,8 @@ bert_topic <-
         )
     }
 
-    if (!use_key_phrase_vectorizer & length(vectorizer_model) == 0 & use_sklearn_vectorizer) {
+    if (!use_key_phrase_vectorizer &
+        length(vectorizer_model) == 0 & use_sklearn_vectorizer) {
       "Using sklearn vectorizer" |> message()
       vectorizer_model <-
         sklearn_vectorizer(
@@ -177,7 +497,8 @@ bert_topic <-
           extra_stop_words = extra_stop_words
         )
     }
-    uses_vectorizer <- use_sklearn_vectorizer | use_key_phrase_vectorizer
+    uses_vectorizer <-
+      use_sklearn_vectorizer | use_key_phrase_vectorizer
     if (uses_vectorizer & exclude_stop_words) {
       stop_words <-
         bert_stopwords(
@@ -210,7 +531,10 @@ bert_topic <-
         embedding_model = embedding_model
       )
 
-    remove_sw <- exclude_stop_words | length(stopword_package_sources) > 0 | length(extra_stop_words) > 0
+    remove_sw <-
+      exclude_stop_words |
+      length(stopword_package_sources) > 0 |
+      length(extra_stop_words) > 0
 
 
     if (remove_sw) {
@@ -281,34 +605,30 @@ bert_plotting <-
 #' transformer
 class_tfidf_transformer <-
   function(bm25_weighting = F,
-         reduce_frequent_words = F) {
-  bertopic <- import_bertopic(assign_to_environment = F)
-  obj <- bertopic$vectorizers$ClassTfidfTransformer(bm25_weighting = bm25_weighting,
-                                                    reduce_frequent_words = reduce_frequent_words)
-  obj
-}
+           reduce_frequent_words = F) {
+    bertopic <- import_bertopic(assign_to_environment = F)
+    obj <-
+      bertopic$vectorizers$ClassTfidfTransformer(bm25_weighting = bm25_weighting,
+                                                 reduce_frequent_words = reduce_frequent_words)
+    obj
+  }
 
-#' An online variant of the CountVectorizer with updating vocabulary.
+#' An Online Vectorizer
 #'
-#' @param decay  A value between [0, 1] to weight the percentage of frequencies the previous bag-of-words should be decreased. For example, a value of .1 will decrease the frequencies in the bag-of-words matrix with 10% at each iteration.  Default `NULL`
-#' @param delete_min_df  Delete words eat each iteration from its vocabulary that do not exceed a minimum frequency. This will keep the resulting bag-of-words matrix small such that it does not explode in size with increasing vocabulary. If decay is None then this equals min_df. Default `NULL`
-#' @param ... Other parameters 	inherited from: sklearn.feature_extraction.text.CountVectorizer In practice, this means that you can still use parameters from the original CountVectorizer, like stop_words and ngram_range.
+#' @param decay
+#' @param delete_min_df
+#' @param ...
 #'
 #' @return
 #' @export
 #'
 #' @examples
-#' library(bertopic)
-#' online_count_vectorizer()
-#' obj <- online_count_vectorizer(stop_words="english")
-#' obj
-#'
 online_count_vectorizer <- function(decay = NULL,
                                     delete_min_df = NULL,
                                     ...) {
   bertopic <- import_bertopic(assign_to_environment = F)
   obj <- bertopic$vectorizers$OnlineCountVectorizer(decay = decay,
-                                                    delete_min_df = delete_min_df,...)
+                                                    delete_min_df = delete_min_df, ...)
   obj
 }
 
@@ -321,10 +641,10 @@ online_count_vectorizer <- function(decay = NULL,
 #' @examples
 base_clusterer <-
   function() {
-  bertopic <- import_bertopic(assign_to_environment = F)
-  obj <- bertopic$cluster$BaseCluster
-  obj
-}
+    bertopic <- import_bertopic(assign_to_environment = F)
+    obj <- bertopic$cluster$BaseCluster
+    obj
+  }
 
 
 #' The Base Embedder used for creating embedding models
@@ -337,9 +657,12 @@ base_clusterer <-
 #'
 #' @examples
 base_embedder <-
-  function(embedding_model = NULL, word_embedding_model = NULL) {
+  function(embedding_model = NULL,
+           word_embedding_model = NULL) {
     bertopic <- import_bertopic(assign_to_environment = F)
-    obj <- bertopic$backend$BaseEmbedder(embedding_model = embedding_model,word_embedding_model = word_embedding_model)
+    obj <-
+      bertopic$backend$BaseEmbedder(embedding_model = embedding_model,
+                                    word_embedding_model = word_embedding_model)
 
     obj
 
@@ -358,4 +681,3 @@ word_doc_embedder <-
       bertopic$backend$WordDocEmbedder
     obj
   }
-

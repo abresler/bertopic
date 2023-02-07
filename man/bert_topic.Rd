@@ -54,6 +54,10 @@ bert_topic(
 
 \item{vectorizer_model}{Pass in a custom CountVectorizer instead of the default model. Default `NULL`}
 
+\item{embedding_model}{type of embedding model - either an object or `NULL` options include \itemize{
+\item \href{https://www.sbert.net/docs/pretrained_models.html}{sbert}
+} and it defaults to `all-MiniLM-L6-v2`}
+
 \item{ctfidf_model}{Pass in a custom ClassTfidfTransformer instead of the default model. Default `NULL`}
 
 \item{nr_topics}{Specifying the number of topics will reduce the initial number of topics to the value specified. This reduction can take a while as each reduction in topics (-1) activates a c-TF-IDF calculation. If this is set to None, no reduction is applied. Use `auto` to automatically reduce topics using HDBSCAN.}
@@ -85,7 +89,9 @@ python object
 Functions for unsupervised clustering algorithms.
 }
 \details{
-
+\itemize{
+\item \href{https://maartengr.github.io/BERTopic/api/bertopic.html}{berttopic}
+}
 }
 \examples{
 import_bertopic()

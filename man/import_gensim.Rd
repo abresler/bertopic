@@ -10,5 +10,7 @@ import_gensim(assign_to_environment = T, path = NULL)
 \item{path}{}
 }
 \description{
-
+\itemize{
+\item \href{https://radimrehurek.com/gensim/}{GENSIM}
+}
 }
