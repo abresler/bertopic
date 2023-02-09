@@ -10,6 +10,8 @@ tbl_keybert_keywords(
   obj = NULL,
   model = "all-MiniLM-L6-v2",
   exclude_stop_words = T,
+  use_future = FALSE,
+  return_message = TRUE,
   keyphrase_ngram_range = list(1L, 1L),
   use_embeddings = F,
   use_key_phrase_vectorizer = T,

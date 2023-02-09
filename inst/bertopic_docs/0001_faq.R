@@ -55,8 +55,8 @@ topic_model$get_params()
 # out <-
 #   topic_model$fit_transform(documents = news_docs, embeddings = embeddings) # similar topcis wont work with custom embeddings
 
- out <-
-   topic_model$fit_transform(documents = news_docs)
+out <-
+  topic_model$fit_transform(documents = news_docs)
 
 topic_model$get_params()
 
@@ -311,7 +311,8 @@ tbl_trump_over_time |>
     theme_name = "better_unica"
   )
 
-tbl_trump_tweets <- tbl_trump_tweets |> mutate(year = lubridate::year(date)) |> arrange(date)
+tbl_trump_tweets <-
+  tbl_trump_tweets |> mutate(year = lubridate::year(date)) |> arrange(date)
 
 topics_per_class <-
   topic_model$topics_per_class(docs = tbl_trump_tweets$text, classes =
@@ -320,17 +321,28 @@ topics_per_class <-
 topic_model$visualize_topics_per_class(topics_per_class, topics = c(11:25)) |> write_bert_viz()
 
 
-tbl_trump_topics_per_class <- topics_per_class |> munge_bert_topics_per_class(class_name = "year", topic_model = topic_model)
+tbl_trump_topics_per_class <-
+  topics_per_class |> munge_bert_topics_per_class(class_name = "year", topic_model = topic_model)
 
 
 #' Visualize Probablities or Distribution
 
 
-appx_dist <- topic_model$approximate_distribution(documents = tweets, min_similarity = 0, calculate_tokens = F)
+appx_dist <-
+  topic_model$approximate_distribution(
+    documents = tweets,
+    min_similarity = 0,
+    calculate_tokens = F
+  )
 
 munge_bert_document_approximate_distributions(data = appx_dist)
 
-appx_dist <- topic_model$approximate_distribution(documents = tweets, min_similarity = 0, calculate_tokens = F)
+appx_dist <-
+  topic_model$approximate_distribution(
+    documents = tweets,
+    min_similarity = 0,
+    calculate_tokens = F
+  )
 
 
 # reduce_topics -----------------------------------------------------------
@@ -341,7 +353,8 @@ topic_model$topics_
 
 #'
 probs <- out[[2]]
-new_topics = topic_model.reduce_outliers(docs, topics, probabilities=probs, strategy="probabilities")
+new_topics = topic_model.reduce_outliers(docs, topics, probabilities = probs, strategy =
+                                           "probabilities")
 
 
 # topic_representations ---------------------------------------------------
@@ -369,14 +382,16 @@ topic_model |> bert_topic_info()
 
 topic_model$visualize_barchart(custom_labels = TRUE) |> write_bert_viz()
 transformers <- import_transformers()
-classifier <- transformers$pipeline("zero-shot-classification", model = "facebook/bart-large-mnli")
-sequence_to_classify <- topic_model |> bert_topics_keywords() |> filter(topic_bert == 2) |> pull(word)
+classifier <-
+  transformers$pipeline("zero-shot-classification", model = "facebook/bart-large-mnli")
+sequence_to_classify <-
+  topic_model |> bert_topics_keywords() |> filter(topic_bert == 2) |> pull(word)
 candidate_labels = list('cooking', 'dancing', 'religion')
 classifier(sequence_to_classify, candidate_labels)
 
 
 # find_topics -------------------------------------------------------------
-out_sim <- topic_model$find_topics("china", top_n=5L)
+out_sim <- topic_model$find_topics("china", top_n = 5L)
 topic_model$get_topic(topic = out_sim[[1]][1])
 
 bert_similar_terms_topics(topic_model = topic_model, c("china", "fraud"))
@@ -410,7 +425,12 @@ tbl_news_topic_bert_wide |>
   gather(bert_topic, prob, -number_document) |>
   filter(number_document == 1) |>
   filter(prob > 0) |>
-  asbviz::hc_xy(x = "bert_topic", y = "prob", type = "column", invert_chart = T)
+  asbviz::hc_xy(
+    x = "bert_topic",
+    y = "prob",
+    type = "column",
+    invert_chart = T
+  )
 
 
 topic_distr_toks <-
@@ -455,7 +475,8 @@ tbl_bert_topic_per_class(
   class_name = "news_label"
 )
 
-topic_model$visualize_topics_per_class(topics_per_class = as_tibble(topics_per_class), top_n_topics = 10L) |>
+topic_model$visualize_topics_per_class(topics_per_class = as_tibble(topics_per_class),
+                                       top_n_topics = 10L) |>
   write_bert_viz()
 
 
@@ -468,7 +489,7 @@ empty_dimensionality_model <-
 
 clf = sklearn_linear_model$LogisticRegression()
 ctfidf_model =
-  bertopic$vectorizers$ClassTfidfTransformer(reduce_frequent_words=TRUE)
+  bertopic$vectorizers$ClassTfidfTransformer(reduce_frequent_words = TRUE)
 
 topic_model_with_y = bert_topic(
   umap_model = empty_dimensionality_model,
@@ -510,7 +531,8 @@ topic_model_with_y |> bert_topic_info()
 trump_topic_model$topics_over_time(tweets, timestamps = tbl_trump_tweets$date, nr_bins =
                                      20L)
 
-trump_topic_model |> bert_topics_over_time(docs = tweets, nr_bins = 20,
+trump_topic_model |> bert_topics_over_time(docs = tweets,
+                                           nr_bins = 20,
                                            timestamps = tbl_trump_tweets$date)
 
 tbl_trump_tweets |> tbl_bert_topics_over_time(
@@ -520,13 +542,14 @@ tbl_trump_tweets |> tbl_bert_topics_over_time(
   nr_bins = 20
 )
 
-trump_topic_model$visualize_topics_over_time(topics_over_time =
-  trump_topic_model |> bert_topics_over_time(
-    docs = tweets,
-    nr_bins = 20,
-    timestamps = tbl_trump_tweets$date,
-    return_tibble = F
-  ),
+trump_topic_model$visualize_topics_over_time(
+  topics_over_time =
+    trump_topic_model |> bert_topics_over_time(
+      docs = tweets,
+      nr_bins = 20,
+      timestamps = tbl_trump_tweets$date,
+      return_tibble = F
+    ),
   top_n_topics = 20L
 ) |> write_bert_viz()
 

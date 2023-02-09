@@ -415,7 +415,7 @@ import_bertopic <-
 #' @param embedding_model type of embedding model - either an object or `NULL` options include \itemize{
 #' \item \href{https://www.sbert.net/docs/pretrained_models.html}{sbert}
 #' } and it defaults to `all-MiniLM-L6-v2`
-#' @param extra_stop_words
+#' @param extra_stop_words vector of other stopwords
 #' @param max_df During fitting ignore keyphrases that have a document frequency strictly higher than the given threshold. Default `1L`
 #' @param min_df During fitting ignore keyphrases that have a document frequency strictly lower than the given threshold. This value is also called cut-off in the literature.  Default `1L`
 #' @param pos_pattern Position patter for keyphrase.  Defaults to `pos_pattern = "<J.*>*<N.*>+",`

@@ -9,7 +9,8 @@ tbl_bert_topic_per_class(
   topic_model,
   document_name = NULL,
   class_name = NULL,
-  global_tuning = TRUE
+  global_tuning = TRUE,
+  sort_by_topic = TRUE
 )
 }
 \arguments{

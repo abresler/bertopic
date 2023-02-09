@@ -156,7 +156,9 @@ bert_similar_terms_topics <-
       })
 
     data <- data |>
-      left_join(topic_model |> bert_topic_info(),
+      left_join(
+        topic_model |> bert_topic_info() |> rename(count_documents_in_topic = count)
+        ,
                 by = c("topic_bert", "is_outlier_bert_topic"))
 
 
@@ -226,7 +228,7 @@ bert_topic_labels <-
       mutate(topic_bert = 1:n() - 2) |>
       select(topic_bert, everything()) |>
       mutate(is_outlier_bert_topic = topic_bert == -1) |>
-      mutate_if(is.character, str_squish)
+      mutate_if(is.character, stringr::str_squish)
   }
 
 
@@ -324,9 +326,17 @@ bert_topics_keywords <-
           mutate(is_outlier_bert_topic = topic_bert == -1)
       })
 
+    data <- data |>
+      left_join(
+        topic_model |> bert_topic_info() |> select(topic_bert, name_topic), by = "topic_bert"
+      ) |>
+      select(topic_bert, name_topic, everything())
+
     if (length(bert_topics) > 0) {
       data <- data |> filter(topic_bert %in% bert_topics)
     }
+
+
 
     data
   }
@@ -475,7 +485,8 @@ tbl_bert_topic_per_class <-
            topic_model,
            document_name = NULL,
            class_name = NULL,
-           global_tuning = TRUE) {
+           global_tuning = TRUE,
+           sort_by_topic = TRUE) {
     if (length(topic_model) == 0) {
       stop("Enter Topic Model")
     }
@@ -487,14 +498,28 @@ tbl_bert_topic_per_class <-
       stop("Enter Class Name Field")
     }
 
+    data <- data |> tidyr::unite(col = "class",
+                 all_of(class_name),
+                 sep = "|",
+                 remove = F)
+
     dat <-
       bert_topic_per_class(
         topic_model = topic_model,
         docs = data[[document_name]],
-        classes = data[[class_name]],
+        classes = data[["class"]],
         global_tuning = global_tuning
       ) |>
-      rename(UQ(class_name) := class)
+      separate(
+        class,
+        into = class_name,
+        sep = "\\|"
+      )
+
+    if (sort_by_topic) {
+      dat |>
+        arrange(name_topic, desc())
+    }
 
     dat
   }
@@ -668,14 +693,19 @@ extract_bert_umap <-
 #' Extract Document Word Coutns
 #'
 #' @param obj
+#' @param docs
+#' @param filter_zero
 #'
 #' @return
 #' @export
 #'
 #' @examples
 extract_document_word_counts <-
-  function(obj, filter_zero = T) {
-    X <- obj$vectorizer_model$fit_transform(bap_docs) |> as.matrix()
+  function(obj, docs = NULL, filter_zero = T) {
+    if (length(docs) == 0) {
+      stop("Enter Docs")
+    }
+    X <- obj$vectorizer_model$fit_transform(docs) |> as.matrix()
 
     X <-
       X |> as_tibble() |> setNames(obj$vectorizer_model$get_feature_names()) |> mutate(number_document = 1:n()) |>

@@ -4,10 +4,10 @@
 \alias{extract_document_word_counts}
 \title{Extract Document Word Coutns}
 \usage{
-extract_document_word_counts(obj, filter_zero = T)
+extract_document_word_counts(obj, docs = NULL, filter_zero = T)
 }
 \arguments{
-\item{obj}{}
+\item{filter_zero}{}
 }
 \description{
 Extract Document Word Coutns

@@ -68,6 +68,8 @@ bert_topic(
 
 \item{stopword_package_sources}{options if not `NULL` `c("snowball", "stopwords-iso", "smart", "nltk")`}
 
+\item{extra_stop_words}{vector of other stopwords}
+
 \item{calculate_probabilities}{Whether to calculate the probabilities of all topics per document instead of the probability of the assigned topic per document. This could slow down the extraction of topics if you have many documents (> 100_000). Set this only to True if you have a low amount of documents or if you do not mind more computation time. NOTE: If false you cannot use the corresponding visualization method visualize_probabilities.  Default to `FALSE`}
 
 \item{diversity}{Whether to use MMR to diversify the resulting topic representations. If set to None, MMR will not be used. Accepted values lie between 0 and 1 with 0 being not at all diverse and 1 being very diverse. Default is `NULL`}

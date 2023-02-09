@@ -87,6 +87,7 @@ keybert_model <-
 #'  doc <- "Sources tell us that Google is acquiring Kaggle, a platform that hosts data science and machine learning competitions. Details about the transaction remain somewhat vague, but given that Google is hosting its Cloud Next conference in San Francisco this week, the official announcement could come as early as tomorrow. Reached by phone, Kaggle co-founder CEO Anthony Goldbloom declined to deny that the acquisition is happening. Google itself declined 'to comment on rumors'. Kaggle, which has about half a million data scientists on its platform, was founded by Goldbloom  and Ben Hamner in 2010. The service got an early start and even though it has a few competitors like DrivenData, TopCoder and HackerRank, it has managed to stay well ahead of them by focusing on its specific niche. The service is basically the de facto home for running data science and machine learning competitions. With Kaggle, Google is buying one of the largest and most active communities for data scientists - and with that, it will get increased mindshare in this community, too (though it already has plenty of that thanks to Tensorflow and other projects). Kaggle has a bit of a history with Google, too, but that's pretty recent. Earlier this month, Google and Kaggle teamed up to host a $100,000 machine learning competition around classifying YouTube videos. That competition had some deep integrations with the Google Cloud Platform, too. Our understanding is that Google will keep the service running - likely under its current name. While the acquisition is probably more about Kaggle's community than technology, Kaggle did build some interesting tools for hosting its competition and 'kernels', too. On Kaggle, kernels are basically the source code for analyzing data sets and developers can share this code on the platform (the company previously called them 'scripts'). Like similar competition-centric sites, Kaggle also runs a job board, too. It's unclear what Google will do with that part of the service. According to Crunchbase, Kaggle raised $12.5 million (though PitchBook says it's $12.75) since its   launch in 2010. Investors in Kaggle include Index Ventures, SV Angel, Max Levchin, Naval Ravikant, Google chief economist Hal Varian, Khosla Ventures and Yuri Milner."
 #'
 #' keybert_keywords(docs = doc, top_n_words = 10)
+#' keybert_keywords(docs = doc, top_n_words = 10, return_message = T)
 #' keybert_keywords(docs = doc, top_n_words = 10, pos_pattern='<N.*>') # only nouns
 #' doc_sample <-  "Supervised learning is the machine learning task of learning a function that maps an input to an output based on example input-output pairs. It infers a function from labeled training data consisting of a set of training examples. In supervised learning, each example is a pair consisting of an input object (typically a vector) and a desired output value (also called the supervisory signal). A supervised learning algorithm analyzes the training data and produces an inferred function, which can be used for mapping new examples. An optimal scenario will allow for the algorithm to correctly determine the class labels for unseen instances. This requires the learning algorithm to generalize from the training data to unseen situations in a 'reasonable' way (see inductive bias)."
 #'
@@ -98,6 +99,8 @@ keybert_model <-
 keybert_keywords <-
   function(docs = NULL,
            obj = NULL,
+           use_future = FALSE,
+           return_message = TRUE,
            model = "all-MiniLM-L6-v2",
            stopword_package_sources = NULL,
            extra_stop_words = NULL,
@@ -213,7 +216,7 @@ keybert_keywords <-
       assign('kb_keyword_extractor', obj, envir = .GlobalEnv)
     }
 
-    dat <- tbl_keybert_data(out = out)
+    dat <- tbl_keybert_data(out = out, use_future = use_future, return_message = return_message)
 
     if (doc_length == 1) {
       dat <- dat |>
@@ -389,6 +392,8 @@ tbl_keybert_keywords <- function(data,
                                  obj = NULL,
                                  model = "all-MiniLM-L6-v2",
                                  exclude_stop_words = T,
+                                 use_future = FALSE,
+                                 return_message = TRUE,
                                  keyphrase_ngram_range = list(1L, 1L),
                                  use_embeddings = F,
                                  use_key_phrase_vectorizer = T,
@@ -453,7 +458,9 @@ tbl_keybert_keywords <- function(data,
     seed_keywords = seed_keywords,
     doc_embeddings = doc_embeddings,
     word_embeddings = word_embeddings,
-    highlight = highlight
+    highlight = highlight,
+    use_future = use_future,
+    return_message = return_message
   )
 
   if (return_summary) {
@@ -490,25 +497,58 @@ tbl_keybert_keywords <- function(data,
 #' Extract Keybert Keywords from Output
 #'
 #' @param out
+#' @param use_future
+#' @param return_message
 #'
 #' @return
 #' @export
 #'
 #' @examples
 tbl_keybert_data <-
-  function(out) {
-    dat <-
-      1:length(out) |>
-      map_dfr(function(x) {
-        values <- out[[x]] |> unlist()
-        keywords <- values[c(T, F)]
-        scores <-  values[c(F, T)] |> as.numeric()
-        tibble(
-          number_document = x,
-          keyword_keybert = keywords,
-          score_keybert = scores
-        )
-      })
+  function(out, use_future = FALSE, return_message = FALSE) {
+    total_documents <- length(out)
+    if (!use_future) {
+
+      dat <-
+        1:length(out) |>
+        map_dfr(function(x) {
+          if (return_message) {
+            glue::glue("Document {x} of {total_documents}")
+          }
+          values <- out[[x]] |> unlist()
+          keywords <- values[c(T, F)]
+          scores <-  values[c(F, T)] |> as.numeric()
+          tibble(
+            number_document = x,
+            keyword_keybert = keywords,
+            score_keybert = scores
+          )
+        })
+    }
+
+    if (use_future) {
+      options(future.globals.maxSize = 999999 * 1024 ^ 12)
+      cores <- round(parallelly::availableCores() * .8)
+      future::plan(future::cluster, workers = cores)
+      dat <-
+        1:length(out) |>
+        furrr::future_map_dfr(function(x) {
+
+          if (return_message) {
+            glue::glue("Document {x} of {total_documents}")
+          }
+          values <- out[[x]] |> unlist()
+          keywords <- values[c(T, F)]
+          scores <-  values[c(F, T)] |> as.numeric()
+          tibble(
+            number_document = x,
+            keyword_keybert = keywords,
+            score_keybert = scores
+          )
+        })
+      closeAllConnections()
+      gc()
+    }
 
     dat
 
