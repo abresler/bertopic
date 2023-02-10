@@ -499,7 +499,7 @@ tbl_keybert_keywords <- function(data,
         ) |>
         ungroup() |>
         mutate(count_keybert_keywords_sklearn = keywords_keybert_sklearn |> str_count("\\|") + 1,
-               has_keybert_keywords_keyphrase = TRUE)
+               has_keybert_keywords_sklearn = TRUE)
     }
 
 
