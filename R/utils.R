@@ -1,4 +1,72 @@
 
+# import_export -----------------------------------------------------------
+
+#' Save a Bertopic Model
+#'
+#' @param obj
+#' @param file_path
+#' @param file_name
+#' @param save_embedding_model
+#'
+#' @return
+#' @export
+#'
+#' @examples
+bert_save <-
+  function(obj, file_path = NULL, file_name = "bert_model", save_embedding_model = TRUE) {
+    if (length(file_path) == 0) {
+      stop("Enter File Path")
+    }
+
+    oldwd <- getwd()
+    setwd("~")
+    has_slash <- file_path |> stringr::str_detect("/$")
+
+    if (has_slash) {
+      file_path <- file_path |> stringr::str_remove_all("/$")
+    }
+    path <- glue::glue("{file_path}/{file_name}")
+
+    obj$save(path = path, save_embedding_model = save_embedding_model)
+
+    if (getwd() != oldwd) {
+      setwd(oldwd)
+    }
+
+    return(invisible())
+
+  }
+
+#' Load BERT
+#'
+#' @param obj Bertopic Modlule
+#' @param model_path Path for model
+#'
+#' @return
+#' @export
+#'
+#' @examples
+bert_load <-
+  function(obj = NULL, model_path = NULL) {
+    if (length(model_path) == 0) {
+      stop("Enter Model Path")
+    }
+
+    if (length(obj) == 0) {
+      obj <- import_bertopic(assign_to_environment = F)
+    }
+    oldwd <- getwd()
+    setwd("~")
+
+    out <- obj$BERTopic$load(path = model_path)
+
+    if (getwd() != oldwd) {
+      setwd(oldwd)
+    }
+
+    out
+  }
+
 
 
 
@@ -230,6 +298,7 @@ bert_topic_labels <-
       mutate(is_outlier_bert_topic = topic_bert == -1) |>
       mutate_if(is.character, stringr::str_squish)
   }
+
 
 
 
@@ -517,8 +586,8 @@ tbl_bert_topic_per_class <-
       )
 
     if (sort_by_topic) {
-      dat |>
-        arrange(name_topic, desc())
+      dat <- dat |>
+        arrange(name_topic, desc(count))
     }
 
     dat
