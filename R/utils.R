@@ -567,9 +567,11 @@ tbl_bert_topic_per_class <-
       stop("Enter Class Name Field")
     }
 
-    data <- data |> tidyr::unite(col = "class",
+    data <- data |>
+
+      tidyr::unite(col = "class",
                  all_of(class_name),
-                 sep = "|",
+                 sep = "~",
                  remove = F)
 
     dat <-
@@ -582,7 +584,10 @@ tbl_bert_topic_per_class <-
       separate(
         class,
         into = class_name,
-        sep = "\\|"
+        sep = "\\~",
+        fill = "right",
+        extra = "merge",
+        convert = TRUE
       )
 
     if (sort_by_topic) {

@@ -4,7 +4,7 @@
 \alias{tbl_keybert_data}
 \title{Extract Keybert Keywords from Output}
 \usage{
-tbl_keybert_data(out, use_future = FALSE, return_message = FALSE)
+tbl_keybert_data(out, use_future = FALSE, return_message = FALSE, slug = NULL)
 }
 \arguments{
 \item{return_message}{}

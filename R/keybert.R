@@ -125,7 +125,6 @@ keybert_keywords <-
            pos_pattern = "<J.*>*<N.*>+",
            use_maxsum = FALSE,
            vocabulary = NULL,
-
            highlight = F) {
     if (length(docs) == 0) {
       "Enter documents"
@@ -145,6 +144,9 @@ keybert_keywords <-
           language = language,
           pos_pattern = pos_pattern
         )
+
+      slug <-
+        "_keyphrase"
     }
 
     if (!use_key_phrase_vectorizer) {
@@ -159,6 +161,7 @@ keybert_keywords <-
           exclude_stop_words = exclude_stop_words,
           extra_stop_words = extra_stop_words
         )
+      slug <- "_sklearn"
     }
 
     if (use_yake_candidates) {
@@ -216,7 +219,10 @@ keybert_keywords <-
       assign('kb_keyword_extractor', obj, envir = .GlobalEnv)
     }
 
-    dat <- tbl_keybert_data(out = out, use_future = use_future, return_message = return_message)
+    dat <-
+      tbl_keybert_data(out = out,
+                       use_future = use_future,
+                       return_message = return_message)
 
     if (doc_length == 1) {
       dat <- dat |>
@@ -229,6 +235,12 @@ keybert_keywords <-
         mutate(number_keyword = 1:n(), .after = "number_document") |>
         ungroup()
     }
+
+    if (length(slug) > 0) {
+      append_cols <- dat |> select(-number_document) |> names()
+      names(dat)[names(dat) %in% append_cols]  <- names(dat)[names(dat) %in% append_cols] |> str_c(slug)
+    }
+
 
     dat
 
@@ -464,20 +476,43 @@ tbl_keybert_keywords <- function(data,
   )
 
   if (return_summary) {
-    df_keybert <-    df_keybert |>
-      group_by(number_document) |>
-      summarise(
-        score_keybert_mean = mean(score_keybert, na.rm = T),
-        keywords_keybert = unique(keyword_keybert) |> str_c(collapse = " | ")
-      ) |>
-      ungroup() |>
-      mutate(count_keybert_keywords = keywords_keybert |> str_count("\\|") + 1,
-             has_keybert_keywords = TRUE)
+
+    if (use_key_phrase_vectorizer) {
+      df_keybert <-    df_keybert |>
+        group_by(number_document) |>
+        summarise(
+          score_keybert_mean_keyphrase = mean(score_keybert_keyphrase, na.rm = T),
+          keywords_keybert_keyphrase = unique(keyword_keybert_keyphrase) |> str_c(collapse = " | ")
+        ) |>
+        ungroup() |>
+        mutate(count_keybert_keywords_keyphrase = keywords_keybert_keyphrase |> str_count("\\|") + 1,
+               has_keybert_keywords_keyphrase = TRUE)
+    }
+
+    if (!use_key_phrase_vectorizer) {
+      df_keybert <-
+        df_keybert |>
+        group_by(number_document) |>
+        summarise(
+          score_keybert_mean_sklearn = mean(score_keybert_sklearn, na.rm = T),
+          keywords_keybert_sklearn = unique(keyword_keybert_sklearn) |> str_c(collapse = " | ")
+        ) |>
+        ungroup() |>
+        mutate(count_keybert_keywords_sklearn = keywords_keybert_sklearn |> str_count("\\|") + 1,
+               has_keybert_keywords_keyphrase = TRUE)
+    }
+
+
     if (join_to_original_data) {
       df_keybert <-
         data |>
-        left_join(df_keybert, by = c("number_document")) |>
-        mutate(has_keybert_keywords = has_keybert_keywords |> coalesce(F))
+        left_join(df_keybert, by = c("number_document"))
+
+      kbl_cols <- df_keybert |> select(matches("has_keybert_keywords")) |> names()
+      df_keybert <- df_keybert |>
+        mutate_at(kbl_cols, list(function(x){
+          x |> coalesce(F)
+        }))
     }
     return(df_keybert)
   }
@@ -505,7 +540,7 @@ tbl_keybert_keywords <- function(data,
 #'
 #' @examples
 tbl_keybert_data <-
-  function(out, use_future = FALSE, return_message = FALSE) {
+  function(out, use_future = FALSE, return_message = FALSE, slug = NULL) {
     total_documents <- length(out)
     if (!use_future) {
 
@@ -550,6 +585,6 @@ tbl_keybert_data <-
       gc()
     }
 
-    dat
+        dat
 
   }
