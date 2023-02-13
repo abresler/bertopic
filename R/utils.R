@@ -10,6 +10,82 @@ list_to_tuple <-
   }
 
 
+# load_save ---------------------------------------------------------------
+
+#' Load BERTopic Model
+#'
+#' @param model_path
+#' @param obj
+#' @param embedding_model
+#'
+#' @return
+#' @export
+#'
+#' @examples
+bert_load <-
+  function(model_path = NULL, obj = NULL,
+           embedding_model = NULL) {
+    if (length(model_path) == 0) {
+      stop("Enter Path")
+    }
+    if (length(obj) == 0) {
+      obj <- import_bertopic()
+    }
+
+    oldwd <- getwd()
+
+    setwd("~")
+
+    out <-
+      obj$BERTopic$load(path = model_path, embedding_model = embedding_model)
+
+    if (oldwd != getwd()) {
+      setwd(oldwd)
+    }
+
+    out
+  }
+
+#' Save BERTopic Model
+#'
+#' @param obj
+#' @param model_path
+#' @param file_name
+#' @param save_embedding_model
+#'
+#' @return
+#' @export
+#'
+#' @examples
+bert_save <-
+  function(obj, model_path = NULL, file_name = "bert_model", save_embedding_model = TRUE) {
+    if (length(model_path) == 0) {
+      stop("Enter Path")
+    }
+
+    oldwd <- getwd()
+
+    setwd("~")
+
+    model_path <- model_path |> str_remove_all("/$")
+
+    bert_model_path <-
+      glue::glue("{model_path}/{file_name}")
+
+    obj$save(path = bert_model_path, save_embedding_model = save_embedding_model)
+
+    if (getwd() != oldwd) {
+      setwd(oldwd)
+    }
+
+    glue::glue("Saved {file_name} BERTopic Model to {model_path}") |> message()
+
+    return(invisible())
+
+  }
+
+
+
 # stopwords ---------------------------------------------------------------
 
 
@@ -196,7 +272,8 @@ bert_topic_info <-
                       sep = "\\+") |>
       select(-remove) |>
       mutate(is_outlier_bert_topic = topic_bert == -1) |>
-      mutate_if(is.character, str_squish)
+      mutate_if(is.character, str_squish) |>
+      select(-count, everything())
 
     data
   }
@@ -517,7 +594,7 @@ tbl_bert_topic_per_class <-
 
     data <- data |> tidyr::unite(col = "class",
                  all_of(class_name),
-                 sep = "|",
+                 sep = "@",
                  remove = F)
 
     dat <-
@@ -527,11 +604,21 @@ tbl_bert_topic_per_class <-
         classes = data[["class"]],
         global_tuning = global_tuning
       ) |>
-      separate(
+      tidyr::separate(
         class,
         into = class_name,
-        sep = "\\|"
-      )
+        sep = "\\@",
+        convert = TRUE,
+        extra = "merge",
+        fill = "right"
+      ) |>
+      select(-count, everything())
+
+    dat <- dat |>
+      mutate_at(class_name, list(function(x){
+        case_when(x == "NA", NA_character_,
+                  TRUE ~ x)
+      }))
 
     if (sort_by_topic) {
       dat <- dat |>
@@ -584,9 +671,9 @@ tbl_bert_text_features <-
 
 #' Bertopic Documents
 #'
-#' @param obj
-#' @param docs
-#' @param document_name
+#' @param obj Topic model object
+#' @param docs vector of documents
+#' @param document_name If not `NULL` name of the text document column
 #'
 #' @return
 #' @export
@@ -600,12 +687,15 @@ bert_document_info <-
         c(
           "document",
           "topic_bert",
-          "topic_labels",
+          "name_topic_labels",
           "top_n_words",
           "pct_probabilty_topic_bert",
           "is_representative_document"
         )
-      )
+      ) |>
+      left_join(obj |> bert_topic_info() |> select(-count), by = "topic_bert") |>
+      select(-name_topic_labels) |>
+      select(document, topic_bert, name_topic, everything())
 
     if (length(document_name) > 0) {
       data <- data |>

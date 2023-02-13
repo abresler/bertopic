@@ -23,6 +23,10 @@ import_top2vec <-
   }
 
 
+# model -------------------------------------------------------------------
+
+
+
 #' Top2Vec Model
 #'
 #' Top2Vec model \url{https://github.com/ddangelov/Top2Vec}
@@ -156,10 +160,157 @@ top2vec_model <-
   }
 
 
+
+
+# topics ------------------------------------------------------------------
+
+#' Textop2vecec Topic Size
+#'
+#' @param obj
+#' @param reduced
+#'
+#' @return
+#' @export
+#'
+#' @examples
+top2vec_topic_size <-
+  function(obj, reduced = F) {
+    out <- obj$get_topic_sizes(reduced = F)
+    tibble(topic_top2vec = out[[2]] |> as.numeric(),
+           count_documents = out[[1]] |> as.numeric())
+
+  }
+
 .parse_top2vec_topic <-
   function(obj) {
- obj[[1]]
-  obj[[2]]
-  obj[[3]] |> as.character()
-  obj[[4]] |> as.numeric()
-}
+    obj[[1]]
+    obj[[2]]
+    obj[[3]] |> as.character()
+    obj[[4]] |> as.numeric()
+  }
+
+#' Topic Vector Embeddings
+#'
+#' @param obj
+#'
+#' @return
+#' @export
+#'
+#' @examples
+top2vec_topic_embeddings <-
+  function(obj){
+    data <- obj$topic_vectors |> as_tibble() |>
+      mutate(topic_top2vec = 1:n() - 1) |>
+      select(topic_top2vec, everything())
+
+    data
+  }
+
+
+#' Textop2vecec Topic Words
+#'
+#' @param obj textop2vecec object
+#'
+#' @return
+#' @export
+#'
+#' @examples
+tbl_top_2_vec_words_topics <-
+  function(obj) {
+    data <- as_tibble(obj$topic_words)
+    topics <- 1:ncol(data) - 1
+
+    topics <- topics |> .pz()
+
+    data <-
+      data |> setNames(glue::glue("tv2_{topics}")) |>
+      mutate(number_word = 1:n()) |>
+      select(number_word, everything())
+
+    data
+
+  }
+
+#' Top Textop2vecec Documents
+#'
+#' @param obj
+#'
+#' @return
+#' @export
+#'
+#' @examples
+top2vec_document_topics <-
+  function(obj) {
+    tibble(id_document = obj$document_ids,
+           topic_top2vec = s.numeric(obj$doc_top),
+           distance = as.numeric(obj$doc_dist)) |>
+      mutate(number_document = 1:n()) |>
+      select(number_document, everything())
+  }
+
+
+# search ------------------------------------------------------------------
+
+
+.top2vec_similar_word <-
+  function(obj, keyword = NULL, keywords_exclude = NULL, number_words = 10L, use_index = FALSE, ef = NULL) {
+
+    if (class(keyword) != "list") {
+      keyword <- list(keyword)
+    }
+
+    if (length(keywords_exclude) > 0) {
+      keywords_exclude <- list(keywords_exclude)
+    }
+
+    out <- obj$similar_words(
+      keywords = keyword,
+      num_words = as.integer(number_words),
+      use_index = use_index,
+      ef = ef
+    )
+
+    words <- out[[1]] |> as.character()
+    scores <- out[[2]] |> as.numeric()
+
+    tibble(similar_words_top2vec = words,
+           score_top2vec = scores) |>
+      mutate(keyword_search = unlist(keyword)) |>
+      select(keyword_search,everything())
+
+
+  }
+
+#' Textop2vecec Similar Words
+#'
+#' @param keywords
+#' @param obj
+#' @param keywords_exclude
+#' @param number_words
+#' @param use_index
+#' @param ef
+#'
+#' @return
+#' @export
+#'
+#' @examples
+top2vec_similar_words <-
+  function(keywords = NULL, obj = NULL, keywords_exclude = NULL, number_words = 10L, use_index = FALSE, ef = NULL) {
+
+    if (length(obj) == 0) {
+     stop("Enter object")
+    }
+    .top2vec_similar_word_safe <-
+      purrr::possibly(.top2vec_similar_word, tibble())
+
+    keywords |>
+      map_dfr(function(x){
+        .top2vec_similar_word_safe(obj = obj,
+                          keyword = x,
+                          keywords_exclude = keywords_exclude,
+                          number_words = number_words,
+                          use_index = use_index,
+                          ef = ef)
+      })
+
+  }

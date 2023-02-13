@@ -7,7 +7,11 @@
 bert_document_info(obj, docs, document_name = NULL)
 }
 \arguments{
-\item{document_name}{}
+\item{obj}{Topic model object}
+
+\item{docs}{vector of documents}
+
+\item{document_name}{If not `NULL` name of the text document column}
 }
 \description{
 Bertopic Documents
