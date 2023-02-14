@@ -2,6 +2,7 @@
 
 library(tidyverse)
 library(bertopic)
+library(asbtools)
 
 
 # Quick Start -------------------------------------------------------------
@@ -263,9 +264,9 @@ tbl_trump_over_time <- tbl_trump_over_time |>
   mutate(year = lubridate::year(date))
 
 tbl_trump_over_time |>
-  asbtools::tbl_dates_quarter_year(date_columns = "date") |>
+  tbl_dates_quarter_year(date_columns = "date") |>
   filter(!is_outlier_bert_topic) |>
-  asbtools::tbl_summarise(
+  tbl_summarise(
     group_variables = c("year_quarter_date_calendar", "topic_bert", "name_topic"),
     max_variables = "date",
     amount_variables = "count"
@@ -288,9 +289,9 @@ tbl_trump_over_time |>
 
 
 tbl_trump_over_time |>
-  asbtools::tbl_dates_quarter_year(date_columns = "date") |>
+  tbl_dates_quarter_year(date_columns = "date") |>
   filter(!is_outlier_bert_topic) |>
-  asbtools::tbl_summarise(
+  tbl_summarise(
     group_variables = c("year_quarter_date_calendar", "topic_bert", "name_topic"),
     max_variables = "date",
     amount_variables = "count"
@@ -482,8 +483,8 @@ topic_model$visualize_topics_per_class(topics_per_class = as_tibble(topics_per_c
 
 # Supervised Topic Modeling -----------------------------------------------
 #' Add Supervised Laels
-asbtools::python_modules("bertopic.dimensionality")
-asbtools::python_modules("sklearn.linear_model")
+python_modules("bertopic.dimensionality")
+python_modules("sklearn.linear_model")
 empty_dimensionality_model <-
   bertopic_dimensionality$BaseDimensionalityReduction()
 
