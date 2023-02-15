@@ -8,6 +8,7 @@ tbl_keybert_keywords(
   data,
   document_column = NULL,
   obj = NULL,
+  include_both_vectorizers = FALSE,
   model = "all-MiniLM-L6-v2",
   exclude_stop_words = T,
   use_future = FALSE,
@@ -46,9 +47,15 @@ tbl_keybert_keywords(
 
 \item{obj}{Keybert Object}
 
+\item{include_both_vectorizers}{if `TRUE` returns keybert and sklearn methods}
+
 \item{model}{Use a custom embedding model. The following backends are currently supported: * SentenceTransformers * 🤗 Transformers * Flair * Spacy * Gensim * USE (TF-Hub) You can also pass in a string that points to one of the following sentence-transformers models: * https://www.sbert.net/docs/pretrained_models.html}
 
 \item{exclude_stop_words}{if `TRUE` excludes stop words}
+
+\item{use_future}{if `TRUE` uses parallel processing}
+
+\item{return_message}{if `TRUE` returns a message}
 
 \item{keyphrase_ngram_range}{Length, in words, of the extracted keywords/keyphrases. NOTE: This is not used if you passed a vectorizer.}
 
