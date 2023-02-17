@@ -47,7 +47,8 @@ topic_model <-
     extra_stop_words = NULL,
     use_key_phrase_vectorizer = FALSE,
     n_gram_range = list(1L, 1L),
-    use_sklearn_vectorizer = F
+    use_sklearn_vectorizer = F,
+    representation_model = mmr_inspired_representation(diversity = .75)
   )
 
 topic_model$get_params()

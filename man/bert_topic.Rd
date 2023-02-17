@@ -6,6 +6,7 @@
 \usage{
 bert_topic(
   language = "english",
+  representation_model = NULL,
   top_n_words = 10L,
   use_key_phrase_vectorizer = F,
   use_sklearn_vectorizer = F,
@@ -24,7 +25,6 @@ bert_topic(
   stopword_package_sources = NULL,
   extra_stop_words = NULL,
   calculate_probabilities = T,
-  diversity = NULL,
   min_df = 1L,
   max_df = 1L,
   pos_pattern = "<J.*>*<N.*>+",
@@ -36,11 +36,11 @@ bert_topic(
 \arguments{
 \item{language}{The main language used in your documents. The default sentence-transformers model for "english" is all-MiniLM-L6-v2. For a full overview of supported languages see bertopic.backend.languages. Select "multilingual" to load in the paraphrase-multilingual-MiniLM-L12-v2 sentence-tranformers model that supports 50+ languages. Default `english`}
 
+\item{representation_model}{}
+
 \item{top_n_words}{The number of words per topic to extract. Setting this too high can negatively impact topic embeddings as topics are typically best represented by at most 10 words.  Default to `10L`}
 
 \item{use_key_phrase_vectorizer}{if `TRUE` uses a keyphrase vectorizer}
-
-\item{use_sklearn_vectorizer}{}
 
 \item{is_lower_case}{if `TRUE` is lowercase}
 
@@ -71,8 +71,6 @@ bert_topic(
 \item{extra_stop_words}{vector of other stopwords}
 
 \item{calculate_probabilities}{Whether to calculate the probabilities of all topics per document instead of the probability of the assigned topic per document. This could slow down the extraction of topics if you have many documents (> 100_000). Set this only to True if you have a low amount of documents or if you do not mind more computation time. NOTE: If false you cannot use the corresponding visualization method visualize_probabilities.  Default to `FALSE`}
-
-\item{diversity}{Whether to use MMR to diversify the resulting topic representations. If set to None, MMR will not be used. Accepted values lie between 0 and 1 with 0 being not at all diverse and 1 being very diverse. Default is `NULL`}
 
 \item{min_df}{During fitting ignore keyphrases that have a document frequency strictly lower than the given threshold. This value is also called cut-off in the literature.  Default `1L`}
 

@@ -775,3 +775,48 @@ tbl_keybert_data <-
     dat
 
   }
+
+#' Gather Keybert Generated Keywords
+#'
+#' @param data
+#' @param id_column
+#' @param only_distinct
+#'
+#' @return
+#' @export
+#'
+#' @examples
+gather_keybert_keywords <-
+  function(data, id_column = NULL,
+           only_distinct = F) {
+    if (length(id_column) == 0) {
+      data <- data |>
+        mutate(id = 1:n())
+      id_column <- "id"
+    }
+    keyword_cols <- data |> select(matches("^keywords")) |> names()
+    data <- data |> select(id_column, matches(keyword_cols)) |>
+      pivot_longer(
+        cols = keyword_cols,
+        names_to = "type_keyword",
+        values_to = "keyword",
+        values_drop_na = T
+      ) |>
+      mutate(type_keyword = case_when(
+        type_keyword |> str_detect("sklearn") ~ "sklearn",
+        type_keyword |> str_detect("keyphrase") ~ "keyphrase",
+        TRUE ~ "other"
+      )) |>
+      separate_rows(keyword, sep = "\\|") |>
+      mutate_if(is.character, str_squish)
+
+    if (only_distinct) {
+      data <-
+        data |>
+        distinct(keyword)
+
+      return(data)
+    }
+
+    data
+  }

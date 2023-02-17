@@ -7,7 +7,7 @@
 top2vec_model(
   docs = NULL,
   min_count = 50L,
-  ngram_vocab = FALSE,
+  ngram_vocab = TRUE,
   ngram_vocab_args = NULL,
   embedding_model = "doc2vec",
   embedding_model_path = NULL,

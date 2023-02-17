@@ -403,7 +403,6 @@ import_bertopic <-
 #' @param nr_topics Specifying the number of topics will reduce the initial number of topics to the value specified. This reduction can take a while as each reduction in topics (-1) activates a c-TF-IDF calculation. If this is set to None, no reduction is applied. Use `auto` to automatically reduce topics using HDBSCAN.
 #' @param low_memory Sets UMAP low memory to True to make sure less memory is used. NOTE: This is only used in UMAP. For example, if you use PCA instead of UMAP this parameter will not be used. Default `FALSE`
 #' @param calculate_probabilities Whether to calculate the probabilities of all topics per document instead of the probability of the assigned topic per document. This could slow down the extraction of topics if you have many documents (> 100_000). Set this only to True if you have a low amount of documents or if you do not mind more computation time. NOTE: If false you cannot use the corresponding visualization method visualize_probabilities.  Default to `FALSE`
-#' @param diversity Whether to use MMR to diversify the resulting topic representations. If set to None, MMR will not be used. Accepted values lie between 0 and 1 with 0 being not at all diverse and 1 being very diverse. Default is `NULL`
 #' @param seed_topic_list A list of seed words per topic to converge around.  Default is `NULL`
 #' @param umap_model Pass in a UMAP model to be used instead of the default. NOTE: You can also pass in any dimensionality reduction algorithm as long as it has .fit and .transform functions.
 #' @param hdbscan_model Pass in a hdbscan.HDBSCAN model to be used instead of the default NOTE: You can also pass in any clustering algorithm as long as it has .fit and .predict functions along with the .labels_ variable. Default `NULL`
@@ -423,6 +422,7 @@ import_bertopic <-
 #' @param vocabulary
 #' @param stopword_package_sources options if not `NULL` `c("snowball", "stopwords-iso", "smart", "nltk")`
 #' @param use_sklearn_vectorizer
+#' @param representation_model
 #'
 #' @return python object
 #' @export
@@ -439,6 +439,7 @@ import_bertopic <-
 
 bert_topic <-
   function(language = "english",
+           representation_model = NULL,
            top_n_words = 10L,
            use_key_phrase_vectorizer = F,
            use_sklearn_vectorizer = F,
@@ -457,7 +458,6 @@ bert_topic <-
            stopword_package_sources = NULL,
            extra_stop_words = NULL,
            calculate_probabilities = T,
-           diversity = NULL,
            min_df = 1L,
            max_df = 1L,
            pos_pattern = "<J.*>*<N.*>+",
@@ -512,8 +512,11 @@ bert_topic <-
     }
 
 
+
+
     obj <-
       bertopic$BERTopic(
+        representation_model = representation_model,
         language = language,
         top_n_words = as.integer(top_n_words),
         n_gram_range = n_gram_range,
@@ -521,7 +524,6 @@ bert_topic <-
         nr_topics = nr_topics,
         low_memory = low_memory,
         calculate_probabilities = calculate_probabilities,
-        diversity = diversity,
         seed_topic_list = seed_topic_list,
         verbose = verbose,
         umap_model = umap_model,
