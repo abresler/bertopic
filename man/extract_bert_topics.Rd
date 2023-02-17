@@ -11,7 +11,7 @@ extract_bert_topics(
   text_column = NULL,
   topic_model = NULL,
   include_labels = T,
-  label_words = 4L,
+  number_words = 4L,
   arrange_topics = F
 )
 }

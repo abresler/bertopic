@@ -147,3 +147,59 @@ hugging_face_transformers <-
     }
     obj$pipelines$pipeline(task = "feature-extraction", model="distilbert-base-cased", ...)
   }
+
+
+
+# base --------------------------------------------------------------------
+
+#' Embed Vector of Words
+#'
+#' @param obj Topic Model Object
+#' @param words Vector of Words
+#' @param verbose if `TRUE` verbose
+#'
+#' @return
+#' @export
+#'
+#' @examples
+bert_embed_words <-
+  function(obj, words, return_tibble = T,
+           verbose = TRUE) {
+    dat <- topic_model$embedding_model$embed_words(words = words, verbose = verbose)
+
+    if (!return_tibble) {
+      rownames(dat) <- words
+      return(dat)
+    }
+    dat |>
+      as_tibble() |>
+      janitor::clean_names() |>
+      mutate(word = words) |>
+      select(word, everything())
+}
+
+#' Embed Documents
+#'
+#' @param obj
+#' @param docs
+#' @param verbose
+#'
+#' @return
+#' @export
+#'
+#' @examples
+bert_embed_documents <-
+  function(obj, docs, return_tibble = TRUE, verbose = TRUE) {
+    dat <- topic_model$embedding_model$embed_documents(document = docs, verbose = verbose)
+
+    if (!return_tibble) {
+      rownames(dat) <- docs
+      return(dat)
+    }
+
+    dat |>
+      as_tibble() |>
+      janitor::clean_names() |>
+      mutate(document = docs) |>
+      select(document, everything())
+  }

@@ -4,13 +4,13 @@
 \alias{munge_bert_document_approximate_distributions}
 \title{Munge Document Topic Proability Distributions}
 \usage{
-munge_bert_document_approximate_distributions(
-  data,
-  topic_model = NULL,
-  return_wide = F
-)
+munge_bert_document_approximate_distributions(out, obj = NULL, return_wide = F)
 }
 \arguments{
+\item{out}{Approximate Distribution Output}
+
+\item{obj}{Bertopic Object}
+
 \item{return_wide}{}
 }
 \description{

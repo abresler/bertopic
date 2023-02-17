@@ -5,14 +5,17 @@
 \title{Topic's Representative Documents}
 \usage{
 bert_representative_documents(
-  topic_model,
+  obj,
   topic_number = NULL,
   include_labels = T,
-  label_words = 5L
+  number_words = 5L,
+  sep = "_"
 )
 }
 \arguments{
-\item{topic_number}{}
+\item{obj}{Topic Model Object}
+
+\item{topic_number}{If not `NULL` number of topic}
 }
 \description{
 Topic's Representative Documents

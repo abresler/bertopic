@@ -31,11 +31,6 @@ tbl_news_docs <-
   mutate(number_document = 1:n()) |>
   select(number_document, number_label, news_label, everything())
 
-import_sentence_transformers()
-SentenceTransformer <-
-  sentence_transformers$SentenceTransformer(model_name_or_path = "all-MiniLM-L6-v2")
-embeddings <-
-  SentenceTransformer$encode(sentences = news_docs, show_progress_bar = T)
 
 
 # Intiate BT model
@@ -48,22 +43,25 @@ topic_model <-
     use_key_phrase_vectorizer = FALSE,
     n_gram_range = list(1L, 1L),
     use_sklearn_vectorizer = F,
+    ctfidf_model = ctfidf(bm25_weighting = TRUE, reduce_frequent_words = TRUE),
     representation_model = mmr_inspired_representation(diversity = .75)
   )
 
-topic_model$get_params()
+topic_model |> bert_parameters(deep = F)
+
+out <-
+  topic_model$fit_transform(documents = news_docs)
+
+
+
+embeddings <-
+  topic_model$embedding_model$embed(documents = news_docs, verbose = T) # same as above
 
 #' Fit the bertopic model
 # out <-
 #   topic_model$fit_transform(documents = news_docs, embeddings = embeddings) # similar topcis wont work with custom embeddings
 
-out <-
-  topic_model$fit_transform(documents = news_docs)
 
-topic_model$get_params()
-
-# embeddings <-
-#   topic_model$embedding_model$embed(documents = news_docs, verbose = T) # same as above
 
 # saving ------------------------------------------------------------------
 # setwd("~")
@@ -79,13 +77,27 @@ tbl_info <-
 topic_model |> bert_topic_count()
 
 topic_model |> bert_topic_labels(number_words = 3L)
+topic_model |> bert_topic_labels(number_words = 3L, word_length = 1000)
 topic_model |> bert_topic_labels(number_words = 10L, separator = "_")
 
 tbl_bert_keywords <- topic_model |> bert_topics_keywords()
 
-topic_model |> bert_topics_keywords(bert_topics = 0)
+news_hier <-
+  topic_model |> bert_topic_hierarchy(docs = tbl_news_docs$document)
 
-topic_model |> bert_document_info(docs = news_docs, document_name = "document")
+
+print_bert_topic_tree(obj = topic_model, hierarchy = news_hier, tight_layout = TRUE, max_distance = NULL)
+
+print_bert_topic_tree(
+  obj = topic_model,
+  hierarchy = news_hier,
+  tight_layout = TRUE,
+  max_distance = 1
+)
+
+topic_model |> bert_topic_keywords(bert_topics = 0)
+
+
 
 
 # visualizations ----------------------------------------------------------
@@ -147,7 +159,7 @@ hierarchical_topics |> as_tibble()
 
 topic_model$visualize_hierarchy(hierarchical_topics = hierarchical_topics) |> write_bert_viz()
 
-topic_model$get_topic_tree(hierarchical_topics, tight_layout = T) |> print()
+topic_model$get_topic_tree(news_hier, tight_layout = T) |> cat(fill = T)
 
 
 # Verms
@@ -158,7 +170,7 @@ viz_bar <-
 viz_bar |> write_bert_viz()
 
 topic_model |>
-  bertopic::bert_topics_keywords() |>
+  bert_topic_keywords()|>
   arrange(topic_bert, desc(score_c_tfidf)) |>
   group_by(topic_bert) |>
   slice(1:15) |>
@@ -331,8 +343,9 @@ tbl_trump_topics_per_class <-
 
 
 appx_dist <-
-  topic_model$approximate_distribution(
-    documents = tweets,
+  topic_model |>
+  bert_approximate_distribution(
+    docs = tweets,
     min_similarity = 0,
     calculate_tokens = F
   )
@@ -350,6 +363,9 @@ appx_dist <-
 # reduce_topics -----------------------------------------------------------
 
 topic_model$reduce_topics(docs = news_docs, nr_topics = 30L)
+topic_model |> bert_reduce_topics(docs = news_docs,number_topics = 5L)
+topic_model |> bert_topic_count() # Does work
+topic_model$reduce_outliers()
 topic_model |> bert_topic_info() |> View()
 topic_model$topics_
 
@@ -482,6 +498,11 @@ topic_model$visualize_topics_per_class(topics_per_class = as_tibble(topics_per_c
   write_bert_viz()
 
 
+# merge -------------------------------------------------------------------
+
+bert_merge_topics(obj = topic_model,
+                  docs = news_docs,
+                  topics_to_merge = list(1L, 2L))
 # Supervised Topic Modeling -----------------------------------------------
 #' Add Supervised Laels
 python_modules("bertopic.dimensionality")
@@ -611,3 +632,13 @@ multiple_topics <-
        list(3, 4))
 
 topic_model$merge_topics(docs = news_docs, topics_to_merge = multiple_topics)
+
+
+# transformers ------------------------------------------------------------
+
+
+import_sentence_transformers()
+SentenceTransformer <-
+  sentence_transformers$SentenceTransformer(model_name_or_path = "all-MiniLM-L6-v2")
+embeddings <-
+  SentenceTransformer$encode(sentences = news_docs, show_progress_bar = T)

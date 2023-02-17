@@ -5,14 +5,23 @@
 \title{Generate BERT Topic Labels}
 \usage{
 bert_topic_labels(
-  topic_model,
+  obj,
   number_words = 4L,
   separator = "_",
-  word_length = NULL
+  word_length = NULL,
+  topic_prefix = FALSE
 )
 }
 \arguments{
-\item{word_length}{}
+\item{obj}{topic model object}
+
+\item{number_words}{Top n words per topic to use.  Default is 4}
+
+\item{separator}{The string with which the words and topic prefix will be separated. Underscores are the default but a nice alternative is ", ".  Default `_`}
+
+\item{word_length}{The maximum length of each word in the topic label. Some words might be relatively long and setting this value helps to make sure that all labels have relatively similar lengths.}
+
+\item{topic_prefix}{Whether to use the topic ID as a prefix. If set to True, the topic ID will be separated using the separator}
 }
 \description{
 Generate BERT Topic Labels

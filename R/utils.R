@@ -2,6 +2,7 @@
 
 
 
+
 # tuple -------------------------------------------------------------------
 
 list_to_tuple <-
@@ -23,7 +24,8 @@ list_to_tuple <-
 #'
 #' @examples
 bert_load <-
-  function(model_path = NULL, obj = NULL,
+  function(model_path = NULL,
+           obj = NULL,
            embedding_model = NULL) {
     if (length(model_path) == 0) {
       stop("Enter Path")
@@ -58,7 +60,10 @@ bert_load <-
 #'
 #' @examples
 bert_save <-
-  function(obj, model_path = NULL, file_name = "bert_model", save_embedding_model = TRUE) {
+  function(obj,
+           model_path = NULL,
+           file_name = "bert_model",
+           save_embedding_model = TRUE) {
     if (length(model_path) == 0) {
       stop("Enter Path")
     }
@@ -235,7 +240,8 @@ bert_similar_terms_topics <-
       left_join(
         topic_model |> bert_topic_info() |> rename(count_documents_in_topic = count)
         ,
-                by = c("topic_bert", "is_outlier_bert_topic"))
+        by = c("topic_bert", "is_outlier_bert_topic")
+      )
 
 
     if (nest_data) {
@@ -268,7 +274,7 @@ bert_topic_info <-
       tbl_topics |>
       mutate(name = name |> str_replace("\\_", "\\+")) |>
       tidyr::separate(name,
-                      into = c("remove", "name_topic"),
+                      into = c("remove", "label_bertopic"),
                       sep = "\\+") |>
       select(-remove) |>
       mutate(is_outlier_bert_topic = topic_bert == -1) |>
@@ -280,28 +286,36 @@ bert_topic_info <-
 
 #' Generate BERT Topic Labels
 #'
-#' @param topic_model
-#' @param number_words
-#' @param separator
-#' @param word_length
+#' @param obj topic model object
+#' @param number_words Top n words per topic to use.  Default is 4
+#' @param separator The string with which the words and topic prefix will be separated. Underscores are the default but a nice alternative is ", ".  Default `_`
+#' @param word_length The maximum length of each word in the topic label. Some words might be relatively long and setting this value helps to make sure that all labels have relatively similar lengths.
+#' @param topic_prefix  Whether to use the topic ID as a prefix. If set to True, the topic ID will be separated using the separator
+
+
 #'
 #' @return
 #' @export
 #'
 #' @examples
 bert_topic_labels <-
-  function(topic_model,
+  function(obj,
            number_words = 4L,
            separator = "_",
-           word_length =  NULL) {
-    topic_labels <- topic_model$generate_topic_labels(
+           word_length =  NULL,
+           topic_prefix = FALSE) {
+    if (length(word_length) > 0) {
+      word_length <- as.integer(word_length)
+    }
+
+    label_bertopic <- obj$generate_topic_labels(
       nr_words = as.integer(number_words),
       separator = separator,
-      topic_prefix = F,
+      topic_prefix = topic_prefix,
       word_length = word_length
     )
 
-    tibble(topic_labels) |>
+    tibble(label_bertopic) |>
       mutate(topic_bert = 1:n() - 2) |>
       select(topic_bert, everything()) |>
       mutate(is_outlier_bert_topic = topic_bert == -1) |>
@@ -310,7 +324,9 @@ bert_topic_labels <-
 
 
 bert_save <-
-  function(obj = NULL, file_path = NULL, file_name = "bert_model") {
+  function(obj = NULL,
+           file_path = NULL,
+           file_name = "bert_model") {
     if (length(file_path) == 0) {
       stop("Enter File Path")
     }
@@ -323,46 +339,58 @@ bert_save <-
     }
     path <- glue::glue("{file_path}/{file_name}")
 
-    obj$save(save_embedding_model = )
+    obj$save(save_embedding_model =)
 
   }
 
 
 #' Topic Counts
 #'
-#' @param topic_model
-#' @param topic_number
+#' @param obj bertopic object
+#' @param topic_number if not `NULL` the number of the topic.  If `NULL` returns all topics.
 #'
 #' @return
 #' @export
 #'
 #' @examples
 bert_topic_count <-
-  function(topic_model, topic_number = NULL) {
-    topic_model$get_topic_freq(topic = topic_number) |>
+  function(obj,
+           topic_number = NULL,
+           join_labels = TRUE) {
+    data <-
+      obj$get_topic_freq(topic = topic_number) |>
       janitor::clean_names() |> as_tibble() |>
       rename(topic_bert = topic) |>
       mutate(is_outlier_bert_topic = topic_bert == -1)
+
+    if (join_labels) {
+      data <- data |>
+        left_join(obj |> bert_topic_info() |> select(1:2), by = "topic_bert")
+    }
+
+
+    data
 
   }
 
 #' Topic's Representative Documents
 #'
-#' @param topic_model
-#' @param topic_number
+#' @param obj Topic Model Object
+#' @param topic_number If not `NULL` number of topic
 #'
 #' @return
 #' @export
 #'
 #' @examples
 bert_representative_documents <-
-  function(topic_model,
+  function(obj,
            topic_number = NULL,
            include_labels = T,
-           label_words = 5L) {
+           number_words = 5L,
+           sep = "_") {
     if (length(topic_number) != 0) {
       rep_docs <-
-        topic_model$get_representative_docs(topic = as.integer(topic_number))
+        obj$get_representative_docs(topic = as.integer(topic_number))
       data <-
         tibble(text = rep_docs) |>
         mutate(topic_bert = topic_number) |>
@@ -370,7 +398,7 @@ bert_representative_documents <-
       return(data)
     }
     rep_docs <-
-      topic_model$get_representative_docs(topic = topic_number)
+      obj$get_representative_docs(topic = topic_number)
     data <- seq_along(rep_docs) |>
       map_dfr(function(x) {
         topic_no <- names(rep_docs[x]) |> readr::parse_number()
@@ -381,31 +409,93 @@ bert_representative_documents <-
       arrange(topic_bert)
 
     if (include_labels) {
-      data <- data |>
-        left_join(bert_topic_labels(
-          topic_model = topic_model,
-          number_words = as.integer(label_words)
-        ),
-        by = "topic_bert") |>
-        select(topic_bert, topic_labels, everything())
+      tbl_labels <- bert_topic_labels(
+        obj = obj,
+        number_words = as.integer(number_words),
+        separator = sep
+      )
+      data <-
+        data |>
+        left_join(tbl_labels,
+                  by = "topic_bert") |>
+        select(topic_bert, label_bertopic, everything())
     }
 
 
     data
   }
 
+#' BERTopic Hieracrchy
+#'
+#' To create this hierarchy, BERTopic needs to be already fitted once. Then, a hierarchy is calculated on the distance matrix of the c-TF-IDF representation using scipy.cluster.hierarchy.linkage.
+#'
+#' @param obj Topic Model Object
+#' @param docs Vector of documents
+#' @param linkage_function  The linkage function to use. Default is: lambda x: sch.linkage(x, 'ward', optimal_ordering=True)
+#' @param distance_function The distance function to use on the c-TF-IDF matrix. Default is: lambda x: 1 - cosine_similarity(x)
+
+
+#'
+#' @return
+#' @export
+#'
+#' @examples
+bert_topic_hierarchy <-
+  function(obj,
+           docs,
+           linkage_function = NULL,
+           distance_function = NULL,
+           print_tree = FALSE) {
+    out <-
+      obj$hierarchical_topics(
+        docs = docs,
+        linkage_function = linkage_function,
+        distance_function = distance_function
+      )
+
+    if (print_tree) {
+      obj$get_topic_tree(hier_topics = out) |> cat(fill = TRUE)
+    }
+
+    out
+  }
+
+#' Print Bertopic Tree
+#'
+#' @param obj Bertopic Model
+#' @param hierarchy  Output from `bert_topic_hierarchy`
+#' @param tight_layout Whether to use a tight layout (narrow width) for easier readability if you have hundreds of topics.  Default `FALSE`
+#' @param max_distance The maximum distance between two topics. This value is based on the Distance column in hier_topics.  Default `NULL`
+#'
+#' @return
+#' @export
+#'
+#' @examples
+print_bert_topic_tree <-
+  function(obj,
+           hierarchy,
+           tight_layout = FALSE,
+           max_distance = NULL) {
+    obj$get_topic_tree(
+      hier_topics  = hierarchy,
+      max_distance = max_distance,
+      tight_layout = tight_layout
+    ) |>
+      cat(fill = TRUE)
+  }
+
 #' Returns keywords for the topics
 #'
-#' @param topic_model
+#' @param obj
 #' @param bert_topics
 #'
 #' @return
 #' @export
 #'
 #' @examples
-bert_topics_keywords <-
-  function(topic_model, bert_topics = NULL)  {
-    topics <- topic_model$get_topics()
+bert_topic_keywords <-
+  function(obj, bert_topics = NULL)  {
+    topics <- obj$get_topics()
     data <-
       seq_along(topics) |>
       map_dfr(function(x) {
@@ -421,10 +511,9 @@ bert_topics_keywords <-
       })
 
     data <- data |>
-      left_join(
-        topic_model |> bert_topic_info() |> select(topic_bert, name_topic), by = "topic_bert"
-      ) |>
-      select(topic_bert, name_topic, everything())
+      left_join(obj |> bert_topic_info() |> select(topic_bert, label_bertopic),
+                by = "topic_bert") |>
+      select(topic_bert, label_bertopic, everything())
 
     if (length(bert_topics) > 0) {
       data <- data |> filter(topic_bert %in% bert_topics)
@@ -456,7 +545,7 @@ extract_bert_topics <-
            text_column = NULL,
            topic_model = NULL,
            include_labels = T,
-           label_words = 4L,
+           number_words = 4L,
            arrange_topics = F) {
     topics <-
       obj[[1]]
@@ -464,7 +553,7 @@ extract_bert_topics <-
     tbl_prob <-
       obj[[2]] |> as_tibble() |> janitor::clean_names() |>
       select(v1) |>
-      rename(pct_probabilty_topic_bert = v1)
+      rename(pct_probability_topic_bert = v1)
 
     data <-
       tbl_prob |>
@@ -497,19 +586,20 @@ extract_bert_topics <-
       select(topic_bert, names(data), everything())
 
     if (include_labels) {
+      tbl_labels <- bert_topic_labels(
+        obj = topic_model,
+        number_words = as.integer(number_words)
+      )
       data <-
         data |>
-        left_join(bert_topic_labels(
-          topic_model = topic_model,
-          number_words = as.integer(label_words)
-        ),
+        left_join(tbl_labels,
         by = "topic_bert") |>
-        select(topic_bert, topic_labels, everything())
+        select(topic_bert, label_bertopic, everything())
     }
 
     if (arrange_topics) {
       data <- data |>
-        arrange(topic_bert, desc(pct_probabilty_topic_bert))
+        arrange(topic_bert, desc(pct_probability_topic_bert))
     }
 
 
@@ -551,12 +641,14 @@ bert_topic_per_class <-
     dat <-
       dat |> setNames(c("topic_bert", "top_words", "count", "class"))
     dat <-
-      dat |> left_join(bert_topic_info(topic_model = topic_model) |>
-                         select(topic_bert, name_topic)
+      dat |> left_join(
+        bert_topic_info(topic_model = topic_model) |>
+          select(topic_bert, label_bertopic)
 
-                       ,
-                       by = "topic_bert") |>
-      select(topic_bert, name_topic, everything()) |>
+        ,
+        by = "topic_bert"
+      ) |>
+      select(topic_bert, label_bertopic, everything()) |>
       arrange(desc(class), topic_bert)
 
     dat
@@ -593,9 +685,9 @@ tbl_bert_topic_per_class <-
     }
 
     data <- data |> tidyr::unite(col = "class",
-                 all_of(class_name),
-                 sep = "@",
-                 remove = F)
+                                 all_of(class_name),
+                                 sep = "@",
+                                 remove = F)
 
     dat <-
       bert_topic_per_class(
@@ -615,17 +707,47 @@ tbl_bert_topic_per_class <-
       select(-count, everything())
 
     dat <- dat |>
-      mutate_at(class_name, list(function(x){
+      mutate_at(class_name, list(function(x) {
         case_when(x == "NA", NA_character_,
                   TRUE ~ x)
       }))
 
     if (sort_by_topic) {
       dat <- dat |>
-        arrange(name_topic, desc(count))
+        arrange(label_bertopic, desc(count))
     }
 
     dat
+  }
+
+#' Merge Topics
+#'
+#' @param obj bertopic model object
+#' @param docs The documents you used when calling either fit or fit_transform
+#' @param topics_to_merge Either a list of topics or a list of list of topics to merge. For example: `list(1,2,3)` will merge topics 1, 2 and 3 `list(list(1,2), list(3,4))` will merge topics 1 and 2, and separately merge topics 3 and 4.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+bert_merge_topics <-
+  function(obj, docs,
+           topics_to_merge = NULL) {
+
+    if (length(topics_to_merge) == 0) {
+      "Enter a list or list of lists of topics to merge" |> message()
+      return(obj)
+    }
+    obj$merge_topics(docs = docs, topics_to_merge = topics_to_merge)
+  }
+
+bert_reduce_topics <-
+  function(obj, docs, number_topics = NULL) {
+    if (length(number_topics) == 0) {
+      "Enter number of reduced topics" |> message()
+      return(obj)
+    }
+    obj$reduce_topics(docs = docs, nr_topics = as.integer(number_topics))
   }
 
 # text --------------------------------------------------------------------
@@ -687,15 +809,15 @@ bert_document_info <-
         c(
           "document",
           "topic_bert",
-          "name_topic_labels",
-          "top_n_words",
-          "pct_probabilty_topic_bert",
-          "is_representative_document"
+          "name_label_bertopic",
+          "top_n_words_label_bertopic",
+          "pct_probability_topic_bert",
+          "is_bertopic_representative_document"
         )
       ) |>
       left_join(obj |> bert_topic_info() |> select(-count), by = "topic_bert") |>
-      select(-name_topic_labels) |>
-      select(document, topic_bert, name_topic, everything())
+      select(-name_label_bertopic) |>
+      select(document, topic_bert, label_bertopic, everything())
 
     if (length(document_name) > 0) {
       data <- data |>
@@ -808,7 +930,9 @@ extract_bert_umap <-
 #'
 #' @examples
 extract_document_word_counts <-
-  function(obj, docs = NULL, filter_zero = T) {
+  function(obj,
+           docs = NULL,
+           filter_zero = T) {
     if (length(docs) == 0) {
       stop("Enter Docs")
     }
@@ -923,8 +1047,7 @@ bert_topics_over_time <-
            datetime_format =  NULL,
            evolution_tuning = TRUE,
            global_tuning = TRUE,
-           return_tibble = TRUE
-           ) {
+           return_tibble = TRUE) {
     if (length(docs) == 0) {
       stop("Enter Documents")
     }
@@ -937,12 +1060,14 @@ bert_topics_over_time <-
       nr_bins <- as.integer(nr_bins)
     }
 
-    out <-  obj$topics_over_time(docs = docs,
-                         timestamps = timestamps,
-                         nr_bins = nr_bins,
-                         datetime_format = datetime_format,
-                         evolution_tuning = evolution_tuning,
-                         global_tuning = global_tuning)
+    out <-  obj$topics_over_time(
+      docs = docs,
+      timestamps = timestamps,
+      nr_bins = nr_bins,
+      datetime_format = datetime_format,
+      evolution_tuning = evolution_tuning,
+      global_tuning = global_tuning
+    )
 
     if (return_tibble) {
       out <- out |> munge_bert_topics_over_time(topic_model = obj)
@@ -976,20 +1101,20 @@ tbl_bert_topics_over_time <-
            datetime_format =  NULL,
            evolution_tuning = TRUE,
            global_tuning = TRUE,
-           return_tibble = TRUE
-  ) {
-
+           return_tibble = TRUE) {
     dat <-
-      bert_topics_over_time(obj = topic_model,
-                          docs = data[[document_name]],
-                          timestamps = data[[time_feature]],
-                          nr_bins = nr_bins,
-                          datetime_format = datetime_format,
-                          evolution_tuning = evolution_tuning,
-                          global_tuning = global_tuning)
+      bert_topics_over_time(
+        obj = topic_model,
+        docs = data[[document_name]],
+        timestamps = data[[time_feature]],
+        nr_bins = nr_bins,
+        datetime_format = datetime_format,
+        evolution_tuning = evolution_tuning,
+        global_tuning = global_tuning
+      )
 
     dat
-}
+  }
 
 #' Munge Topic Over Time
 #'
@@ -1017,6 +1142,8 @@ munge_bert_topics_over_time <-
     data
 
   }
+
+
 
 
 #' Munge Topics Per Class Output
@@ -1052,11 +1179,59 @@ munge_bert_topics_per_class <-
     data
 
   }
+# approx_distribution -----------------------------------------------------
+
+#' Get a string representation of the current object.
+#'
+#' @param obj Topic Model Object
+#' @param docs Vector of Documents
+#' @param window Size of the moving window which indicates the number of tokens being considered.  Default `4`
+#' @param stride How far the window should move at each step.  Default `1`.
+#' @param min_similarity The minimum similarity of a document's tokenset with respect to the topics.  Default `.1`
+#' @param batch_size The number of documents to process at a time. If None, then all documents are processed at once. NOTE: With a large number of documents, it is not advised to process all documents at once.    Default `1000`
+#' @param padding  Whether to pad the beginning and ending of a document with empty tokens.  Default `FALSE`
+#' @param use_embedding_model Whether to use the topic model's embedding model to calculate the similarity between tokensets and topics instead of using c-TF-IDF.  Default `FALSE`
+#' @param calculate_tokens Calculate the similarity of tokens with all topics. NOTE: This is computation-wise more expensive and can require more memory. Using this over batches of documents might be preferred.  Default `FALSE`
+#' @param separator  The separator used to merge tokens into tokensets.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+bert_approximate_distribution <-
+  function(obj,
+           docs,
+           window = 4,
+           stride = 1,
+           min_similarity = 0.1,
+           batch_size = 1000,
+           padding = FALSE,
+           use_embedding_model = FALSE,
+           calculate_tokens = FALSE,
+           separator = ' ') {
+
+    out <-
+      obj$approximate_distribution(
+        documents = docs,
+        window = as.integer(window),
+        stride = as.integer(stride),
+        min_similarity = min_similarity,
+        batch_size = as.integer(batch_size),
+        padding = padding,
+        use_embedding_model = use_embedding_model,
+        calculate_tokens = calculate_tokens,
+        separator = separator
+      )
+
+
+    out
+  }
+
 
 #' Munge Document Topic Proability Distributions
 #'
-#' @param data
-#' @param topic_model
+#' @param out Approximate Distribution Output
+#' @param obj Bertopic Object
 #' @param return_wide
 #'
 #' @return
@@ -1064,21 +1239,22 @@ munge_bert_topics_per_class <-
 #'
 #' @examples
 munge_bert_document_approximate_distributions <-
-  function(data,
-           topic_model = NULL,
+  function(out,
+           obj = NULL,
            return_wide = F) {
     options(scipen = 999)
-    data <- data[[1]] |> as_tibble()
+    data <- out[[1]] |> as_tibble()
     topic_number <- 1:ncol(data) - 1
     data <-
       data |> setNames(str_c("topic_bert_", topic_number)) |>
       mutate(number_document = 1:n()) |>
       select(number_document, everything())
 
-    if (length(topic_model) > 0) {
-      actual_topic_names <- topic_model |> bert_topic_info() |>
+    if (length(obj) > 0) {
+      actual_topic_names <-
+        obj |> bert_topic_info() |>
         filter(topic_bert != -1) |>
-        mutate(topic = glue::glue("topic_bert_{topic_bert}_{name_topic}")) |>
+        mutate(topic = glue::glue("topic_bert_{topic_bert}_{label_bertopic}")) |>
         pull(topic)
       names(data)[!names(data) %in% c("number_document")] <-
         actual_topic_names
@@ -1097,12 +1273,12 @@ munge_bert_document_approximate_distributions <-
       mutate(label_topic_bert = label_topic_bert |> str_remove_all("topic_bert_") |> str_replace("\\_", "\\|")) |>
       separate(
         label_topic_bert,
-        into = c("topic_bert", "name_topic"),
+        into = c("topic_bert", "label_bertopic"),
         sep = "\\|",
         convert = T,
         extra = "merge",
         fill = "right",
-        remove = F
+        remove = T
       ) |>
       arrange(number_document, desc(pct_probability_topic_bert))
 

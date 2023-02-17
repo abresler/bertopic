@@ -4,10 +4,12 @@
 \alias{bert_topic_count}
 \title{Topic Counts}
 \usage{
-bert_topic_count(topic_model, topic_number = NULL)
+bert_topic_count(obj, topic_number = NULL, join_labels = TRUE)
 }
 \arguments{
-\item{topic_number}{}
+\item{obj}{bertopic object}
+
+\item{topic_number}{if not `NULL` the number of the topic.  If `NULL` returns all topics.}
 }
 \description{
 Topic Counts
