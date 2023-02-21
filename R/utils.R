@@ -3,6 +3,7 @@
 
 
 
+
 # tuple -------------------------------------------------------------------
 
 list_to_tuple <-
@@ -339,7 +340,7 @@ bert_save <-
     }
     path <- glue::glue("{file_path}/{file_name}")
 
-    obj$save(save_embedding_model =)
+    obj$save(save_embedding_model = )
 
   }
 
@@ -586,14 +587,12 @@ extract_bert_topics <-
       select(topic_bert, names(data), everything())
 
     if (include_labels) {
-      tbl_labels <- bert_topic_labels(
-        obj = topic_model,
-        number_words = as.integer(number_words)
-      )
+      tbl_labels <- bert_topic_labels(obj = topic_model,
+                                      number_words = as.integer(number_words))
       data <-
         data |>
         left_join(tbl_labels,
-        by = "topic_bert") |>
+                  by = "topic_bert") |>
         select(topic_bert, label_bertopic, everything())
     }
 
@@ -707,9 +706,13 @@ tbl_bert_topic_per_class <-
       select(-count, everything())
 
     dat <- dat |>
+      select(topic_bert,
+             label_bertopic,
+             matches("class_name"),
+             everything()) |>
       mutate_at(class_name, list(function(x) {
-        case_when(x == "NA", NA_character_,
-                  TRUE ~ x)
+        case_when(is.na(x) ~ NA_character_,
+                  TRUE ~ as.character(x))
       }))
 
     if (sort_by_topic) {
@@ -733,7 +736,6 @@ tbl_bert_topic_per_class <-
 bert_merge_topics <-
   function(obj, docs,
            topics_to_merge = NULL) {
-
     if (length(topics_to_merge) == 0) {
       "Enter a list or list of lists of topics to merge" |> message()
       return(obj)
@@ -748,6 +750,51 @@ bert_reduce_topics <-
       return(obj)
     }
     obj$reduce_topics(docs = docs, nr_topics = as.integer(number_topics))
+  }
+
+#' Updates the topic representation by recalculating c-TF-IDF with the new parameters as defined in this function.
+#'
+#' @param obj BERTopic Object
+#' @param docs The documents you used when calling either fit or fit_transform
+#' @param topics  A list of topics where each topic is related to a document in docs. Use this variable to change or map the topics. NOTE: Using a custom list of topic assignments may lead to errors if topic reduction techniques are used afterwards. Make sure that manually assigning topics is the last step in the pipeline.  Default `NULL`
+#' @param top_n_words The number of words per topic to extract. Setting this too high can negatively impact topic embeddings as topics are typically best represented by at most 10 words.  Default `10`
+#' @param n_gram_range The n-gram range for the CountVectorizer. Default `NULL`
+#' @param vectorizer_model Pass in your own CountVectorizer from scikit-learn.  Default `NULL`
+#' @param ctfidf_model Pass in your own c-TF-IDF model to update the representations.  Default `NULL`
+#' @param representation_model  Pass in a model that fine-tunes the topic representations calculated through c-TF-IDF. Models from bertopic.representation are supported. Default `NULL`
+#'
+#' @return
+#' @export
+#'
+#' @examples
+bert_update_topics <-
+  function(obj,
+           docs = NULL,
+           topics = NULL,
+           top_n_words = 10,
+           n_gram_range = NULL,
+           vectorizer_model = NULL,
+           ctfidf_model = NULL,
+           representation_model = NULL) {
+
+    if (length(docs) == 0) {
+      "Enter documents to fit" |> message()
+      return(obj)
+    }
+
+    if (length(n_gram_range) > 0) {
+      n_gram_range <- reticulate::tuple(n_gram_range)
+    }
+
+    obj$update_topics(
+      docs = docs,
+      topics = topics,
+      top_n_words = as.integer(top_n_words),
+      n_gram_range = n_gram_range,
+      vectorizer_model = vectorizer_model,
+      ctfidf_model = ctfidf_model,
+      representation_model = representation_model
+    )
   }
 
 # text --------------------------------------------------------------------
@@ -901,8 +948,10 @@ extract_bert_umap <-
 
     pct_dbscan_prob = obj$hdbscan_model$outlier_scores_ |> as.numeric()
 
-    df_map <- df_umap |>
-      mutate(pct_dbscan_prob)
+    df_umap <- df_umap |>
+      mutate(pct_dbscan_prob) |>
+      mutate(id = row_number()) |>
+      select(id, everything())
 
     if (length(data) == 0) {
       return(df_umap)
@@ -1209,7 +1258,6 @@ bert_approximate_distribution <-
            use_embedding_model = FALSE,
            calculate_tokens = FALSE,
            separator = ' ') {
-
     out <-
       obj$approximate_distribution(
         documents = docs,
