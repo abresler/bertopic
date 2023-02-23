@@ -778,9 +778,10 @@ tbl_keybert_data <-
 
 #' Gather Keybert Generated Keywords
 #'
-#' @param data
-#' @param id_column
-#' @param only_distinct
+#' @param data A `tbl`
+#' @param id_column Name of ID coliumn
+#' @param only_distinct if `TRUE` only distinct keywords
+#' @param other_join_columns If `TRUE` other column features to include
 #'
 #' @return
 #' @export
@@ -788,6 +789,7 @@ tbl_keybert_data <-
 #' @examples
 gather_keybert_keywords <-
   function(data, id_column = NULL,
+           other_join_columns = NULL,
            only_distinct = F) {
     if (length(id_column) == 0) {
       data <- data |>
@@ -795,7 +797,7 @@ gather_keybert_keywords <-
       id_column <- "id"
     }
     keyword_cols <- data |> select(matches("^keywords")) |> names()
-    data <- data |> select(id_column, matches(keyword_cols)) |>
+    data <- data |> select(id_column, one_of(other_join_columns), matches(keyword_cols)) |>
       pivot_longer(
         cols = keyword_cols,
         names_to = "type_keyword",
@@ -817,6 +819,10 @@ gather_keybert_keywords <-
 
       return(data)
     }
+
+    data <- data |>
+      mutate(is_sklearn = type_keyword == "sklearn",
+             is_keyphrase = type_keyword == "keyphrase")
 
     data
   }

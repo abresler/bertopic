@@ -4,10 +4,21 @@
 \alias{gather_keybert_keywords}
 \title{Gather Keybert Generated Keywords}
 \usage{
-gather_keybert_keywords(data, id_column = NULL, only_distinct = F)
+gather_keybert_keywords(
+  data,
+  id_column = NULL,
+  other_join_columns = NULL,
+  only_distinct = F
+)
 }
 \arguments{
-\item{only_distinct}{}
+\item{data}{A `tbl`}
+
+\item{id_column}{Name of ID coliumn}
+
+\item{other_join_columns}{If `TRUE` other column features to include}
+
+\item{only_distinct}{if `TRUE` only distinct keywords}
 }
 \description{
 Gather Keybert Generated Keywords
