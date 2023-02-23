@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{bert_similar_terms_topics}
 \alias{bert_similar_terms_topics}
-\title{Simlar Term Embeddings}
+\title{Simllar Term Embeddings}
 \usage{
 bert_similar_terms_topics(
   topic_model,
@@ -13,8 +13,14 @@ bert_similar_terms_topics(
 )
 }
 \arguments{
-\item{nest_data}{}
+\item{topic_model}{Bertopic Model}
+
+\item{terms}{Vector of Terms to search}
+
+\item{top_n_terms}{the number of topics to return.  Default is 10}
+
+\item{nest_data}{if `TRUE` Nests data}
 }
 \description{
-Simlar Term Embeddings
+Simllar Term Embeddings
 }

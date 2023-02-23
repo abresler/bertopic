@@ -9,6 +9,8 @@ bert_topic_labels(
   number_words = 4L,
   separator = "_",
   word_length = NULL,
+  update_topic_model_labels = FALSE,
+  append_number_words = FALSE,
   topic_prefix = FALSE
 )
 }
@@ -20,6 +22,10 @@ bert_topic_labels(
 \item{separator}{The string with which the words and topic prefix will be separated. Underscores are the default but a nice alternative is ", ".  Default `_`}
 
 \item{word_length}{The maximum length of each word in the topic label. Some words might be relatively long and setting this value helps to make sure that all labels have relatively similar lengths.}
+
+\item{update_topic_model_labels}{if `TRUE` updates new label into a custom field}
+
+\item{append_number_words}{Append the number of words}
 
 \item{topic_prefix}{Whether to use the topic ID as a prefix. If set to True, the topic ID will be separated using the separator}
 }

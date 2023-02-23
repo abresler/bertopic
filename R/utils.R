@@ -208,12 +208,12 @@ select_correct_python <-
 
   }
 
-#' Simlar Term Embeddings
+#' Simllar Term Embeddings
 #'
-#' @param topic_model
-#' @param terms
-#' @param top_n_terms
-#' @param nest_data
+#' @param topic_model Bertopic Model
+#' @param terms Vector of Terms to search
+#' @param top_n_terms the number of topics to return.  Default is 10
+#' @param nest_data if `TRUE` Nests data
 #'
 #' @return
 #' @export
@@ -292,8 +292,8 @@ bert_topic_info <-
 #' @param separator The string with which the words and topic prefix will be separated. Underscores are the default but a nice alternative is ", ".  Default `_`
 #' @param word_length The maximum length of each word in the topic label. Some words might be relatively long and setting this value helps to make sure that all labels have relatively similar lengths.
 #' @param topic_prefix  Whether to use the topic ID as a prefix. If set to True, the topic ID will be separated using the separator
-
-
+#' @param append_number_words Append the number of words
+#' @param update_topic_model_labels if `TRUE` updates new label into a custom field
 #'
 #' @return
 #' @export
@@ -304,6 +304,8 @@ bert_topic_labels <-
            number_words = 4L,
            separator = "_",
            word_length =  NULL,
+           update_topic_model_labels = FALSE,
+           append_number_words = FALSE,
            topic_prefix = FALSE) {
     if (length(word_length) > 0) {
       word_length <- as.integer(word_length)
@@ -316,11 +318,25 @@ bert_topic_labels <-
       word_length = word_length
     )
 
-    tibble(label_bertopic) |>
+    dat <-
+      tibble(label_bertopic) |>
       mutate(topic_bert = 1:n() - 2) |>
       select(topic_bert, everything()) |>
       mutate(is_outlier_bert_topic = topic_bert == -1) |>
       mutate_if(is.character, stringr::str_squish)
+
+    if (append_number_words) {
+      new_name <- str_c("label_bertopic_",.pad_zeros(x = number_words, number_zeros = 3), "_words")
+      names(dat)[names(dat) %in% "label_bertopic"] <-
+        new_name
+    }
+
+    if (update_topic_model_labels) {
+      message("Updating topic lables")
+      obj$set_topic_labels(topic_labels = label_bertopic)
+    }
+
+    dat
   }
 
 
