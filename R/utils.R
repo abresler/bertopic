@@ -759,10 +759,24 @@ bert_merge_topics <-
     obj$merge_topics(docs = docs, topics_to_merge = topics_to_merge)
   }
 
+#' Reduce BERTopics
+#'
+#' @param obj BERTopic Topic Model
+#' @param docs Vector of Documents
+#' @param number_topics Number of topics to reduce to
+#'
+#' @return
+#' @export
+#'
+#' @examples
 bert_reduce_topics <-
-  function(obj, docs, number_topics = NULL) {
+  function(obj, docs = NULL, number_topics = NULL) {
     if (length(number_topics) == 0) {
       "Enter number of reduced topics" |> message()
+      return(obj)
+    }
+    if (length(docs) == 0) {
+      "Enter Documents" |> message()
       return(obj)
     }
     obj$reduce_topics(docs = docs, nr_topics = as.integer(number_topics))
