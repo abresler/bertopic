@@ -189,6 +189,8 @@ top2vec_topic_size <-
     obj[[4]] |> as.numeric()
   }
 
+
+
 #' Topic Vector Embeddings
 #'
 #' @param obj
@@ -242,7 +244,7 @@ tbl_top_2_vec_words_topics <-
 top2vec_document_topics <-
   function(obj) {
     tibble(id_document = obj$document_ids,
-           topic_top2vec = s.numeric(obj$doc_top),
+           topic_top2vec = as.numeric(obj$doc_top),
            distance = as.numeric(obj$doc_dist)) |>
       mutate(number_document = 1:n()) |>
       select(number_document, everything())
