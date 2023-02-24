@@ -4,7 +4,18 @@
 \alias{bert_reduce_topics}
 \title{Reduce BERTopics}
 \usage{
-bert_reduce_topics(obj, docs = NULL, number_topics = NULL)
+bert_reduce_topics(
+  obj,
+  docs = NULL,
+  number_topics = NULL,
+  update_bert_labels = TRUE,
+  number_words = 1L,
+  separator = "_",
+  word_length = NULL,
+  update_topic_model_labels = TRUE,
+  append_number_words = FALSE,
+  topic_prefix = FALSE
+)
 }
 \arguments{
 \item{obj}{BERTopic Topic Model}
@@ -12,6 +23,20 @@ bert_reduce_topics(obj, docs = NULL, number_topics = NULL)
 \item{docs}{Vector of Documents}
 
 \item{number_topics}{Number of topics to reduce to}
+
+\item{update_bert_labels}{If `TRUE` updates actual topic labels}
+
+\item{number_words}{Top n words per topic to use.  Default is 4}
+
+\item{separator}{The string with which the words and topic prefix will be separated. Underscores are the default but a nice alternative is ", ".  Default `_`}
+
+\item{word_length}{The maximum length of each word in the topic label. Some words might be relatively long and setting this value helps to make sure that all labels have relatively similar lengths.}
+
+\item{update_topic_model_labels}{if `TRUE` updates new label into a custom field}
+
+\item{append_number_words}{Append the number of words}
+
+\item{topic_prefix}{Whether to use the topic ID as a prefix. If set to True, the topic ID will be separated using the separator}
 }
 \description{
 Reduce BERTopics

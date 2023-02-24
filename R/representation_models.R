@@ -55,13 +55,13 @@ keybert_inspired_representation <-
 #'
 #' @examples
 mmr_inspired_representation <-
-  function(diversity = .1, top_n_words = 10,
-           obj = NULL) {
+  function(obj = NULL, diversity = .1, top_n_words = 10
+           ) {
     obj <- bertopic_representations(obj = obj)
     obj$MaximalMarginalRelevance(diversity = diversity, top_n_words = as.integer(top_n_words))
   }
 
-#' Title
+#' Cohere Representation
 #'
 #' @param client
 #' @param model

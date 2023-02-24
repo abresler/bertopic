@@ -5,14 +5,14 @@
 \title{Calculate Maximal Marginal Relevance (MMR) between candidate keywords and the document.
 MMR considers the similarity of keywords/keyphrases with the document, along with the similarity of already selected keywords and keyphrases. This results in a selection of keywords that maximize their within diversity with respect to the document.}
 \usage{
-mmr_inspired_representation(diversity = 0.1, top_n_words = 10, obj = NULL)
+mmr_inspired_representation(obj = NULL, diversity = 0.1, top_n_words = 10)
 }
 \arguments{
+\item{obj}{Bertopic Module}
+
 \item{diversity}{How diverse the select keywords/keyphrases are. Values range between 0 and 1 with 0 being not diverse at all and 1 being most diverse.  Default `0.1`}
 
 \item{top_n_words}{The number of keywords/keyhprases to return default `10`}
-
-\item{obj}{Bertopic Module}
 }
 \description{
 Calculate Maximal Marginal Relevance (MMR) between candidate keywords and the document.

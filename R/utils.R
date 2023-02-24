@@ -4,6 +4,7 @@
 
 
 
+
 # tuple -------------------------------------------------------------------
 
 list_to_tuple <-
@@ -326,14 +327,18 @@ bert_topic_labels <-
       mutate_if(is.character, stringr::str_squish)
 
     if (append_number_words) {
-      new_name <- str_c("label_bertopic_",.pad_zeros(x = number_words, number_zeros = 3), "_words")
+      new_name <-
+        str_c("label_bertopic_",
+              .pad_zeros(x = number_words, number_zeros = 3),
+              "_words")
       names(dat)[names(dat) %in% "label_bertopic"] <-
         new_name
     }
 
     if (update_topic_model_labels) {
-      message("Updating topic lables")
-      obj$set_topic_labels(topic_labels = label_bertopic)
+      message("Updating topic labels")
+      obj <<- obj$set_topic_labels(topic_labels = label_bertopic)
+      return(dat)
     }
 
     dat
@@ -356,7 +361,7 @@ bert_save <-
     }
     path <- glue::glue("{file_path}/{file_name}")
 
-    obj$save(save_embedding_model = )
+    obj$save(save_embedding_model =)
 
   }
 
@@ -764,13 +769,29 @@ bert_merge_topics <-
 #' @param obj BERTopic Topic Model
 #' @param docs Vector of Documents
 #' @param number_topics Number of topics to reduce to
+#' @param number_words Top n words per topic to use.  Default is 4
+#' @param separator The string with which the words and topic prefix will be separated. Underscores are the default but a nice alternative is ", ".  Default `_`
+#' @param word_length The maximum length of each word in the topic label. Some words might be relatively long and setting this value helps to make sure that all labels have relatively similar lengths.
+#' @param topic_prefix  Whether to use the topic ID as a prefix. If set to True, the topic ID will be separated using the separator
+#' @param append_number_words Append the number of words
+#' @param update_bert_labels If `TRUE` updates actual topic labels
+#' @param update_topic_model_labels if `TRUE` updates new label into a custom field
 #'
 #' @return
 #' @export
 #'
 #' @examples
 bert_reduce_topics <-
-  function(obj, docs = NULL, number_topics = NULL) {
+  function(obj,
+           docs = NULL,
+           number_topics = NULL,
+           update_bert_labels = TRUE,
+           number_words = 1L,
+           separator = "_",
+           word_length = NULL,
+           update_topic_model_labels = TRUE,
+           append_number_words = FALSE,
+           topic_prefix = FALSE) {
     if (length(number_topics) == 0) {
       "Enter number of reduced topics" |> message()
       return(obj)
@@ -780,7 +801,24 @@ bert_reduce_topics <-
       return(obj)
     }
     obj$reduce_topics(docs = docs, nr_topics = as.integer(number_topics))
-  }
+
+    if (!update_bert_labels) {
+      return(obj)
+    }
+    message("Updating BERTopic Labels")
+    obj <- bert_topic_labels(
+      obj = obj,
+      number_words = number_words,
+      separator = separator,
+      word_length = word_length,
+      update_topic_model_labels = update_topic_model_labels,
+      append_number_words = append_number_words,
+      topic_prefix = topic_prefix
+    )
+
+    obj
+
+      }
 
 #' Updates the topic representation by recalculating c-TF-IDF with the new parameters as defined in this function.
 #'
@@ -806,7 +844,6 @@ bert_update_topics <-
            vectorizer_model = NULL,
            ctfidf_model = NULL,
            representation_model = NULL) {
-
     if (length(docs) == 0) {
       "Enter documents to fit" |> message()
       return(obj)
@@ -816,7 +853,7 @@ bert_update_topics <-
       n_gram_range <- reticulate::tuple(n_gram_range)
     }
 
-    obj$update_topics(
+    obj <- obj$update_topics(
       docs = docs,
       topics = topics,
       top_n_words = as.integer(top_n_words),
@@ -825,6 +862,8 @@ bert_update_topics <-
       ctfidf_model = ctfidf_model,
       representation_model = representation_model
     )
+
+    obj
   }
 
 # text --------------------------------------------------------------------

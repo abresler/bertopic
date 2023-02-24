@@ -2,7 +2,7 @@
 % Please edit documentation in R/representation_models.R
 \name{cohere_representation}
 \alias{cohere_representation}
-\title{Title}
+\title{Cohere Representation}
 \usage{
 cohere_representation(client = NULL, model = NULL, prompt = NULL, obj = NULL)
 }
@@ -10,5 +10,5 @@ cohere_representation(client = NULL, model = NULL, prompt = NULL, obj = NULL)
 \item{obj}{}
 }
 \description{
-Title
+Cohere Representation
 }
