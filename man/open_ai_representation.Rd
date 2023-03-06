@@ -5,15 +5,24 @@
 \title{OpenAI Representation Model}
 \usage{
 open_ai_representation(
-  model = "text-ada-0001",
+  model = "gpt-3.5-turbo",
   prompt = NULL,
-  generator_kwargs = NULL,
+  delay_in_seconds = 10,
+  chat = TRUE,
   obj = NULL
 )
 }
 \arguments{
-\item{obj}{}
+\item{model}{Open AI model NAME}
+
+\item{prompt}{Prompt.  For example: `I have a topic that contains the following documents: [DOCUMENTS]The topic is described by the following keywords: [KEYWORDS]Based on the information above, extract a short topic label in the following format:topic: <topic label>`}
+
+\item{delay_in_seconds}{How Long to Wait?}
+
+\item{chat}{If `TRUE` enter chat mode.}
+
+\item{obj}{BERTopic Object}
 }
 \description{
-OpenAI Representation Model
+See \href{https://maartengr.github.io/BERTopic/getting_started/representation/representation.html#chatgpt}{API Example} and  \href{https://maartengr.github.io/BERTopic/changelog.html#version-0141}{Change Log Example}
 }

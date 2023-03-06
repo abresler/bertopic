@@ -4,10 +4,24 @@
 \alias{cohere_representation}
 \title{Cohere Representation}
 \usage{
-cohere_representation(client = NULL, model = NULL, prompt = NULL, obj = NULL)
+cohere_representation(
+  client = NULL,
+  model = "xlarge",
+  prompt = NULL,
+  delay_in_seconds = NULL,
+  obj = NULL
+)
 }
 \arguments{
-\item{obj}{}
+\item{client}{A cohere.Client}
+
+\item{model}{Model to use within Cohere, defaults to "xlarge".}
+
+\item{prompt}{Example Prompt `'I have topic that contains the following documents: [DOCUMENTS]. The topic is described by the following keywords: [KEYWORDS]. Based on the above information, can you give a short label of the topic?'`}
+
+\item{delay_in_seconds}{}
+
+\item{obj}{BERTopic Object}
 }
 \description{
 Cohere Representation

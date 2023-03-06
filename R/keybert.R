@@ -54,8 +54,10 @@ keybert_model <-
     if (length(keybert) == 0) {
       keybert <- import_keybert(assign_to_environment = F)
     }
-    kb <- keybert$KeyBERT(model = model)
-    kb
+    obj <- keybert$KeyBERT(model = model)
+
+    obj
+
   }
 
 

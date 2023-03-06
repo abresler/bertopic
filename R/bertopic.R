@@ -418,11 +418,11 @@ import_bertopic <-
 #' @param max_df During fitting ignore keyphrases that have a document frequency strictly higher than the given threshold. Default `1L`
 #' @param min_df During fitting ignore keyphrases that have a document frequency strictly lower than the given threshold. This value is also called cut-off in the literature.  Default `1L`
 #' @param pos_pattern Position patter for keyphrase.  Defaults to `pos_pattern = "<J.*>*<N.*>+",`
-#' @param keyphrase_ngram_range
+#' @param keyphrase_ngram_range If not `NULL` range for keyphrase
 #' @param vocabulary
 #' @param stopword_package_sources options if not `NULL` `c("snowball", "stopwords-iso", "smart", "nltk")`
-#' @param use_sklearn_vectorizer
-#' @param representation_model
+#' @param use_sklearn_vectorizer if `TRUE` uses SKLearn vetorizer
+#' @param representation_model The base representation model for fine-tuning topic representations
 #'
 #' @return python object
 #' @export
@@ -463,7 +463,8 @@ bert_topic <-
            pos_pattern = "<J.*>*<N.*>+",
            seed_topic_list = NULL,
            verbose = T,
-           vocabulary = NULL) {
+           vocabulary = NULL,
+           set_attributes = TRUE) {
     bertopic <- import_bertopic(assign_to_environment = F)
 
     if (length(n_gram_range) > 0) {
@@ -498,7 +499,8 @@ bert_topic <-
         )
     }
     uses_vectorizer <-
-      use_sklearn_vectorizer | use_key_phrase_vectorizer
+      use_sklearn_vectorizer |
+      use_key_phrase_vectorizer
     if (uses_vectorizer & exclude_stop_words) {
       stop_words <-
         bert_stopwords(
@@ -533,6 +535,10 @@ bert_topic <-
         embedding_model = embedding_model
       )
 
+
+
+
+
     remove_sw <-
       exclude_stop_words |
       length(stopword_package_sources) > 0 |
@@ -556,6 +562,40 @@ bert_topic <-
     # Fix ngramrange
     obj$vectorizer_model$ngram_range <- n_gram_range
 
+    if (set_attributes) {
+      base_params <- obj |> bert_parameters(use_dfc_method = T, return_attributes = T)
+
+      attr(obj, "base_parameters") <- base_params
+
+      hdbscan_params <-
+        obj$hdbscan_model |> bert_parameters(return_attributes = T)
+
+      attr(obj, "hdbscan_parameters") <- hdbscan_params
+
+      ctfidf_params <-
+        obj$ctfidf_model$get_params() |> flatten_df() |>  tbl_bert_parameter_features_to_attribute()
+
+      attr(obj, "cftfidf_parameters") <- ctfidf_params
+
+      umap_params <-
+        obj$umap_model |> bert_parameters(return_tibble = T, return_attributes = T)
+
+      attr(obj, "umap_parameters") <- umap_params
+
+      vectorizer_params <- obj$vectorizer_model |> bert_parameters(return_tibble = T, use_dfc_method = T, return_attributes = T)
+
+      attr(obj, "vectorizer_parameters") <- vectorizer_params
+
+      if (length(representation_model) > 0) {
+        representation_method <- attributes(representation_model)[["representation_method"]]
+        attr(obj, "representation_model") <- representation_method
+        representation_method_parameters <-
+          attributes(representation_model)[["input_parameters"]]
+
+        attr(obj, "representation_method_parameters") <- representation_method_parameters
+      }
+    }
+
     obj
 
   }
@@ -576,6 +616,9 @@ bert_backend <-
 
 
 
+# plot --------------------------------------------------------------------
+
+
 #' Bertopic Plotting
 #'
 #' @return
@@ -589,20 +632,246 @@ bert_plotting <-
     obj
   }
 
+
+# attributes_and_features -------------------------------------------------
+
+
+#' Convert BERT Parameter Table to Attributes
+#'
+#' @param data
+#' @param feature_separator How to concatenate features.  Defaults to `@`
+#' @param text_separator How to concatenate text.  Defaults to `|`
+#'
+#' @return
+#' @export
+#'
+#' @examples
+tbl_bert_parameter_features_to_attribute <-
+  function(data,
+           feature_separator = "@",
+           text_separator = "|") {
+    if (!data |> hasName("feature")) {
+      data <- data |>
+        tidyr::gather(feature, value)
+    }
+
+    data |>
+      tidyr::unite(feature, feature, value, sep = feature_separator) |>
+      pull() |>
+      str_c(collapse = text_separator)
+  }
+
 #' BERTopic Parameters
 #'
 #' @param obj topic model object
 #' @param deep if `TRUE` returns deep information
+#' @param return_tibble If `TRUE` returns a `tibble`
+#' @param return_attributes If `TRUE` returns concatenated character vector of the parameters
 #'
 #' @return
 #' @export
 #'
 #' @examples
 bert_parameters <-
-  function(obj, deep = TRUE) {
-    obj$get_params(deep = deep)
+  function(obj,
+           deep = FALSE,
+           return_tibble = FALSE,
+           use_dfc_method = FALSE,
+           return_attributes = FALSE) {
+    out <- obj$get_params(deep = deep)
+
+    if (return_attributes) {
+      return_tibble <- TRUE
+    }
+
+    if (!return_tibble) {
+      return(out)
+    }
+    all_classes <-
+      out |> map(class)
+
+    tbl_classes <-
+      seq_along(all_classes) |>
+      map_dfr(function(x) {
+        parameter <- names(all_classes[x])
+        class_type <- all_classes[[x]] |> str_c(collapse = " | ")
+        tibble(parameter, class = class_type) |>
+          mutate(
+            is_excluded_feature = !class |> str_detect("list|numeric|character|factor|integer|logical")
+          )
+      })
+
+    keep_params <-
+      tbl_classes |>
+      filter(!is_excluded_feature) |>
+      pull(parameter)
+
+    out <- out[names(out) %in% keep_params]
+
+    if (out |> hasName("pos_patterns") | use_dfc_method) {
+      out <-
+        names(out) |>
+        map_dfc(function(x) {
+          if (x == "model") {
+            return(invisible())
+          }
+          value <-
+            out[[x]] |>
+            unlist() |>
+            as.character() |>
+            str_c(collapse = ", ")
+
+          tibble(UQ(x) := value)
+        })
+    } else {
+
+      out <-
+        out |> purrr::flatten_df()
+
+    }
+
+    if (return_attributes) {
+      out <- tbl_bert_parameter_features_to_attribute(data = out)
+    }
+
+    out
   }
 
+#' Return Tibble of BERT Attributes
+#'
+#' @param obj BERTopic Object
+#' @param return_clean if `TRUE` returns clean set of parameters
+#' @param return_wide if `TRUE` returns it in wide form
+#' @param parameter_filter if not `NULL` filters the attrbutes
+#'
+#' @return
+#' @export
+#'
+#' @examples
+tbl_bert_attributes <-
+  function(obj, return_clean = F, return_wide = F, parameter_filter = NULL) {
+    out <- attributes(obj)
+
+    if (return_wide) {
+      return_clean <- TRUE
+    }
+
+    if (length(out) == 0) {
+      message("No attrbutes") |> message()
+    }
+
+    dat <- out[names(out)[!names(out) %in% "class"]] |> flatten_df()
+
+    if (!return_clean) {
+      return(dat)
+    }
+
+    if (return_clean) {
+      dat <-
+        names(dat) |>
+        map_dfr(function(x) {
+          values <-
+            dat[[x]] |>
+            str_split("\\|") |>
+            flatten_chr()
+          d <- tibble(value = values) |>
+            tidyr::separate(
+              value ,
+              into = c("feature", "value"),
+              sep = "\\@",
+              convert = TRUE,
+              extra = "merge",
+              fill = "left"
+            ) |>
+            mutate(parameter = x) |>
+            select(parameter, everything()) |>
+            mutate_all(as.character)
+
+          if (x == "representation_method") {
+            d <- d |> mutate(feature = "model")
+          }
+
+
+          d
+        })
+    }
+
+    dat <- dat |>
+      filter(value != "NA")
+
+    if (length(parameter_filter) > 0) {
+      param_slugs <-
+        parameter_filter |> str_c(collapse = "|")
+      dat <- dat |>
+        filter(parameter |> str_detect(param_slugs))
+    }
+
+    if (return_wide) {
+      dat <-
+        dat |> tidyr::unite(parameter, parameter, feature ,sep = "_") |> tidyr::spread(parameter, value, convert = TRUE)
+    }
+
+
+    dat
+  }
+
+#' BERTopic Transform
+#'
+#' After having fit a model, use transform to predict new instances
+#'
+#' @param obj BERTopic Object
+#' @param documents  A single document or a list of documents to fit on
+#' @param embeddings If not `NULL` Pre-trained document embeddings. These can be used instead of the sentence-transformer model.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+bert_transform <-
+  function(obj, documents, embeddings = NULL) {
+    obj <- obj$transform(documents = documents, embeddings = embeddings)
+
+    obj
+  }
+
+#' BERTopic Fit
+#'
+#' Fit the models (Bert, UMAP, and, HDBSCAN) on a collection of documents and generate topics
+#'
+#' @param obj BERTopic Object
+#' @param documents  A single document or a list of documents to fit on
+#' @param embeddings If not `NULL` Pre-trained document embeddings. These can be used instead of the sentence-transformer model.
+#' @param y If Not `NULL` The target class for (semi)-supervised modeling. Use -1 if no class for a specific instance is specified.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+bert_fit <-
+  function(obj, documents, embeddings = NULL, y = NULL) {
+    obj <- obj$fit(documents = documents, embeddings = embeddings, y = y)
+
+    obj
+  }
+
+#' BERTopic Fit and Transform
+#'
+#' Fit the models on a collection of documents, generate topics, and return the docs with topics.
+#'
+#' @param obj BERTopic Object
+#' @param documents  A single document or a list of documents to fit on
+#' @param embeddings If not `NULL` Pre-trained document embeddings. These can be used instead of the sentence-transformer model.
+#' @param y If Not `NULL` The target class for (semi)-supervised modeling. Use -1 if no class for a specific instance is specified.#'
+#' @return
+#' @export
+#'
+#' @examples
+bert_fit_transform <-
+  function(obj, documents, embeddings = NULL, y = NULL) {
+    obj <- obj$fit_transform(documents = documents, embeddings = embeddings, y = y)
+
+
+  }
 
 # ctfidf ---------------------------------------------------------------
 
@@ -628,6 +897,11 @@ class_tfidf_transformer <-
                                                  reduce_frequent_words = reduce_frequent_words)
     obj
   }
+
+
+# other -------------------------------------------------------------------
+
+
 
 #' An Online Vectorizer
 #'
@@ -666,11 +940,12 @@ ctfidf <-
   function(bm25_weighting = FALSE,
            reduce_frequent_words = FALSE,
            obj = NULL) {
-   if (length(obj) == 0)   {
-     obj <- import_bertopic(assign_to_environment = F)
-   }
+    if (length(obj) == 0)   {
+      obj <- import_bertopic(assign_to_environment = F)
+    }
 
-    obj$vectorizers$ClassTfidfTransformer(bm25_weighting = bm25_weighting, reduce_frequent_words = reduce_frequent_words)
+    obj$vectorizers$ClassTfidfTransformer(bm25_weighting = bm25_weighting,
+                                          reduce_frequent_words = reduce_frequent_words)
   }
 
 

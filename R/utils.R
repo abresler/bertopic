@@ -337,8 +337,7 @@ bert_topic_labels <-
 
     if (update_topic_model_labels) {
       message("Updating topic labels")
-      obj <<- obj$set_topic_labels(topic_labels = label_bertopic)
-      return(dat)
+      obj$set_topic_labels(topic_labels = label_bertopic)
     }
 
     dat
@@ -378,7 +377,9 @@ bert_save <-
 bert_topic_count <-
   function(obj,
            topic_number = NULL,
-           join_labels = TRUE) {
+           join_labels = TRUE,
+           include_parameters = FALSE,
+           parameter_filters = NULL) {
     data <-
       obj$get_topic_freq(topic = topic_number) |>
       janitor::clean_names() |> as_tibble() |>
@@ -388,6 +389,18 @@ bert_topic_count <-
     if (join_labels) {
       data <- data |>
         left_join(obj |> bert_topic_info() |> select(1:2), by = "topic_bert")
+    }
+
+    if (include_parameters) {
+      data <- data |>
+        mutate(id = 1)
+      tbl_ids <-
+        obj |> tbl_bert_attributes(return_wide = T, parameter_filter = parameter_filters) |>
+        mutate(id = 1)
+      data <- data |>
+        left_join(tbl_ids, by = "id") |>
+        select(one_of(names(tbl_ids)), everything()) |>
+        select(-id)
     }
 
 
@@ -830,6 +843,19 @@ bert_reduce_topics <-
 #' @param vectorizer_model Pass in your own CountVectorizer from scikit-learn.  Default `NULL`
 #' @param ctfidf_model Pass in your own c-TF-IDF model to update the representations.  Default `NULL`
 #' @param representation_model  Pass in a model that fine-tunes the topic representations calculated through c-TF-IDF. Models from bertopic.representation are supported. Default `NULL`
+#' @param language The main language used in your documents. The default sentence-transformers model for "english" is all-MiniLM-L6-v2. For a full overview of supported languages see bertopic.backend.languages. Select "multilingual" to load in the paraphrase-multilingual-MiniLM-L12-v2 sentence-tranformers model that supports 50+ languages. Default `english`
+#' @param use_key_phrase_vectorizer if `TRUE` uses a keyphrase vectorizer
+#' @param use_sklearn_vectorizer If `TRUE` uses SKLearn vectorizer
+#' @param is_lower_case if `TRUE` lower case
+#' @param keyphrase_ngram_range If not `NULL` range for keyphrase
+#' @param exclude_stop_words if `TRUE` excludes basic stopwords
+#' @param stopword_package_sources options if not `NULL` `c("snowball", "stopwords-iso", "smart", "nltk")`
+#' @param extra_stop_words vector of other stopwords
+#' @param min_df During fitting ignore keyphrases that have a document frequency strictly lower than the given threshold. This value is also called cut-off in the literature.  Default `1L`
+#' @param pos_pattern Position patter for keyphrase.  Defaults to `pos_pattern = "<J.*>*<N.*>+",`
+#' @param seed_topic_list A list of seed words per topic to converge around.  Default is `NULL`
+#' @param max_df
+#' @param vocabulary
 #'
 #' @return
 #' @export
@@ -840,10 +866,25 @@ bert_update_topics <-
            docs = NULL,
            topics = NULL,
            top_n_words = 10,
-           n_gram_range = NULL,
+           n_gram_range = list(1L, 1L),
            vectorizer_model = NULL,
            ctfidf_model = NULL,
-           representation_model = NULL) {
+           representation_model = NULL,
+           language = "english",
+           use_key_phrase_vectorizer = F,
+           use_sklearn_vectorizer = F,
+           is_lower_case = T,
+           keyphrase_ngram_range = list(1L,
+                                        1L),
+           exclude_stop_words = T,
+           stopword_package_sources = NULL,
+           extra_stop_words = NULL,
+           min_df = 1L,
+           max_df = 1L,
+           pos_pattern = "<J.*>*<N.*>+",
+           seed_topic_list = NULL,
+           vocabulary = NULL
+  ) {
     if (length(docs) == 0) {
       "Enter documents to fit" |> message()
       return(obj)
@@ -853,17 +894,73 @@ bert_update_topics <-
       n_gram_range <- reticulate::tuple(n_gram_range)
     }
 
-    obj <- obj$update_topics(
+    if (use_key_phrase_vectorizer) {
+      "Using keyphrase vectorizer" |> message()
+      vectorizer_model <-
+        keyphrase_vectorizer(
+          min_df = min_df,
+          max_df =  max_df,
+          exclude_stop_words = exclude_stop_words,
+          language = language,
+          pos_pattern = pos_pattern,
+          extra_stop_words = extra_stop_words
+        )
+    }
+
+    if (!use_key_phrase_vectorizer &
+        length(vectorizer_model) == 0) {
+      "Using sklearn vectorizer" |> message()
+      use_sklearn_vectorizer <- T
+      vectorizer_model <-
+        sklearn_vectorizer(
+          min_df = min_df,
+          max_df =  max_df,
+          ngram_range = n_gram_range,
+          vocabulary = vocabulary,
+          language = language,
+          exclude_stop_words = exclude_stop_words,
+          extra_stop_words = extra_stop_words
+        )
+    }
+    uses_vectorizer <-
+      use_sklearn_vectorizer |
+      use_key_phrase_vectorizer
+    if (uses_vectorizer & exclude_stop_words) {
+      stop_words <-
+        bert_stopwords(
+          language = language,
+          is_lower_case = is_lower_case,
+          extra_stop_words = extra_stop_words,
+          stopword_package_sources = stopword_package_sources
+        )
+      vectorizer_model$stop_words <-
+        c(stop_words) |> unique()
+    }
+
+    obj$update_topics(
       docs = docs,
       topics = topics,
       top_n_words = as.integer(top_n_words),
       n_gram_range = n_gram_range,
       vectorizer_model = vectorizer_model,
-      ctfidf_model = ctfidf_model,
       representation_model = representation_model
     )
 
     obj
+  }
+
+#' Set Topic Labals
+#'
+#' @param obj
+#' @param topic_labels
+#'
+#' @return
+#' @export
+#'
+#' @examples
+bert_set_topic_labels <-
+  function(obj, topic_labels) {
+    obj$set_topic_labels(topic_labels = topic_labels)
   }
 
 # text --------------------------------------------------------------------

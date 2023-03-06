@@ -4,7 +4,13 @@
 \alias{bert_topic_count}
 \title{Topic Counts}
 \usage{
-bert_topic_count(obj, topic_number = NULL, join_labels = TRUE)
+bert_topic_count(
+  obj,
+  topic_number = NULL,
+  join_labels = TRUE,
+  include_parameters = FALSE,
+  parameter_filters = NULL
+)
 }
 \arguments{
 \item{obj}{bertopic object}

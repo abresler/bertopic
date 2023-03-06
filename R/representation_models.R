@@ -1,4 +1,8 @@
 
+
+
+
+
 #' Import Bertopic Representations
 #'
 #' @param obj Bertopic Module
@@ -36,11 +40,21 @@ keybert_inspired_representation <-
            random_state = 42,
            obj = NULL) {
     obj <- bertopic_representations(obj = obj)
-    obj$KeyBERTInspired(top_n_words = as.integer(top_n_words),
-                        nr_repr_docs = as.integer(nr_repr_docs),
-                        nr_samples = as.integer(nr_samples),
-                        nr_candidate_words = as.integer(nr_samples),
-                        random_state = as.integer(random_state))
+    out <-
+      obj$KeyBERTInspired(
+        top_n_words = as.integer(top_n_words),
+        nr_repr_docs = as.integer(nr_repr_docs),
+        nr_samples = as.integer(nr_samples),
+        nr_candidate_words = as.integer(nr_samples),
+        random_state = as.integer(random_state)
+      )
+
+    attr(out, "representation_method") <- c("keybert")
+    input_parameters <-
+      bert_parameters(obj = out, return_attributes = TRUE)
+    attr(out, "input_parameters") <- input_parameters
+
+    out
   }
 
 #' Calculate Maximal Marginal Relevance (MMR) between candidate keywords and the document.
@@ -55,50 +69,92 @@ keybert_inspired_representation <-
 #'
 #' @examples
 mmr_inspired_representation <-
-  function(obj = NULL, diversity = .1, top_n_words = 10
-           ) {
+  function(obj = NULL,
+           diversity = .1,
+           top_n_words = 10) {
     obj <- bertopic_representations(obj = obj)
-    obj$MaximalMarginalRelevance(diversity = diversity, top_n_words = as.integer(top_n_words))
+    out <-
+      obj$MaximalMarginalRelevance(diversity = diversity, top_n_words = as.integer(top_n_words))
+
+    attr(out, "representation_method") <- c("mmr")
+    input_parameters <-
+      bert_parameters(obj = out, return_attributes = TRUE)
+    attr(out, "input_parameters") <- input_parameters
+
+    out
+
   }
 
 #' Cohere Representation
 #'
-#' @param client
-#' @param model
-#' @param prompt
-#' @param obj
+#' @param client A cohere.Client
+#' @param model Model to use within Cohere, defaults to "xlarge".
+#' @param prompt Example Prompt `'I have topic that contains the following documents: [DOCUMENTS]. The topic is described by the following keywords: [KEYWORDS]. Based on the above information, can you give a short label of the topic?'`
+#' @param obj BERTopic Object
+#' @param delay_in_seconds
 #'
 #' @return
 #' @export
 #'
 #' @examples
 cohere_representation <-
-  function(client = NULL, model = NULL, prompt = NULL,
+  function(client = NULL,
+           model = "xlarge",
+           prompt = NULL,
+           delay_in_seconds = NULL,
            obj = NULL) {
     obj <- bertopic_representations(obj = obj)
-    obj$Cohere(client = client, model = model, prompt = prompt)
+    out <-
+      obj$Cohere(
+        client = client,
+        model = model,
+        prompt = prompt,
+        delay_in_seconds = delay_in_seconds
+      )
+
+    attr(out, "representation_method") <- c("cohere")
+    input_parameters <-
+      bert_parameters(obj = out, return_attributes = TRUE)
+    attr(out, "input_parameters") <- input_parameters
+
+    out
   }
 
 #' OpenAI Representation Model
 #'
-#' @param model
-#' @param prompt
-#' @param generator_kwargs
-#' @param obj
+#' See \href{https://maartengr.github.io/BERTopic/getting_started/representation/representation.html#chatgpt}{API Example} and  \href{https://maartengr.github.io/BERTopic/changelog.html#version-0141}{Change Log Example}
+#'
+#' @param model Open AI model NAME
+#' @param prompt Prompt.  For example: `I have a topic that contains the following documents: [DOCUMENTS]The topic is described by the following keywords: [KEYWORDS]Based on the information above, extract a short topic label in the following format:topic: <topic label>`
+#' @param obj BERTopic Object
+#' @param delay_in_seconds How Long to Wait?
+#' @param chat If `TRUE` enter chat mode.
 #'
 #' @return
 #' @export
 #'
 #' @examples
 open_ai_representation <-
-  function(model = "text-ada-0001",
-           prompt = NULL ,
-           generator_kwargs = NULL,
+  function(model = "gpt-3.5-turbo",
+           prompt = NULL,
+           delay_in_seconds = 10,
+           chat = TRUE,
            obj = NULL) {
     obj <- bertopic_representations(obj = obj)
-    obj$OpenAI(model = model,
-               prompt = prompt ,
-               generator_kwargs = generator_kwargs)
+    out <-
+      obj$OpenAI(
+        model = model,
+        prompt = prompt ,
+        delay_in_seconds = as.integer(delay_in_seconds),
+        chat = chat
+      )
+
+    attr(out, "representation_method") <- c("openai")
+    input_parameters <-
+      bert_parameters(obj = out, return_attributes = TRUE)
+    attr(out, "input_parameters") <- input_parameters
+
+    out
   }
 
 
@@ -113,15 +169,38 @@ open_ai_representation <-
 #' @export
 #'
 #' @examples
+#' library(bertopic)
+#' part_of_speech_representation(pos_patterns = list(list(list('POS' = 'ADJ'), list('POS' = 'NOUN')), list(list('POS' = 'NOUN')), list(list('POS' = 'ADJ'))))
+#'
 part_of_speech_representation <-
   function(model = 'en_core_web_sm',
            top_n_words = 10,
            pos_patterns = NULL,
            obj = NULL) {
     obj <- bertopic_representations(obj = obj)
-    obj$PartOfSpeech(model = model,
-                     top_n_words = as.integer(top_n_words),
-                     pos_patterns = pos_patterns)
+
+    if (length(pos_patterns) == 0) {
+      out <-
+        obj$PartOfSpeech(model = model,
+                         top_n_words = as.integer(top_n_words))
+    }
+
+    if (length(pos_patterns) > 0) {
+      out <-
+        obj$PartOfSpeech(
+          model = model,
+          top_n_words = as.integer(top_n_words),
+          pos_patterns = pos_patterns
+        )
+    }
+
+
+    attr(out, "representation_method") <- c("part_of_speech")
+    input_parameters <-
+      bert_parameters(obj = out, return_attributes = TRUE)
+    attr(out, "input_parameters") <- input_parameters
+
+    out
   }
 
 #' Zero-shot Classification on topic keywords with candidate labels
@@ -142,14 +221,18 @@ zeroshot_representation <-
            pipeline_kwargs = list(),
            min_prob = .8,
            obj = NULL) {
-
     obj <- bertopic_representations(obj = obj)
-    obj$ZeroShotClassification(
-      candidate_topics = candidate_topics,
-      model = model,
-      pipeline_kwargs = pipeline_kwargs,
-      min_prob = min_prob
-    )
+    out <-
+      obj$ZeroShotClassification(candidate_topics = candidate_topics,
+                                 model = model,
+                                 min_prob = min_prob)
+
+    attr(out, "representation_method") <- c("zeroshot")
+    input_parameters <-
+      bert_parameters(obj = out, return_attributes = TRUE)
+    attr(out, "input_parameters") <- input_parameters
+
+    out
   }
 
 
@@ -169,16 +252,25 @@ transformer_representation <-
   function(model = 'gpt2',
            prompt = NULL,
            pipeline_kwargs = NULL,
-           random_state =42,
+           random_state = 42,
            obj = NULL) {
-
     obj <- bertopic_representations(obj = obj)
-    obj$TextGeneration(
-      model = model,
-      prompt = prompt,
-      pipeline_kwargs = pipeline_kwargs,
-      random_state = as.integer(random_state)
-    )
+    out <-
+      out <-
+      obj$TextGeneration(
+        model = model,
+        prompt = prompt,
+        pipeline_kwargs = pipeline_kwargs,
+        random_state = as.integer(random_state)
+      )
+
+    attr(out, "representation_method") <- c("transformer")
+    input_parameters <-
+      bert_parameters(obj = out, return_attributes = TRUE)
+    attr(out, "input_parameters") <- input_parameters
+
+
+    out
   }
 
 #' Lang Chain Representation
@@ -195,7 +287,14 @@ langchain_representation <-
   function(chain = NULL,
            prompt = NULL,
            obj = NULL) {
-  obj <- bertopic_representations(obj = obj)
-  obj$LangChain(chain = chain, prompt = prompt)
+    obj <- bertopic_representations(obj = obj)
+    out <-
+      obj$LangChain(chain = chain, prompt = prompt, )
 
-}
+    attr(out, "representation_method") <- c("langchain")
+    input_parameters <-
+      bert_parameters(obj = out, return_attributes = TRUE)
+    attr(out, "input_parameters") <- input_parameters
+    out
+
+  }

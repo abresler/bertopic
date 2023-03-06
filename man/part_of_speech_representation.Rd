@@ -23,3 +23,8 @@ part_of_speech_representation(
 \description{
 Extract Topic Keywords based on their Part-of-Speech
 }
+\examples{
+library(bertopic)
+part_of_speech_representation(pos_patterns = list(list(list('POS' = 'ADJ'), list('POS' = 'NOUN')), list(list('POS' = 'NOUN')), list(list('POS' = 'ADJ'))))
+
+}

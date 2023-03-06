@@ -30,21 +30,26 @@ bert_topic(
   pos_pattern = "<J.*>*<N.*>+",
   seed_topic_list = NULL,
   verbose = T,
-  vocabulary = NULL
+  vocabulary = NULL,
+  set_attributes = TRUE
 )
 }
 \arguments{
 \item{language}{The main language used in your documents. The default sentence-transformers model for "english" is all-MiniLM-L6-v2. For a full overview of supported languages see bertopic.backend.languages. Select "multilingual" to load in the paraphrase-multilingual-MiniLM-L12-v2 sentence-tranformers model that supports 50+ languages. Default `english`}
 
-\item{representation_model}{}
+\item{representation_model}{The base representation model for fine-tuning topic representations}
 
 \item{top_n_words}{The number of words per topic to extract. Setting this too high can negatively impact topic embeddings as topics are typically best represented by at most 10 words.  Default to `10L`}
 
 \item{use_key_phrase_vectorizer}{if `TRUE` uses a keyphrase vectorizer}
 
+\item{use_sklearn_vectorizer}{if `TRUE` uses SKLearn vetorizer}
+
 \item{is_lower_case}{if `TRUE` is lowercase}
 
 \item{n_gram_range}{The n-gram range for the CountVectorizer. Advised to keep high values between 1 and 3. More would likely lead to memory issues. NOTE: This param will not be used if you pass in your own CountVectorizer. Default to `list(1L, 1L)`}
+
+\item{keyphrase_ngram_range}{If not `NULL` range for keyphrase}
 
 \item{min_topic_size}{The minimum size of the topic. Increasing this value will lead to a lower number of clusters/topics. NOTE: This param will not be used if you are not using HDBSCAN. Default 10}
 
