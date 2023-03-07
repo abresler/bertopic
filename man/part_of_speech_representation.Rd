@@ -16,7 +16,7 @@ part_of_speech_representation(
 
 \item{top_n_words}{The top n words to extract.  Default `10`}
 
-\item{pos_patterns}{Patterns for Spacy to use. See https://spacy.io/usage/rule-based-matching}
+\item{pos_patterns}{Patterns for Spacy to use. See https://spacy.io/usage/rule-based-matching and https://demos.explosion.ai/matcher and https://www.kaggle.com/code/curiousprogrammer/entity-extraction-and-classification-using-spacy for more}
 
 \item{obj}{}
 }

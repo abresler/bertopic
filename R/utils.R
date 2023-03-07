@@ -468,8 +468,8 @@ bert_representative_documents <-
 #' @param docs Vector of documents
 #' @param linkage_function  The linkage function to use. Default is: lambda x: sch.linkage(x, 'ward', optimal_ordering=True)
 #' @param distance_function The distance function to use on the c-TF-IDF matrix. Default is: lambda x: 1 - cosine_similarity(x)
-
-
+#' @param tight_layout Whether to use a tight layout (narrow width) for easier readability if you have hundreds of topics.
+#' @param print_tree If `TRUE` prints tree
 #'
 #' @return
 #' @export
@@ -480,6 +480,7 @@ bert_topic_hierarchy <-
            docs,
            linkage_function = NULL,
            distance_function = NULL,
+           tight_layout = F,
            print_tree = FALSE) {
     out <-
       obj$hierarchical_topics(
@@ -489,7 +490,11 @@ bert_topic_hierarchy <-
       )
 
     if (print_tree) {
-      obj$get_topic_tree(hier_topics = out) |> cat(fill = TRUE)
+      tree <- obj$get_topic_tree(hier_topics = out, tight_layout = tight_layout)
+
+      assign('bert_tree', tree, envir = .GlobalEnv)
+
+      tree |> cat(fill = TRUE)
     }
 
     out
@@ -943,8 +948,11 @@ bert_update_topics <-
       top_n_words = as.integer(top_n_words),
       n_gram_range = n_gram_range,
       vectorizer_model = vectorizer_model,
-      representation_model = representation_model
+      representation_model = representation_model,
+      ctfidf_model = ctfidf_model
     )
+
+    obj <- set_bert_attributes(obj = obj, representation_model = representation_model)
 
     obj
   }

@@ -9,6 +9,7 @@ bert_topic_hierarchy(
   docs,
   linkage_function = NULL,
   distance_function = NULL,
+  tight_layout = F,
   print_tree = FALSE
 )
 }
@@ -20,6 +21,10 @@ bert_topic_hierarchy(
 \item{linkage_function}{The linkage function to use. Default is: lambda x: sch.linkage(x, 'ward', optimal_ordering=True)}
 
 \item{distance_function}{The distance function to use on the c-TF-IDF matrix. Default is: lambda x: 1 - cosine_similarity(x)}
+
+\item{tight_layout}{Whether to use a tight layout (narrow width) for easier readability if you have hundreds of topics.}
+
+\item{print_tree}{If `TRUE` prints tree}
 }
 \description{
 To create this hierarchy, BERTopic needs to be already fitted once. Then, a hierarchy is calculated on the distance matrix of the c-TF-IDF representation using scipy.cluster.hierarchy.linkage.

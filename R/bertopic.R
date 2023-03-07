@@ -384,7 +384,49 @@ import_bertopic <-
 
 
 # stup --------------------------------------------------------------------
+#' Set BERTopic Model Attriubtes
+#'
+#' @param obj BERTopic Object
+#' @param representation_model  If not `NULL` representation model
+#'
+#' @return
+#' @export
+#'
+#' @examples
+set_bert_attributes <-
+  function(obj, representation_model = NULL) {
+    base_params <- obj |> bert_parameters(use_dfc_method = T, return_attributes = T)
 
+      attr(obj, "base_parameters") <- base_params
+
+      hdbscan_params <-
+        obj$hdbscan_model |> bert_parameters(return_attributes = T)
+
+      attr(obj, "hdbscan_parameters") <- hdbscan_params
+
+      ctfidf_params <-
+        obj$ctfidf_model$get_params() |> flatten_df() |>  tbl_bert_parameter_features_to_attribute()
+
+      attr(obj, "cftfidf_parameters") <- ctfidf_params
+
+      umap_params <-
+        obj$umap_model |> bert_parameters(return_tibble = T, return_attributes = T)
+
+      attr(obj, "umap_parameters") <- umap_params
+
+      vectorizer_params <- obj$vectorizer_model |> bert_parameters(return_tibble = T, use_dfc_method = T, return_attributes = T)
+
+      attr(obj, "vectorizer_parameters") <- vectorizer_params
+      if (length(representation_model) > 0) {
+        representation_method <- attributes(representation_model)[["representation_method"]]
+        attr(obj, "representation_model") <- representation_method
+        representation_method_parameters <-
+          attributes(representation_model)[["input_parameters"]]
+
+        attr(obj, "representation_method_parameters") <- representation_method_parameters
+      }
+      obj
+  }
 
 
 #' Initiate BERT Topic Model
@@ -563,37 +605,7 @@ bert_topic <-
     obj$vectorizer_model$ngram_range <- n_gram_range
 
     if (set_attributes) {
-      base_params <- obj |> bert_parameters(use_dfc_method = T, return_attributes = T)
-
-      attr(obj, "base_parameters") <- base_params
-
-      hdbscan_params <-
-        obj$hdbscan_model |> bert_parameters(return_attributes = T)
-
-      attr(obj, "hdbscan_parameters") <- hdbscan_params
-
-      ctfidf_params <-
-        obj$ctfidf_model$get_params() |> flatten_df() |>  tbl_bert_parameter_features_to_attribute()
-
-      attr(obj, "cftfidf_parameters") <- ctfidf_params
-
-      umap_params <-
-        obj$umap_model |> bert_parameters(return_tibble = T, return_attributes = T)
-
-      attr(obj, "umap_parameters") <- umap_params
-
-      vectorizer_params <- obj$vectorizer_model |> bert_parameters(return_tibble = T, use_dfc_method = T, return_attributes = T)
-
-      attr(obj, "vectorizer_parameters") <- vectorizer_params
-
-      if (length(representation_model) > 0) {
-        representation_method <- attributes(representation_model)[["representation_method"]]
-        attr(obj, "representation_model") <- representation_method
-        representation_method_parameters <-
-          attributes(representation_model)[["input_parameters"]]
-
-        attr(obj, "representation_method_parameters") <- representation_method_parameters
-      }
+      obj <- set_bert_attributes(obj = obj, representation_model = representation_model)
     }
 
     obj
@@ -810,6 +822,10 @@ tbl_bert_attributes <-
       dat <-
         dat |> tidyr::unite(parameter, parameter, feature ,sep = "_") |> tidyr::spread(parameter, value, convert = TRUE)
     }
+
+    names(dat) <-
+      names(dat) |>
+      str_remove_all("_NA$")
 
 
     dat
