@@ -344,26 +344,6 @@ bert_topic_labels <-
   }
 
 
-bert_save <-
-  function(obj = NULL,
-           file_path = NULL,
-           file_name = "bert_model") {
-    if (length(file_path) == 0) {
-      stop("Enter File Path")
-    }
-
-    oldwd <- getwd()
-    has_slash <- file_path |> stringr::str_detect("/$")
-
-    if (has_slash) {
-      file_path <- file_path |> stringr::str_remove_all("/$")
-    }
-    path <- glue::glue("{file_path}/{file_name}")
-
-    obj$save(save_embedding_model =)
-
-  }
-
 
 #' Topic Counts
 #'

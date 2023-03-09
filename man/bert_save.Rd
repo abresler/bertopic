@@ -4,7 +4,12 @@
 \alias{bert_save}
 \title{Save BERTopic Model}
 \usage{
-bert_save(obj = NULL, file_path = NULL, file_name = "bert_model")
+bert_save(
+  obj,
+  model_path = NULL,
+  file_name = "bert_model",
+  save_embedding_model = TRUE
+)
 }
 \arguments{
 \item{save_embedding_model}{}

@@ -192,7 +192,7 @@ open_ai_representation <-
 #'
 #' @param model The Spacy model to use
 #' @param top_n_words The top n words to extract.  Default `10`
-#' @param pos_patterns Patterns for Spacy to use. See https://spacy.io/usage/rule-based-matching and https://demos.explosion.ai/matcher and https://www.kaggle.com/code/curiousprogrammer/entity-extraction-and-classification-using-spacy for more
+#' @param pos_patterns Patterns for Spacy to use. See https://spacy.io/usage/rule-based-matching and https://demos.explosion.ai/matcher and https://www.kaggle.com/code/curiousprogrammer/entity-extraction-and-classification-using-spacy for more and alsohttps://spacy.io/usage/rule-based-matching
 #' @param obj
 #'
 #' @return

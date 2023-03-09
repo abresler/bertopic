@@ -335,6 +335,14 @@ tbl_kb_1_3_ctf_1_20_no_stop <-
 
 
 # pos ---------------------------------------------------------------------
+pos_non_adj_noun <-
+  part_of_speech_representation(top_n_words = 3L, pos_patterns = list(
+    list(list('POS' = 'ADJ'), list('POS' = 'NOUN')),
+    list(list('POS' = 'NOUN')), list(list('POS' = 'ADJ'))
+  ))
+pos_adj_noun <- part_of_speech_representation(top_n_words = 1L, pos_patterns = list(
+  list(list('POS' = 'ADJ'), list('POS' = 'NOUN'))
+))
 
 
 tbl_pos_custom_no_ctfidf <-
@@ -372,8 +380,8 @@ tbl_pos_custom_ctfidf <-
     obj = tm_bap,
     docs = bap_docs,
     topics = NULL,
-    top_n_words = 3L,
-    n_gram_range = list(3L, 5L),
+    top_n_words = !L,
+    n_gram_range = list(3L, 3L),
     vectorizer_model = NULL,
     ctfidf_model = ctfidf(bm25_weighting = TRUE, reduce_frequent_words = TRUE),
     representation_model = part_of_speech_representation(top_n_words = 3L, pos_patterns = list(
@@ -480,3 +488,34 @@ bap_topic_heir <-
   tm_bap |> bert_topic_hierarchy(docs = bap_docs, print_tree = T, tight_layout = T)
 bert_tree |> as.character() |> jsonify::to_json() |> jsonview::json_tree_view(scroll = T, auto_unbox = T)
 
+
+
+# treetest ----------------------------------------------------------------
+
+
+# library(collapsibleTree)
+#
+# tbl_bap_docs <-
+#   bert_document_info(obj = tm_bap, bap_docs, document_name = "quote")
+#
+# df <- df |>
+#   left_join(
+#     tbl_keybert, by = c("number_quote" = "number_document")
+#   ) |>
+#   left_join(
+#     tbl_bap_docs
+#   )
+#
+# z <- df |>
+#   filter(topic_bert %in% c(0:2)) |>
+#   select(label_bertopic,
+#          keywords_keybert_keyphrase,
+#          keywords_keybert_sklearn) |>
+#   gather_keybert_keywords(other_join_columns = "label_bertopic")
+#
+# z |> collapsibleTree(c("label_bertopic", "type_keyword", "keyword"), fontSize = 8, height = 1500)
+#
+#
+# collapsibleTree(tbl_test_count, c("is_outlier_bert_topic", "label_bertopic", "count"),
+#                 collapsed = FALSE
+# )
