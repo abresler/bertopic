@@ -190,6 +190,9 @@ select_correct_python <-
     reticulate::use_python(python = path)
   }
 
+# simillar ----------------------------------------------------------------
+
+
 .bert_similar_term_topics <-
   function(topic_model,
            term = NULL,
@@ -205,7 +208,10 @@ select_correct_python <-
            score_c_tfidf = similar_topics[[2]] |> flatten_dbl()) |>
       mutate(term) |>
       select(term, everything()) |>
-      mutate(is_outlier_bert_topic = topic_bert == -1)
+      mutate(is_outlier_bert_topic = topic_bert == -1,
+             is_c_tfidf_over_50 = if_else(score_c_tfidf >= .45, TRUE, FALSE),
+             bin_c_tfidf_score = (score_c_tfidf * 100) %/% 10 * 10,
+             rounded_c_tfidf_score = (score_c_tfidf * 100) |> round(digits=-1))
 
   }
 
@@ -256,6 +262,9 @@ bert_similar_terms_topics <-
     data
 
   }
+
+# info --------------------------------------------------------------------
+
 
 #' BERT Topic Model Info
 #'
@@ -503,6 +512,34 @@ print_bert_topic_tree <-
     ) |>
       cat(fill = TRUE)
   }
+
+#' Returns Topic Tree Text
+#'
+#' @param obj Bertopic Model
+#' @param hierarchy  Output from `bert_topic_hierarchy`
+#' @param tight_layout Whether to use a tight layout (narrow width) for easier readability if you have hundreds of topics.  Default `FALSE`
+#' @param max_distance The maximum distance between two topics. This value is based on the Distance column in hier_topics.  Default `NULL`
+#'
+#' @return
+#' @export
+#'
+#' @examples
+bert_topic_tree_text <-
+  function(obj,
+           hierarchy,
+           tight_layout = FALSE,
+           max_distance = NULL) {
+    text <-
+      obj$get_topic_tree(
+      hier_topics  = hierarchy,
+      max_distance = max_distance,
+      tight_layout = tight_layout
+    )
+
+    text
+  }
+
+
 
 #' Returns keywords for the topics
 #'

@@ -1,5 +1,6 @@
 
 
+
 library(bertopic)
 
 library(sheldon)
@@ -85,8 +86,12 @@ tm_bap <-
   )
 
 out <-
-  bert_fit_transform(obj = tm_bap, documents = bap_docs, embeddings = NULL, y = NULL)
-
+  bert_fit_transform(
+    obj = tm_bap,
+    documents = bap_docs,
+    embeddings = NULL,
+    y = NULL
+  )
 
 tbl_base_topics_base_ctfidf <-
   tm_bap |> bert_topic_count(include_parameters = T)
