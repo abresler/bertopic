@@ -1,6 +1,6 @@
 Package: bertopic
 Title: bertopic and friends
-Version: 0.1.0001
+Version: 0.1.1
 Encoding: UTF-8
 Authors@R: c(person("Alex", "Bresler", role = c("aut", "cre"), email = "abresler@asbcllc.com"))
 Maintainer: Alex Bresler <abresler@asbcllc.com>

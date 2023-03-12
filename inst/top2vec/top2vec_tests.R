@@ -1,9 +1,8 @@
 #' https://maartengr.github.io/BERTopic/getting_started/quickstart/quickstart.html
 
 library(tidyverse)
-# library(bertopic)
-library(asbtools)
-devtools::load_all(".")
+library(bertopic)
+# library(asbtools)
 
 # Quick Start -------------------------------------------------------------
 
