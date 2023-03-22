@@ -8,12 +8,13 @@ tbl_keybert_keywords(
   data,
   document_column = NULL,
   obj = NULL,
+  iterate_individually = FALSE,
   include_both_vectorizers = FALSE,
   model = "all-MiniLM-L6-v2",
   exclude_stop_words = T,
   use_future = FALSE,
   return_message = TRUE,
-  keyphrase_ngram_range = list(1L, 1L),
+  keyphrase_ngram_range = list(1L, 3L),
   use_embeddings = F,
   use_key_phrase_vectorizer = T,
   top_n_words = 5L,
@@ -46,6 +47,8 @@ tbl_keybert_keywords(
 \item{document_column}{name of `document` column}
 
 \item{obj}{Keybert Object}
+
+\item{iterate_individually}{}
 
 \item{include_both_vectorizers}{if `TRUE` returns keybert and sklearn methods}
 

@@ -7,7 +7,7 @@
 keybert_keywords(
   docs = NULL,
   obj = NULL,
-  use_future = FALSE,
+  iterate_individually = FALSE,
   return_message = TRUE,
   model = "all-MiniLM-L6-v2",
   stopword_package_sources = NULL,
@@ -15,6 +15,7 @@ keybert_keywords(
   exclude_stop_words = T,
   assign_to_environment = T,
   keyphrase_ngram_range = list(1L, 1L),
+  use_future = TRUE,
   use_embeddings = F,
   use_key_phrase_vectorizer = T,
   top_n_words = 5L,

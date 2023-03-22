@@ -1,6 +1,7 @@
 
 
 
+
 # https://github.com/MaartenGr/KeyBERT
 
 
@@ -31,6 +32,43 @@ import_keybert <-
     obj
   }
 
+
+.extract_document_keywords <- function(obj,
+                                       doc,
+                                       candidates =  NULL,
+                                       keyphrase_ngram_range = list(1L, 1L),
+                                       stop_words,
+                                       min_df,
+                                       use_maxsum,
+                                       word_embeddings,
+                                       doc_embeddings,
+                                       seed_keywords,
+                                       highlight,
+                                       vectorizer_model,
+                                       use_mmr,
+                                       diversity,
+                                       nr_candidates,
+                                       top_n_words = 5
+) {
+  obj$extract_keywords(
+    docs = doc,
+    candidates = candidates,
+    keyphrase_ngram_range = reticulate::tuple(keyphrase_ngram_range),
+    stop_words = stop_words,
+    top_n = as.integer(top_n_words),
+    min_df = min_df,
+    use_maxsum = use_maxsum,
+    word_embeddings = word_embeddings,
+    doc_embeddings = doc_embeddings,
+    seed_keywords = seed_keywords,
+    highlight = highlight,
+    vectorizer = vectorizer_model,
+    use_mmr = use_mmr,
+    diversity = diversity,
+    nr_candidates = nr_candidates
+  )
+
+}
 
 # model -------------------------------------------------------------------
 
@@ -110,7 +148,7 @@ keybert_model <-
 keybert_keywords <-
   function(docs = NULL,
            obj = NULL,
-           use_future = FALSE,
+           iterate_individually = FALSE,
            return_message = TRUE,
            model = "all-MiniLM-L6-v2",
            stopword_package_sources = NULL,
@@ -118,6 +156,7 @@ keybert_keywords <-
            exclude_stop_words = T,
            assign_to_environment = T,
            keyphrase_ngram_range = list(1L, 1L),
+           use_future = TRUE,
            use_embeddings = F,
            use_key_phrase_vectorizer = T,
            top_n_words = 5L,
@@ -207,7 +246,42 @@ keybert_keywords <-
       word_embeddings <- out[[2]]
     }
 
-    out <-
+
+    if (iterate_individually) {
+      .extract_document_keywords_safe <-
+        purrr::possibly(.extract_document_keywords, list())
+
+      out <-
+          seq_along(docs) |>
+          map(function(x) {
+            if (return_message) {
+              glue("Extracting Keywords from Document # {x}") |> message()
+            }
+            .extract_document_keywords_safe(
+              obj = obj,
+              doc = docs[[x]],
+              candidates = candidates,
+              keyphrase_ngram_range = keyphrase_ngram_range,
+              stop_words = stop_words,
+              top_n_words = top_n_words,
+              min_df = min_df,
+              use_maxsum = use_maxsum,
+              word_embeddings = word_embeddings,
+              doc_embeddings = doc_embeddings,
+              seed_keywords = seed_keywords,
+              highlight = highlight,
+              vectorizer_model = vectorizer_model,
+              use_mmr = use_mmr,
+              diversity = diversity,
+              nr_candidates = nr_candidates
+            )
+
+          })
+    }
+
+
+    if (!iterate_individually) {
+      out <-
       obj$extract_keywords(
         docs = docs,
         candidates = candidates,
@@ -225,10 +299,13 @@ keybert_keywords <-
         diversity = diversity,
         nr_candidates = nr_candidates
       )
+    }
 
     if (assign_to_environment) {
       assign('kb_keyword_extractor', obj, envir = .GlobalEnv)
     }
+
+
 
     dat <-
       tbl_keybert_data(out = out,
@@ -256,7 +333,7 @@ keybert_keywords <-
 
     dat
 
-  }
+    }
 
 #' Extract Embeddings from Documents
 #'
@@ -378,6 +455,7 @@ keybert_embeddings <-
 .tbl_keybert_keywords <- function(data,
                                   document_column = NULL,
                                   obj = NULL,
+                                  iterate_individually = FALSE,
                                   model = "all-MiniLM-L6-v2",
                                   exclude_stop_words = T,
                                   use_future = FALSE,
@@ -425,6 +503,7 @@ keybert_embeddings <-
     docs = docs,
     obj = obj,
     model = model,
+    iterate_individually = iterate_individually,
     exclude_stop_words = exclude_stop_words,
     keyphrase_ngram_range = keyphrase_ngram_range,
     use_embeddings = use_embeddings,
@@ -544,6 +623,8 @@ keybert_embeddings <-
 #' @param include_both_vectorizers if `TRUE` returns keybert and sklearn methods
 #' @param use_future if `TRUE` uses parallel processing
 #' @param return_message if `TRUE` returns a message
+#' @param use_future_individually
+#' @param iterate_individually
 #'
 #' @return `tibble` of keywords
 #'
@@ -554,12 +635,13 @@ keybert_embeddings <-
 tbl_keybert_keywords <- function(data,
                                  document_column = NULL,
                                  obj = NULL,
+                                 iterate_individually = FALSE,
                                  include_both_vectorizers = FALSE,
                                  model = "all-MiniLM-L6-v2",
                                  exclude_stop_words = T,
                                  use_future = FALSE,
                                  return_message = TRUE,
-                                 keyphrase_ngram_range = list(1L, 1L),
+                                 keyphrase_ngram_range = list(1L, 3L),
                                  use_embeddings = F,
                                  use_key_phrase_vectorizer = T,
                                  top_n_words = 5L,
@@ -591,6 +673,7 @@ tbl_keybert_keywords <- function(data,
         document_column = document_column,
         obj = obj,
         model = obj,
+        iterate_individually = iterate_individually,
         exclude_stop_words = exclude_stop_words,
         use_future = use_future,
         return_message = return_message,
@@ -632,6 +715,7 @@ tbl_keybert_keywords <- function(data,
       model = model,
       exclude_stop_words = exclude_stop_words,
       use_future = use_future,
+      iterate_individually = iterate_individually,
       return_message = return_message,
       keyphrase_ngram_range = keyphrase_ngram_range,
       use_embeddings = use_embeddings,
@@ -667,6 +751,7 @@ tbl_keybert_keywords <- function(data,
       obj = obj,
       model = model,
       exclude_stop_words = exclude_stop_words,
+      iterate_individually = iterate_individually,
       use_future = use_future,
       return_message = return_message,
       keyphrase_ngram_range = keyphrase_ngram_range,
@@ -790,7 +875,8 @@ tbl_keybert_data <-
 #'
 #' @examples
 gather_keybert_keywords <-
-  function(data, id_column = NULL,
+  function(data,
+           id_column = NULL,
            other_join_columns = NULL,
            only_distinct = F) {
     if (length(id_column) == 0) {
@@ -799,18 +885,23 @@ gather_keybert_keywords <-
       id_column <- "id"
     }
     keyword_cols <- data |> select(matches("^keywords")) |> names()
-    data <- data |> select(id_column, one_of(other_join_columns), matches(keyword_cols)) |>
+    data <-
+      data |> select(id_column,
+                     one_of(other_join_columns),
+                     matches(keyword_cols)) |>
       pivot_longer(
         cols = keyword_cols,
         names_to = "type_keyword",
         values_to = "keyword",
         values_drop_na = T
       ) |>
-      mutate(type_keyword = case_when(
-        type_keyword |> str_detect("sklearn") ~ "sklearn",
-        type_keyword |> str_detect("keyphrase") ~ "keyphrase",
-        TRUE ~ "other"
-      )) |>
+      mutate(
+        type_keyword = case_when(
+          type_keyword |> str_detect("sklearn") ~ "sklearn",
+          type_keyword |> str_detect("keyphrase") ~ "keyphrase",
+          TRUE ~ "other"
+        )
+      ) |>
       separate_rows(keyword, sep = "\\|") |>
       mutate_if(is.character, str_squish)
 
