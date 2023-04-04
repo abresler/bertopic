@@ -3,6 +3,8 @@
 
 #' Import Flair Module
 #'
+#' Flair module \url{https://flair.readthedocs.io/en/latest/modules.html}
+#'
 #' @param assign_to_environment
 #' @param path
 #'
@@ -20,6 +22,18 @@ import_flair <-
       assign('flair', obj, envir = .GlobalEnv)
     }
     obj
+  }
+
+#' Title
+#'
+#' @return
+#' @export
+#'
+#' @examples
+flair_embeddings <-
+  function() {
+    obj <- import_flair(assign_to_environment = F)
+    obj$embeddings
   }
 
 #' Roberta Embeddings

@@ -10,5 +10,5 @@ import_flair(assign_to_environment = T, path = NULL)
 \item{path}{}
 }
 \description{
-Import Flair Module
+Flair module \url{https://flair.readthedocs.io/en/latest/modules.html}
 }

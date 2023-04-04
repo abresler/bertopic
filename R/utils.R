@@ -7,6 +7,14 @@
 
 # tuple -------------------------------------------------------------------
 
+#' List to Tuple
+#'
+#' @param obj
+#'
+#' @return
+#' @export
+#'
+#' @examples
 list_to_tuple <-
   function(obj) {
     reticulate::tuple(obj)

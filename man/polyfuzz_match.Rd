@@ -9,6 +9,9 @@ polyfuzz_match(
   from_list = NULL,
   to_list = NULL,
   top_n_matches = 1,
+  group_model = NULL,
+  link_min_similarity = 0.75,
+  group_all_strings = FALSE,
   model_id = NULL,
   exclude_unmatched = FALSE
 )
@@ -18,9 +21,15 @@ polyfuzz_match(
 
 \item{from_list}{The list from which you want mappings. If you want to map items within a list, and not map the items to themselves, you can supply only the from_list and ignore the to_list.}
 
-\item{to_list}{The list where you want to map t}
+\item{to_list}{The list where you want to map to}
 
 \item{top_n_matches}{The number of matches you want returned. This is currently only implemented for polyfuzz.models.TFIDF and polyfuzz.models.Embeddings as they can computationally handle more comparisons.}
+
+\item{group_model}{you can choose one of the models in polyfuzz.models to be used as a grouper default `NONE`}
+
+\item{link_min_similarity}{If not `NULL` the minimum similarity between strings before they are grouped in a single linkage fashion.  Default `.75`}
+
+\item{group_all_strings}{if you want to compare a list of strings with itself and then cluster those strings, set this to True. Otherwise, only the strings that were mapped To are clustered.}
 
 \item{model_id}{the model id of the model if you have specified multiple models}
 

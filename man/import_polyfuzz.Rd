@@ -2,7 +2,8 @@
 % Please edit documentation in R/polyfuzz.R
 \name{import_polyfuzz}
 \alias{import_polyfuzz}
-\title{Import Polyfuzz}
+\title{Import Polyfuzz
+Polyfuzz module \url{https://maartengr.github.io/PolyFuzz/}}
 \usage{
 import_polyfuzz(assign_to_environment = T, path = NULL)
 }
@@ -11,4 +12,5 @@ import_polyfuzz(assign_to_environment = T, path = NULL)
 }
 \description{
 Import Polyfuzz
+Polyfuzz module \url{https://maartengr.github.io/PolyFuzz/}
 }

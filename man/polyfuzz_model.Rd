@@ -4,14 +4,27 @@
 \alias{polyfuzz_model}
 \title{Polyfuzz Model}
 \usage{
-polyfuzz_model(obj = NULL, method = "TF-IDF", verbose = TRUE)
+polyfuzz_model(
+  method = "TF-IDF",
+  model_object = NULL,
+  obj = NULL,
+  verbose = TRUE,
+  from_list = NULL,
+  to_list = NULL
+)
 }
 \arguments{
+\item{method}{the method(s) used for matching. For quick selection of models select one of the following: `EditDistance`, `TF-IDF` or `Embeddings`. If you want more control over the models above, pass in a model from polyfuzz.models. For examples, see usage below.  Default `TF-iDF`}
+
+\item{model_object}{A pretrained model object}
+
 \item{obj}{Polyfuzz Object}
 
-\item{method}{the method(s) used for matching. For quick selection of models select one of the following: "EditDistance", "TF-IDF" or "Embeddings". If you want more control over the models above, pass in a model from polyfuzz.models. For examples, see usage below.  Default `TF-iDF`}
+\item{verbose}{If `TRUE` prints results}
 
-\item{verbose}{}
+\item{from_list}{If not `NULL` vector of from list}
+
+\item{to_list}{If not `NULL` vector of to list}
 }
 \description{
 Polyfuzz Model
