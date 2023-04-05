@@ -13,7 +13,7 @@ import_bertopic(assign_to_environment = T, path = NULL)
 python object
 }
 \description{
-\href{https://maartengr.github.io/BERTopic}{BERTopic API from python}
+\href{https://maartengr.github.io/BERTopic}{BERTopic API from python} and other examples \href{https://github.com/MaartenGr/BERTopic}{here}
 }
 \examples{
 library(bertopic)

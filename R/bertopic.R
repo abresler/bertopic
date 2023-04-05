@@ -360,7 +360,7 @@ bert_stop_words <-
 
 #' Import Bert Topic
 #'
-#' \href{https://maartengr.github.io/BERTopic}{BERTopic API from python}
+#' \href{https://maartengr.github.io/BERTopic}{BERTopic API from python} and other examples \href{https://github.com/MaartenGr/BERTopic}{here}
 #'
 #' @param assign_to_environment if \code{TRUE} assigns to environment
 #'
