@@ -555,9 +555,6 @@ bert_topic <-
         c(stop_words) |> unique()
     }
 
-
-
-
     obj <-
       bertopic$BERTopic(
         representation_model = representation_model,
