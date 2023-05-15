@@ -4,3 +4,6 @@
 .Ruserdata
 dev/
 inst/
+^dev/
+^inst/
+^examples/

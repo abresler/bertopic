@@ -10,3 +10,4 @@ dev$
 .Ruserdata
 ^dev/
 ^inst/
+^examples/
