@@ -4,3 +4,9 @@
 ^\dev
 [.]xlsx$
 dev$
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+^dev/
+^inst/

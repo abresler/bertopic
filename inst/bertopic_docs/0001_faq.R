@@ -2,7 +2,6 @@
 
 library(tidyverse)
 library(bertopic)
-library(asbtools)
 
 
 # Quick Start -------------------------------------------------------------
