@@ -5,6 +5,7 @@
 
 
 
+
 # tuple -------------------------------------------------------------------
 
 #' List to Tuple
@@ -216,10 +217,13 @@ select_correct_python <-
            score_c_tfidf = similar_topics[[2]] |> flatten_dbl()) |>
       mutate(term) |>
       select(term, everything()) |>
-      mutate(is_outlier_bert_topic = topic_bert == -1,
-             is_c_tfidf_over_50 = if_else(score_c_tfidf >= .45, TRUE, FALSE),
-             bin_c_tfidf_score = (score_c_tfidf * 100) %/% 10 * 10,
-             rounded_c_tfidf_score = (score_c_tfidf * 100) |> round(digits=-1))
+      mutate(
+        is_outlier_bert_topic = topic_bert == -1,
+        is_c_tfidf_over_50 = if_else(score_c_tfidf >= .45, TRUE, FALSE),
+        bin_c_tfidf_score = (score_c_tfidf * 100) %/% 10 * 10,
+        rounded_c_tfidf_score = (score_c_tfidf * 100) |> round(digits =
+                                                                 -1)
+      )
 
   }
 
@@ -374,6 +378,7 @@ bert_topic_labels <-
 bert_topic_count <-
   function(obj,
            topic_number = NULL,
+           include_representative_documents = TRUE,
            join_labels = TRUE,
            include_parameters = FALSE,
            parameter_filters = NULL) {
@@ -382,6 +387,10 @@ bert_topic_count <-
       janitor::clean_names() |> as_tibble() |>
       rename(topic_bert = topic) |>
       mutate(is_outlier_bert_topic = topic_bert == -1)
+
+    if (include_representative_documents) {
+      join_labels <- T
+    }
 
     if (join_labels) {
       data <- data |>
@@ -398,6 +407,14 @@ bert_topic_count <-
         left_join(tbl_ids, by = "id") |>
         select(one_of(names(tbl_ids)), everything()) |>
         select(-id)
+    }
+
+    if (include_representative_documents) {
+      tbl_docs <- obj |> bert_representative_documents()
+      tbl_docs <- tbl_docs |> group_by(topic_bert) |>
+        summarise(text_representative_documents = unique(text) |> str_c(collapse = ".  "))
+
+      data <- data |> left_join(tbl_docs, by = "topic_bert")
     }
 
 
@@ -487,7 +504,8 @@ bert_topic_hierarchy <-
       )
 
     if (print_tree) {
-      tree <- obj$get_topic_tree(hier_topics = out, tight_layout = tight_layout)
+      tree <-
+        obj$get_topic_tree(hier_topics = out, tight_layout = tight_layout)
 
       assign('bert_tree', tree, envir = .GlobalEnv)
 
@@ -539,10 +557,10 @@ bert_topic_tree_text <-
            max_distance = NULL) {
     text <-
       obj$get_topic_tree(
-      hier_topics  = hierarchy,
-      max_distance = max_distance,
-      tight_layout = tight_layout
-    )
+        hier_topics  = hierarchy,
+        max_distance = max_distance,
+        tight_layout = tight_layout
+      )
 
     text
   }
@@ -861,7 +879,7 @@ bert_reduce_topics <-
 
     obj
 
-      }
+  }
 
 #' Updates the topic representation by recalculating c-TF-IDF with the new parameters as defined in this function.
 #'
@@ -913,8 +931,7 @@ bert_update_topics <-
            max_df = 1L,
            pos_pattern = "<J.*>*<N.*>+",
            seed_topic_list = NULL,
-           vocabulary = NULL
-  ) {
+           vocabulary = NULL) {
     if (length(docs) == 0) {
       "Enter documents to fit" |> message()
       return(obj)
@@ -977,7 +994,8 @@ bert_update_topics <-
       ctfidf_model = ctfidf_model
     )
 
-    obj <- set_bert_attributes(obj = obj, representation_model = representation_model)
+    obj <-
+      set_bert_attributes(obj = obj, representation_model = representation_model)
 
     obj
   }
@@ -1162,6 +1180,191 @@ extract_bert_umap <-
     data |>
       bind_cols(df_umap)
 
+  }
+
+
+# visualization_data_inputs -----------------------------------------------
+
+
+#' Extract UMAP for Visualization
+#'
+#' @param obj
+#' @param n_components
+#' @param metric
+#' @param random_state
+#' @param min_dist
+#' @param learning_rate
+#' @param exclude_outlier
+#'
+#' @return
+#' @export
+#'
+#' @examples
+tbl_bert_umap_label_level <-
+  function(obj,
+           exclude_outlier = FALSE,
+           n_components = 2L,
+           metric = 'cosine',
+           random_state = 42L,
+           min_dist = .1,
+           learning_rate = 1L) {
+    freq_df <- obj |>  bert_topic_count()
+
+
+    umap <- import_umap()
+    um <- umap$UMAP(
+      n_components = n_components,
+      metric = metric,
+      random_state = random_state,
+      min_dist = min_dist,
+      learning_rate = learning_rate
+    )
+
+    if (exclude_outlier) {
+      freq_df <-
+        freq_df |> filter(!is_outlier_bert_topic)
+      embed <-
+        obj$topic_embeddings_[2:length(obj$topic_embeddings_)]
+    }
+
+    if (!exclude_outlier) {
+      embed <- obj$topic_embeddings_
+    }
+    reduced_embeddings <-
+      um$fit_transform(X = embed) |>
+      tbl_array(output_type = 'umap') |>
+      mutate(topic_bert = 1:n() - 2)
+
+
+    freq_df <-
+      freq_df |>
+      left_join(reduced_embeddings,  by = "topic_bert") |>
+      select(-count, everything())
+
+    freq_df
+  }
+
+#' BERT Cosine Simiarity
+#'
+#' @param obj topic model object
+#' @param exclude_outlier if `TRUE` excludes outlier topic
+#' @param include_topic_number if `TRUE` includes topic number
+#' @param return_tibble if `TRUE` returns tibble
+#'
+#' @return
+#' @export
+#'
+#' @examples
+tbl_bert_label_cosine_similarity <-
+  function(obj,
+           exclude_outlier = FALSE,
+           include_topic_number = TRUE,
+           distinct_matches = FALSE,
+           separate_data = T,
+           return_tibble = F) {
+    freq_df <- obj |>  bert_topic_count()
+    sk <- import_sklearn()
+    cosine_similarity <- sk$metrics$pairwise$cosine_similarity
+
+    if (exclude_outlier) {
+      freq_df <-
+        freq_df |> filter(!is_outlier_bert_topic)
+      embed <-
+        obj$topic_embeddings_[2:length(obj$topic_embeddings_)]
+    }
+
+    if (!exclude_outlier) {
+      embed <- obj$topic_embeddings_
+    }
+
+    dist <- cosine_similarity(embed)
+
+    if (include_topic_number) {
+      feature_names <- freq_df |>
+        unite(name, topic_bert, label_bertopic, sep = "_") |>
+        pull(name)
+    }
+
+    if (!include_topic_number) {
+      feature_names <- freq_df |> pull(label_bertopic)
+    }
+
+
+
+
+    rownames(dist) <- feature_names
+    colnames(dist) <- feature_names
+
+    if (!return_tibble) {
+      return(dist)
+    }
+
+    data <-
+      as_tibble(dist) |>
+      mutate(feature_01 = rownames(dist)) |>
+      gather(feature_02, value, -feature_01) |>
+      filter(feature_01 != feature_02) |>
+      rename(cosine_similarity = value)
+
+    if (include_topic_number & separate_data) {
+      data <-
+        data |>
+        separate(
+          feature_01,
+          into = c("topic_bert_01", "label_bertopic_01"),
+          sep = "\\_",
+          convert = T
+        ) |>
+        separate(
+          feature_02,
+          into = c("topic_bert_02", "label_bertopic_02"),
+          sep = "\\_",
+          convert = T
+        )
+
+
+
+    }
+
+    if (!include_topic_number & separate_data) {
+      data <-
+        data |>
+        rename(label_bertopic_01 = feature_01,
+               label_bertopic_02 = feature_02)
+    }
+
+    if (distinct_matches) {
+      data <- data |>
+        mutate(label = glue({"{label_bertopic_01}|{label_bertopic_02}"})) |>
+        mutate(id = 1:n())
+
+      tbl_labels <-
+        data |>
+        select(id, label) |>
+        separate_rows(label, sep = "\\|", convert = T) |>
+        group_by(id) |>
+        summarise(label_unique = unique(label) |> sort() |> str_c(collapse = "|")) |>
+        distinct(id, label_unique)
+
+      tbl_labels <- tbl_labels |>
+        mutate(row = 1:n()) |>
+        group_by(label_unique) |>
+        filter(row == min(row)) |>
+        ungroup() |>
+        select(id = row, label_unique) |>
+        mutate(is_first = TRUE)
+
+
+      data <- data |>
+        left_join(tbl_labels, by = "id") |>
+        filter(is_first) |>
+        select(-c(id, label_unique, is_first))
+    }
+
+    data <- data |>
+      arrange(label_bertopic_01, desc(cosine_similarity))
+
+    data
   }
 
 

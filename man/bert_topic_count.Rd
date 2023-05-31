@@ -7,6 +7,7 @@
 bert_topic_count(
   obj,
   topic_number = NULL,
+  include_representative_documents = TRUE,
   join_labels = TRUE,
   include_parameters = FALSE,
   parameter_filters = NULL
