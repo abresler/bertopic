@@ -4,7 +4,13 @@
 \alias{bert_document_info}
 \title{Bertopic Documents}
 \usage{
-bert_document_info(obj, docs, document_name = NULL)
+bert_document_info(
+  obj,
+  docs,
+  document_name = NULL,
+  exclude_list_columns = T,
+  assign_to_environment = TRUE
+)
 }
 \arguments{
 \item{obj}{Topic model object}
@@ -12,6 +18,8 @@ bert_document_info(obj, docs, document_name = NULL)
 \item{docs}{vector of documents}
 
 \item{document_name}{If not `NULL` name of the text document column}
+
+\item{exclude_list_columns}{}
 }
 \description{
 Bertopic Documents

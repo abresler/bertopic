@@ -4,10 +4,16 @@
 \alias{bert_topic_info}
 \title{BERT Topic Model Info}
 \usage{
-bert_topic_info(topic_model, topic_number = NULL)
+bert_topic_info(
+  obj,
+  topic_number = NULL,
+  assign_to_environment = TRUE,
+  concatenator = ".  ",
+  remove_list_columns = FALSE
+)
 }
 \arguments{
-\item{topic_model}{}
+\item{remove_list_columns}{}
 }
 \description{
 BERT Topic Model Info

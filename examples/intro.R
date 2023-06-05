@@ -50,9 +50,9 @@ test_term <-
 # topic_info --------------------------------------------------------------
 
 #' Topic Info
-bert_topic_info(topic_model = tm, topic_number = NULL)
+bert_topic_info(obj = tm, topic_number = NULL)
 
-bert_topic_count(topic_model = tm)
+bert_topic_count(obj = tm)
 
 
 # topics ------------------------------------------------------------------

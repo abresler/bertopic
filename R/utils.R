@@ -6,6 +6,7 @@
 
 
 
+
 # tuple -------------------------------------------------------------------
 
 #' List to Tuple
@@ -61,10 +62,12 @@ bert_load <-
 
 #' Save BERTopic Model
 #'
-#' @param obj
-#' @param model_path
-#' @param file_name
-#' @param save_embedding_model
+#' @param obj BERTopic Object
+#' @param model_path Path where object is saved
+#' @param file_name name of the BERTOPIC Model
+#' @param save_embedding_model if `TRUE` If serialization pickle, then you can choose to skip saving the embedding model. If serialization safetensors or pytorch, this variable can be used as a string pointing towards a huggingface model.
+#' @param serialization  If pickle, the entire model will be pickled. If safetensors or pytorch the model will be saved without the embedding, dimensionality reduction, and clustering algorithms. This is a very efficient format and typically advised.  Default `safetensors`
+#' @param save_ctfidf
 #'
 #' @return
 #' @export
@@ -74,6 +77,8 @@ bert_save <-
   function(obj,
            model_path = NULL,
            file_name = "bert_model",
+           serialization = "safetensors",
+           save_ctfidf = TRUE,
            save_embedding_model = TRUE) {
     if (length(model_path) == 0) {
       stop("Enter Path")
@@ -88,7 +93,11 @@ bert_save <-
     bert_model_path <-
       glue::glue("{model_path}/{file_name}")
 
-    obj$save(path = bert_model_path, save_embedding_model = save_embedding_model)
+    obj$save(
+      path = bert_model_path,
+      save_embedding_model = save_embedding_model,
+      serialization = serialization
+    )
 
     if (getwd() != oldwd) {
       setwd(oldwd)
@@ -275,24 +284,141 @@ bert_similar_terms_topics <-
 
   }
 
+
+# aspects -----------------------------------------------------------------
+
+.munge_aspect_column <-
+  function(data,
+           aspect_column,
+           assign_to_environment = TRUE) {
+    aspect_slug <-
+      aspect_column |> str_extract_all("[0-9]") |> flatten_chr() |> .pad_zeros(number_zeros = 3)
+
+    if (!data |> hasName(aspect_column)) {
+      return(data)
+    }
+
+    dat_slug <-
+      glue("data_aspect_{aspect_slug}")
+    tbl_aspect <-
+      data |> select(topic_bert, label_bertopic, !!sym(aspect_column)) |>  unnest() |>
+      mutate(id = 1:n()) |>
+      unnest()
+
+    tbl_aspect <-
+      tbl_aspect |>
+      mutate(type = !!sym(aspect_column),
+             type = type |> map_chr(class))
+
+    has_no_int <-
+      tbl_aspect |> filter(type %in% c("integer", "numeric")) |> unnest() |> nrow() == 0
+
+    if (has_no_int) {
+      dat <-
+        tbl_aspect |> filter(!type %in% c("integer", "numeric")) |> unnest() |>
+        select(-type) |> rename(word := !!sym(aspect_column)) |>
+        select(-id) |>
+        filter(word != "") |>
+        group_by(topic_bert) |>
+        mutate(number_word = 1:n()) |>
+        ungroup() |>
+        select(-word, everything())
+    }
+
+    if (!has_no_int) {
+      dat <-
+        tbl_aspect |> filter(type %in% c("integer", "numeric")) |> unnest() |> select(-type) |>
+        rename(value := !!sym(aspect_column)) |>
+        left_join(
+          tbl_aspect |> filter(!type %in% c("integer", "numeric")) |> unnest() |>
+            select(-type) |> rename(word := !!sym(aspect_column)),
+          by = c("topic_bert", "label_bertopic", "id")
+        ) |>
+        select(-id) |>
+        select(-value, everything()) |>
+        filter(word != "")
+    }
+
+
+
+    if (assign_to_environment) {
+      tbl_slug <-
+        glue("tbl_bert_aspect_{aspect_slug}")
+      assign(tbl_slug, dat, envir = .GlobalEnv)
+    }
+
+    dat <-
+      dat |>
+      group_by(topic_bert, label_bertopic) |>
+      nest() |>
+      rename(UQ(dat_slug) := data) |>
+      ungroup()
+
+
+    dat
+  }
+
+.munge_respresentation <-
+  function(data, assign_to_environment = T) {
+    rep_column <-
+      data |> select(matches("representation")) |>
+      select(-matches("data_representation")) |>
+      names()
+    if (length(rep_column) == 0) {
+      return(data)
+    }
+    dat <-
+      data |> select(topic_bert, label_bertopic, !!sym(rep_column)) |>  unnest() |>
+      mutate(id = 1:n()) |>
+      unnest() |>
+      rename(word := !!sym(rep_column)) |>
+      select(-id) |>
+      filter(word != "")
+
+    if (assign_to_environment) {
+      tbl_slug <-
+        glue("tbl_bert_representations")
+      assign(tbl_slug, dat, envir = .GlobalEnv)
+    }
+
+    dat <-
+      dat |>
+      group_by(topic_bert, label_bertopic) |>
+      nest() |>
+      rename(data_representation = data) |>
+      ungroup()
+
+    dat
+  }
+
 # info --------------------------------------------------------------------
 
 
 #' BERT Topic Model Info
 #'
-#' @param topic_model
+#' @param obj
+#' @param topic_number
+#' @param assign_to_environment
+#' @param concatenator
+#' @param remove_list_columns
 #'
 #' @return
 #' @export
 #'
 #' @examples
 bert_topic_info <-
-  function(topic_model, topic_number = NULL) {
+  function(obj,
+           topic_number = NULL,
+           assign_to_environment = TRUE,
+           concatenator = ".  ",
+           remove_list_columns = FALSE) {
     df <-
-      topic_model$get_topic_info(topic = topic_number)
+      obj$get_topic_info(topic = topic_number)
+
     tbl_topics <-
       df |> janitor::clean_names() |> as_tibble() |>
       rename(topic_bert = topic)
+
     data <-
       tbl_topics |>
       mutate(name = name |> str_replace("\\_", "\\+")) |>
@@ -302,8 +428,63 @@ bert_topic_info <-
       select(-remove) |>
       mutate(is_outlier_bert_topic = topic_bert == -1) |>
       mutate_if(is.character, str_squish) |>
-      select(-count, everything())
+      select(-count, everything()) |>
+      select_if(~ !any(is.na(.)))
 
+    aspect_cols <- data |> select(matches("aspect")) |> names()
+
+    if (length(aspect_cols) > 0) {
+      tbl_aspect <- aspect_cols |>
+        map(function(x) {
+          .munge_aspect_column(
+            data = data,
+            aspect_column = x,
+            assign_to_environment = assign_to_environment
+          )
+        }) |>
+        reduce(left_join, by = c("topic_bert", "label_bertopic"))
+
+      data <- data |>
+        select(-one_of(aspect_cols)) |>
+        left_join(tbl_aspect, by = c("topic_bert", "label_bertopic"))
+    }
+
+    rep_cols <- data |> select(matches("representation")) |> names()
+
+    if (length(rep_cols) > 0) {
+      tbl_rep <-
+        data |> .munge_respresentation(assign_to_environment = assign_to_environment)
+
+      data <- data |>
+        select(-one_of(rep_cols)) |>
+        left_join(tbl_rep,  by = c("topic_bert", "label_bertopic"))
+
+    }
+
+    if (data |> hasName("representative_docs")) {
+      tbl_docs <-
+        data |> select(topic_bert, label_bertopic, representative_docs) |> unnest() |>
+        group_by(topic_bert, label_bertopic) |>
+        summarise(
+          text_representative_documents = unique(representative_docs) |> str_squish() |> str_c(collapse = ".  ")
+        ) |>
+        ungroup()
+
+      data <- data |> select(-representative_docs) |>
+        left_join(tbl_docs, by = c("topic_bert", "label_bertopic")) |>
+        select(-text_representative_documents, everything())
+    }
+
+    list_cols <- data |> select_if(is.list) |> names()
+
+    if (length(list_cols) > 0) {
+      data <- data |>
+        select(-one_of(list_cols), everything())
+
+      if (remove_list_columns) {
+        data <- data |> select(-one_of(list_cols))
+      }
+    }
     data
   }
 
@@ -378,7 +559,7 @@ bert_topic_labels <-
 bert_topic_count <-
   function(obj,
            topic_number = NULL,
-           include_representative_documents = TRUE,
+           include_representative_documents = F,
            join_labels = TRUE,
            include_parameters = FALSE,
            parameter_filters = NULL) {
@@ -410,11 +591,16 @@ bert_topic_count <-
     }
 
     if (include_representative_documents) {
-      tbl_docs <- obj |> bert_representative_documents()
-      tbl_docs <- tbl_docs |> group_by(topic_bert) |>
-        summarise(text_representative_documents = unique(text) |> str_c(collapse = ".  "))
+      bert_representative_documents_safe <-
+        possibly(bert_representative_documents, tibble())
+      tbl_docs <- obj |> bert_representative_documents_safe()
+      if (nrow(tbl_docs) > 0) {
+        tbl_docs <- tbl_docs |> group_by(topic_bert) |>
+          summarise(text_representative_documents = unique(text) |> str_c(collapse = ".  "))
 
-      data <- data |> left_join(tbl_docs, by = "topic_bert")
+        data <- data |> left_join(tbl_docs, by = "topic_bert")
+      }
+
     }
 
 
@@ -1060,13 +1246,14 @@ tbl_bert_text_features <-
 #' @param obj Topic model object
 #' @param docs vector of documents
 #' @param document_name If not `NULL` name of the text document column
+#' @param exclude_list_columns
 #'
 #' @return
 #' @export
 #'
 #' @examples
 bert_document_info <-
-  function(obj, docs, document_name = NULL) {
+  function(obj, docs, document_name = NULL, exclude_list_columns =T, assign_to_environment = TRUE) {
     data <- obj$get_document_info(docs = docs) |> as_tibble()
     data <-
       data |> setNames(
@@ -1074,18 +1261,53 @@ bert_document_info <-
           "document",
           "topic_bert",
           "name_label_bertopic",
+          "representation",
+          "representative_documents",
           "top_n_words_label_bertopic",
           "pct_probability_topic_bert",
           "is_bertopic_representative_document"
         )
-      ) |>
-      left_join(obj |> bert_topic_info() |> select(-count), by = "topic_bert") |>
+      )
+
+    tbl_info <- obj |> bert_topic_info(assign_to_environment = assign_to_environment) |> select(-count)
+
+    join_cols <- names(tbl_info)[names(tbl_info) %in% names(data)]
+
+    data <-
+      data |>
+      left_join(tbl_info, by = join_cols) |>
       select(-name_label_bertopic) |>
       select(document, topic_bert, label_bertopic, everything())
+
+    # tbl_rep <-
+    #   data |> .munge_respresentation()
+    #
+
+
+    if (data |> hasName("representative_documents") & !data |> hasName("text_representative_documents")) {
+      tbl_docs <-
+        data |> select(topic_bert, label_bertopic, representative_documents) |> unnest() |>
+        group_by(topic_bert, label_bertopic) |>
+        summarise(
+          text_representative_documents = unique(representative_documents) |> str_squish() |> str_c(collapse = ".  ")
+        ) |>
+        ungroup()
+
+      data <-
+        data |> select(-representative_documents) |>
+        left_join(tbl_docs, by = c("topic_bert", "label_bertopic"))
+    }
 
     if (length(document_name) > 0) {
       data <- data |>
         rename(UQ(document_name) := document)
+    }
+
+    list_cols <- data |> select_if(is.list) |> names()
+
+    if (length(list_cols) > 0 & exclude_list_columns) {
+      data <- data |>
+        select(-one_of(list_cols))
     }
 
     data
@@ -1335,7 +1557,9 @@ tbl_bert_label_cosine_similarity <-
 
     if (distinct_matches) {
       data <- data |>
-        mutate(label = glue({"{label_bertopic_01}|{label_bertopic_02}"})) |>
+        mutate(label = glue({
+          "{label_bertopic_01}|{label_bertopic_02}"
+        })) |>
         mutate(id = 1:n())
 
       tbl_labels <-
