@@ -909,7 +909,7 @@ bert_topic_per_class <-
       dat |> setNames(c("topic_bert", "top_words", "count", "class"))
     dat <-
       dat |> left_join(
-        bert_topic_info(topic_model = topic_model) |>
+        bert_topic_info(obj = topic_model) |>
           select(topic_bert, label_bertopic)
 
         ,
