@@ -11,7 +11,8 @@ bert_topic_labels(
   word_length = NULL,
   update_topic_model_labels = FALSE,
   append_number_words = FALSE,
-  topic_prefix = FALSE
+  topic_prefix = FALSE,
+  aspect = NULL
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ bert_topic_labels(
 \item{append_number_words}{Append the number of words}
 
 \item{topic_prefix}{Whether to use the topic ID as a prefix. If set to True, the topic ID will be separated using the separator}
+
+\item{aspect}{The aspect from which to generate topic labels when not `NULL`}
 }
 \description{
 Generate BERT Topic Labels

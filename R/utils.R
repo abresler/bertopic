@@ -2,6 +2,61 @@
 
 
 
+# names -------------------------------------------------------------------
+
+.dict_doc_names <-
+  function() {
+    tibble(
+      name_bertopic = c(
+        "Document",
+        "Topic",
+        "Name",
+        "Representation",
+        "main",
+        "aspect1",
+        "aspect2",
+        "Representative_Docs",
+        "Top_n_words",
+        "Probability",
+        "Representative_document"
+      ),
+      name_actual = c(
+        "document",
+        "topic_bert",
+        "name_label_bertopic",
+        "representation",
+        "main",
+        "aspect1",
+        "aspect2",
+        "representative_documents",
+        "top_n_words_label_bertopic",
+        "pct_probability_topic_bert",
+        "is_bertopic_representative_document"
+      )
+
+
+
+
+    )
+  }
+
+.resolve_document_info_names <-
+  function(data) {
+    tbl_names <- .dict_doc_names()
+    actual_names <-
+      names(data) |>
+      map_chr(function(x){
+        df_row <- tbl_names |> filter(name_bertopic == x)
+        if (nrow(df_row) == 0) {
+          return(janitor::make_clean_names(x))
+        }
+        df_row$name_actual
+      })
+
+    data |> setNames(actual_names)
+  }
+
+
 
 
 
@@ -22,6 +77,56 @@ list_to_tuple <-
     reticulate::tuple(obj)
   }
 
+#' Unite Features
+#'
+#' @param data a `tibble`
+#' @param unite_columns vector of columns to unite
+#' @param new_column  name of new column.  If `NULL` concats the unite coljumns
+#' @param sep default `@`
+#' @param remove if `TRUE` removes original columns
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' library(tidyverse)
+#' tbl_unite_features(diamonds, unite_columns = c("cut", "color", "clarity"))
+tbl_unite_features <-
+  function(data, unite_columns = NULL,
+         new_column = NULL,
+         sep = "@",
+         to_factor = TRUE,
+         remove = F) {
+
+  if (length(unite_columns) == 0) {
+    return(data)
+  }
+
+  if (length(new_column) == 0) {
+    new_column <-
+    unite_columns |> str_c(collapse = "_")
+  }
+    data <-
+      data |> tidyr::unite(
+      col = UQ(new_column),
+      all_of(unite_columns),
+      sep = sep,
+      remove = remove
+    )
+
+    if (to_factor) {
+      data <- data |>
+        mutate_at(new_column, as.factor)
+
+      new_id <- glue("id_{new_column}")
+
+      data <- data |>
+        mutate(UQ(new_id) := as.numeric(!!sym(new_column)), .before = new_column)
+
+    }
+
+  data
+}
 
 # load_save ---------------------------------------------------------------
 
@@ -212,15 +317,16 @@ select_correct_python <-
 
 
 .bert_similar_term_topics <-
-  function(topic_model,
+  function(obj,
            term = NULL,
-           top_n_terms = 10L) {
+           top_n_terms = 10L,
+           image = NULL) {
     if (length(term) == 0) {
       "Enter search term" |> message()
       return(invisible())
     }
     similar_topics <-
-      topic_model$find_topics(search_term = term, top_n = as.integer(top_n_terms))
+      obj$find_topics(search_term = term, top_n = as.integer(top_n_terms),image = image)
 
     tibble(topic_bert = similar_topics[[1]],
            score_c_tfidf = similar_topics[[2]] |> flatten_dbl()) |>
@@ -228,7 +334,7 @@ select_correct_python <-
       select(term, everything()) |>
       mutate(
         is_outlier_bert_topic = topic_bert == -1,
-        is_c_tfidf_over_50 = if_else(score_c_tfidf >= .45, TRUE, FALSE),
+        is_c_tfidf_over_50 = if_else(score_c_tfidf >= .5, TRUE, FALSE),
         bin_c_tfidf_score = (score_c_tfidf * 100) %/% 10 * 10,
         rounded_c_tfidf_score = (score_c_tfidf * 100) |> round(digits =
                                                                  -1)
@@ -236,22 +342,24 @@ select_correct_python <-
 
   }
 
-#' Simllar Term Embeddings
+#' Find topics most similar to Search Terms
 #'
-#' @param topic_model Bertopic Model
+#' @param obj BERTopic Ojbect
 #' @param terms Vector of Terms to search
 #' @param top_n_terms the number of topics to return.  Default is 10
 #' @param nest_data if `TRUE` Nests data
+#' @param return_message
 #'
 #' @return
 #' @export
 #'
 #' @examples
 bert_similar_terms_topics <-
-  function(topic_model,
+  function(obj,
            terms = NULL,
            top_n_terms = 10L,
            nest_data = F,
+           image = NULL,
            return_message = T) {
     data <-
       terms |>
@@ -260,17 +368,19 @@ bert_similar_terms_topics <-
           glue::glue("Finding {top_n_terms} similar term topic embeddings for {x}") |> message()
         }
 
-        .bert_similar_term_topics(topic_model = topic_model,
+        .bert_similar_term_topics(obj = obj,
                                   term = x,
-                                  top_n_terms = top_n_terms)
+                                  top_n_terms = top_n_terms,
+                                  image = image  )
       })
-
+    tbl_count <- obj |> bert_topic_info(remove_list_columns = T) |> rename(count_documents_in_topic = count)
     data <- data |>
       left_join(
-        topic_model |> bert_topic_info() |> rename(count_documents_in_topic = count)
-        ,
+
+        tbl_count ,
         by = c("topic_bert", "is_outlier_bert_topic")
-      )
+      ) |>
+      select(term, topic_bert, names(tbl_count), everything())
 
 
     if (nest_data) {
@@ -290,16 +400,36 @@ bert_similar_terms_topics <-
 .munge_aspect_column <-
   function(data,
            aspect_column,
+           top_n_aspect_words = NULL,
+           return_summary = TRUE,
            assign_to_environment = TRUE) {
-    aspect_slug <-
+    aspect_num_slug <-
       aspect_column |> str_extract_all("[0-9]") |> flatten_chr() |> .pad_zeros(number_zeros = 3)
+
+    other_aspect <-
+      aspect_column |> str_remove_all("^aspect") |>
+      str_remove_all("[0-9]") |>
+      str_remove_all("^_")
 
     if (!data |> hasName(aspect_column)) {
       return(data)
     }
 
-    dat_slug <-
-      glue("data_aspect_{aspect_slug}")
+    if (other_aspect == "") {
+      dat_slug <-
+        glue("data_aspect_{aspect_num_slug}")
+      aspect_slug <- aspect_slug
+    }
+
+    if (other_aspect != "") {
+      dat_slug <-
+        glue("data_aspect_{other_aspect}_{aspect_num_slug}")
+
+      aspect_slug <-
+        glue("{other_aspect}_{aspect_num_slug}")
+    }
+
+
     tbl_aspect <-
       data |> select(topic_bert, label_bertopic, !!sym(aspect_column)) |>  unnest() |>
       mutate(id = 1:n()) |>
@@ -347,19 +477,40 @@ bert_similar_terms_topics <-
       assign(tbl_slug, dat, envir = .GlobalEnv)
     }
 
-    dat <-
-      dat |>
-      group_by(topic_bert, label_bertopic) |>
-      nest() |>
-      rename(UQ(dat_slug) := data) |>
-      ungroup()
+    if (length(top_n_aspect_words) > 0) {
+      dat <- dat |>
+        group_by(topic_bert, label_bertopic) |>
+        filter(number_word <= top_n_aspect_words) |>
+        ungroup()
+    }
+
+    if (return_summary) {
+      aspect_slug <-
+        dat_slug |> str_remove_all("^data_")
+      dat <- dat |>
+        group_by(topic_bert, label_bertopic) |>
+        summarise(UQ(aspect_slug) := word |> str_flatten_comma(last = " and ")) |>
+        ungroup()
+    }
+
+    if (!return_summary) {
+      dat <-
+        dat |>
+        group_by(topic_bert, label_bertopic) |>
+        nest() |>
+        rename(UQ(dat_slug) := data) |>
+        ungroup()
+
+    }
+
 
 
     dat
   }
 
 .munge_respresentation <-
-  function(data, assign_to_environment = T) {
+  function(data, assign_to_environment = T, return_summary = TRUE,
+           top_n_aspect_words = NULL) {
     rep_column <-
       data |> select(matches("representation")) |>
       select(-matches("data_representation")) |>
@@ -381,12 +532,30 @@ bert_similar_terms_topics <-
       assign(tbl_slug, dat, envir = .GlobalEnv)
     }
 
-    dat <-
-      dat |>
-      group_by(topic_bert, label_bertopic) |>
-      nest() |>
-      rename(data_representation = data) |>
-      ungroup()
+    if (length(top_n_aspect_words) > 0) {
+      dat <- dat |>
+        group_by(topic_bert, label_bertopic) |>
+        filter(number_word <= top_n_aspect_words) |>
+        ungroup()
+    }
+
+    if (return_summary) {
+
+      dat <- dat |>
+        group_by(topic_bert, label_bertopic) |>
+        summarise(representation := word |> str_flatten_comma(last = " and ")) |>
+        ungroup()
+    }
+
+    if (!return_summary) {
+      dat <-
+        dat |>
+        group_by(topic_bert, label_bertopic) |>
+        nest() |>
+        rename(data_representation = data) |>
+        ungroup()
+
+    }
 
     dat
   }
@@ -401,6 +570,8 @@ bert_similar_terms_topics <-
 #' @param assign_to_environment
 #' @param concatenator
 #' @param remove_list_columns
+#' @param return_summary
+#' @param top_n_aspect_words
 #'
 #' @return
 #' @export
@@ -409,9 +580,11 @@ bert_similar_terms_topics <-
 bert_topic_info <-
   function(obj,
            topic_number = NULL,
+           return_summary = TRUE,
            assign_to_environment = TRUE,
            concatenator = ".  ",
-           remove_list_columns = FALSE) {
+           top_n_aspect_words = NULL,
+           remove_list_columns = TRUE) {
     df <-
       obj$get_topic_info(topic = topic_number)
 
@@ -434,12 +607,15 @@ bert_topic_info <-
     aspect_cols <- data |> select(matches("aspect")) |> names()
 
     if (length(aspect_cols) > 0) {
-      tbl_aspect <- aspect_cols |>
+      tbl_aspect <-
+        aspect_cols |>
         map(function(x) {
           .munge_aspect_column(
             data = data,
             aspect_column = x,
-            assign_to_environment = assign_to_environment
+            assign_to_environment = assign_to_environment,
+            top_n_aspect_words = top_n_aspect_words,
+            return_summary = return_summary
           )
         }) |>
         reduce(left_join, by = c("topic_bert", "label_bertopic"))
@@ -453,7 +629,11 @@ bert_topic_info <-
 
     if (length(rep_cols) > 0) {
       tbl_rep <-
-        data |> .munge_respresentation(assign_to_environment = assign_to_environment)
+        data |> .munge_respresentation(
+          assign_to_environment = assign_to_environment,
+          top_n_aspect_words = top_n_aspect_words,
+          return_summary = return_summary
+        )
 
       data <- data |>
         select(-one_of(rep_cols)) |>
@@ -477,6 +657,17 @@ bert_topic_info <-
 
     list_cols <- data |> select_if(is.list) |> names()
 
+    if (data |> hasName("label_bertopic") & data |> hasName("representation")) {
+      n_row_same <- data |>
+        select(label_bertopic, representation) |>
+        mutate(is_same = representation == label_bertopic) |>
+        filter(is_same) |> nrow()
+
+      if (nrow(data) == n_row_same) {
+        data <- data |> select(-one_of(c("representation", "data_representation")))
+      }
+    }
+
     if (length(list_cols) > 0) {
       data <- data |>
         select(-one_of(list_cols), everything())
@@ -485,6 +676,8 @@ bert_topic_info <-
         data <- data |> select(-one_of(list_cols))
       }
     }
+
+
     data
   }
 
@@ -497,6 +690,7 @@ bert_topic_info <-
 #' @param topic_prefix  Whether to use the topic ID as a prefix. If set to True, the topic ID will be separated using the separator
 #' @param append_number_words Append the number of words
 #' @param update_topic_model_labels if `TRUE` updates new label into a custom field
+#' @param aspect The aspect from which to generate topic labels when not `NULL`
 #'
 #' @return
 #' @export
@@ -509,7 +703,8 @@ bert_topic_labels <-
            word_length =  NULL,
            update_topic_model_labels = FALSE,
            append_number_words = FALSE,
-           topic_prefix = FALSE) {
+           topic_prefix = FALSE,
+           aspect = NULL) {
     if (length(word_length) > 0) {
       word_length <- as.integer(word_length)
     }
@@ -518,24 +713,51 @@ bert_topic_labels <-
       nr_words = as.integer(number_words),
       separator = separator,
       topic_prefix = topic_prefix,
-      word_length = word_length
+      word_length = word_length,
+      aspect = aspect
     )
 
-    dat <-
-      tibble(label_bertopic) |>
-      mutate(topic_bert = 1:n() - 2) |>
-      select(topic_bert, everything()) |>
-      mutate(is_outlier_bert_topic = topic_bert == -1) |>
-      mutate_if(is.character, stringr::str_squish)
+    if (length(aspect) == 0) {
+      dat <-
+        tibble(label_bertopic) |>
+        mutate(topic_bert = 1:n() - 2) |>
+        select(topic_bert, everything()) |>
+        mutate(is_outlier_bert_topic = topic_bert == -1) |>
+        mutate_if(is.character, stringr::str_squish)
 
-    if (append_number_words) {
-      new_name <-
-        str_c("label_bertopic_",
-              .pad_zeros(x = number_words, number_zeros = 3),
-              "_words")
-      names(dat)[names(dat) %in% "label_bertopic"] <-
-        new_name
+      if (append_number_words) {
+        new_name <-
+          str_c("label_bertopic_",
+                .pad_zeros(x = number_words, number_zeros = 3),
+                "_words")
+        names(dat)[names(dat) %in% "label_bertopic"] <-
+          new_name
+      }
     }
+
+    if (length(aspect) > 0) {
+      dat <-
+        tibble(label_bertopic) |>
+        mutate(aspect = aspect, topic_bert = 1:n() - 2) |>
+        select(topic_bert, everything()) |>
+        mutate(is_outlier_bert_topic = topic_bert == -1) |>
+        mutate_if(is.character, stringr::str_squish)
+
+      if (append_number_words) {
+        new_name <-
+          str_c(
+            "label_bertopic_",
+            aspect,
+            "_",
+            .pad_zeros(x = number_words, number_zeros = 3),
+            "_words"
+          )
+        names(dat)[names(dat) %in% "label_bertopic"] <-
+          new_name
+      }
+    }
+
+
 
     if (update_topic_model_labels) {
       message("Updating topic labels")
@@ -622,6 +844,7 @@ bert_representative_documents <-
            topic_number = NULL,
            include_labels = T,
            number_words = 5L,
+           top_n_documents = NULL,
            sep = "_") {
     if (length(topic_number) != 0) {
       rep_docs <-
@@ -656,11 +879,25 @@ bert_representative_documents <-
         select(topic_bert, label_bertopic, everything())
     }
 
+    data <- data |>
+      group_by(topic_bert) |>
+      mutate(number_document_topic = 1:n(), .before = "topic_bert") |>
+      ungroup()
+
+    if (length(top_n_documents) > 0) {
+      data <- data |>
+        filter(number_document_topic <= top_n_documents)
+    }
+
 
     data
   }
 
-#' BERTopic Hieracrchy
+
+#Hierarchy -------------------------------------------------------------------------
+
+
+#' BERTopic Hierarchy
 #'
 #' To create this hierarchy, BERTopic needs to be already fitted once. Then, a hierarchy is calculated on the distance matrix of the c-TF-IDF representation using scipy.cluster.hierarchy.linkage.
 #'
@@ -755,29 +992,66 @@ bert_topic_tree_text <-
 
 #' Returns keywords for the topics
 #'
-#' @param obj
-#' @param bert_topics
+#' @param obj Topic Model Object
+#' @param bert_topics if not `NULL` specific topics
+#' @param return_full_data  If True, returns all different forms of topic representations for each topic, including aspects
+
+
 #'
 #' @return
 #' @export
 #'
 #' @examples
 bert_topic_keywords <-
-  function(obj, bert_topics = NULL)  {
-    topics <- obj$get_topics()
-    data <-
-      seq_along(topics) |>
-      map_dfr(function(x) {
-        topic_number <- names(topics)[[x]] |> readr::parse_number()
-        all_values <- topics[[x]] |> unlist()
-        word <- all_values[c(T, F)]
-        score <- all_values[c(F, T)] |> readr::parse_number()
-        tibble(word, score_c_tfidf = score) |>
-          mutate(topic_bert = topic_number,
-                 length_ngram = word |> str_count("\\ ")) |>
-          select(topic_bert, everything()) |>
-          mutate(is_outlier_bert_topic = topic_bert == -1)
-      })
+  function(obj,
+           bert_topics = NULL,
+           return_full_data = FALSE)  {
+    topics <- obj$get_topics(full = return_full_data)
+
+    if (!return_full_data) {
+      data <-
+        seq_along(topics) |>
+        map_dfr(function(x) {
+          topic_number <- x - 2
+          all_values <- topics[[x]] |> unlist()
+          word <- all_values[c(T, F)]
+          score <- all_values[c(F, T)] |> readr::parse_number()
+          tibble(word, score_c_tfidf = score) |>
+            mutate(topic_bert = topic_number,
+                   length_ngram = word |> str_count("\\ ")) |>
+            select(topic_bert, everything()) |>
+            mutate(is_outlier_bert_topic = topic_bert == -1)
+        })
+
+    }
+
+    if (return_full_data) {
+      topics_nums <- obj$get_topic_freq(topic = NULL) |> nrow()
+      data <-
+        1:topics_nums |>
+        map_dfr(function(x) {
+          topic_number <- x - 2
+
+          aspects <- names(topics)
+
+          dat <-
+            aspects |>
+            map_dfr(function(a) {
+              all_values <- topics[[a]][[x]] |> unlist()
+              word <- all_values[c(T, F)]
+              score <- all_values[c(F, T)] |> readr::parse_number()
+              tibble(aspect = a, word, score_c_tfidf = score) |>
+                mutate(topic_bert = topic_number,
+                       length_ngram = word |> str_count("\\ ")) |>
+                select(topic_bert, everything()) |>
+                mutate(is_outlier_bert_topic = topic_bert == -1)
+            })
+
+          dat
+        })
+
+      data <- data |> filter(word != "")
+    }
 
     data <- data |>
       left_join(obj |> bert_topic_info() |> select(topic_bert, label_bertopic),
@@ -873,6 +1147,9 @@ extract_bert_topics <-
     data
   }
 
+# structured_class --------------------------------------------------------
+
+
 #' Topics Per Structured Class
 #'
 #' @param topic_model
@@ -908,13 +1185,11 @@ bert_topic_per_class <-
     dat <-
       dat |> setNames(c("topic_bert", "top_words", "count", "class"))
     dat <-
-      dat |> left_join(
-        bert_topic_info(obj = topic_model) |>
-          select(topic_bert, label_bertopic)
+      dat |> left_join(bert_topic_info(obj = topic_model) |>
+                         select(topic_bert, label_bertopic)
 
-        ,
-        by = "topic_bert"
-      ) |>
+                       ,
+                       by = "topic_bert") |>
       select(topic_bert, label_bertopic, everything()) |>
       arrange(desc(class), topic_bert)
 
@@ -991,6 +1266,9 @@ tbl_bert_topic_per_class <-
     dat
   }
 
+# merge_topics ------------------------------------------------------------
+
+
 #' Merge Topics
 #'
 #' @param obj bertopic model object
@@ -1008,8 +1286,17 @@ bert_merge_topics <-
       "Enter a list or list of lists of topics to merge" |> message()
       return(obj)
     }
-    obj$merge_topics(docs = docs, topics_to_merge = topics_to_merge)
+    not_list <- class(topics_to_merge) != "list"
+    if (not_list) {
+      topics_to_merge <- as.integer(topics_to_merge)
+      topics_to_merge <- list(topics_to_merge)
+    }
+    obj <- obj$merge_topics(docs = docs, topics_to_merge = topics_to_merge)
+    obj
   }
+
+bert_reduce_outliers <-
+  function()
 
 #' Reduce BERTopics
 #'
@@ -1253,23 +1540,17 @@ tbl_bert_text_features <-
 #'
 #' @examples
 bert_document_info <-
-  function(obj, docs, document_name = NULL, exclude_list_columns =T, assign_to_environment = TRUE) {
+  function(obj,
+           docs,
+           document_name = NULL,
+           exclude_list_columns = T,
+           assign_to_environment = TRUE) {
     data <- obj$get_document_info(docs = docs) |> as_tibble()
-    data <-
-      data |> setNames(
-        c(
-          "document",
-          "topic_bert",
-          "name_label_bertopic",
-          "representation",
-          "representative_documents",
-          "top_n_words_label_bertopic",
-          "pct_probability_topic_bert",
-          "is_bertopic_representative_document"
-        )
-      )
+    data <- .resolve_document_info_names(data = data)
 
-    tbl_info <- obj |> bert_topic_info(assign_to_environment = assign_to_environment) |> select(-count)
+    tbl_info <-
+      obj |> bert_topic_info(assign_to_environment = assign_to_environment,
+                             remove_list_columns = TRUE) |> select(-count)
 
     join_cols <- names(tbl_info)[names(tbl_info) %in% names(data)]
 
@@ -1284,7 +1565,8 @@ bert_document_info <-
     #
 
 
-    if (data |> hasName("representative_documents") & !data |> hasName("text_representative_documents")) {
+    if (data |> hasName("representative_documents") &
+        !data |> hasName("text_representative_documents")) {
       tbl_docs <-
         data |> select(topic_bert, label_bertopic, representative_documents) |> unnest() |>
         group_by(topic_bert, label_bertopic) |>

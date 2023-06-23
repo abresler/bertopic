@@ -251,7 +251,7 @@ zeroshot_representation <-
            pipeline_kwargs = list(),
            min_prob = .8,
            obj = NULL) {
-    obj <- bertopic_representations(obj = obj)
+    obj <- bertopic_representations(obj = NULL)
     out <-
       obj$ZeroShotClassification(candidate_topics = candidate_topics,
                                  model = model,

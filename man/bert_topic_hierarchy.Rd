@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{bert_topic_hierarchy}
 \alias{bert_topic_hierarchy}
-\title{BERTopic Hieracrchy}
+\title{BERTopic Hierarchy}
 \usage{
 bert_topic_hierarchy(
   obj,

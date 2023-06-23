@@ -44,7 +44,7 @@ embeddings <-
 
 
 test_term <-
-  bert_similar_terms_topics(topic_model = tm, terms = "crime", 10)
+  bert_similar_terms_topics(obj = tm, terms = "crime", 10)
 
 
 # topic_info --------------------------------------------------------------
@@ -57,7 +57,7 @@ bert_topic_count(obj = tm)
 
 # topics ------------------------------------------------------------------
 
-bert_similar_terms_topics(topic_model = tm,
+bert_similar_terms_topics(obj = tm,
                           terms = c("iran", "israel", "sex")) |> group_by(term) |> slice_max(score, n = 3)
 
 
@@ -80,7 +80,7 @@ viz |>
 
 # labels ------------------------------------------------------------------
 
-bert_topic_labels(topic_model = tm, number_words = 3L)
+bert_topic_labels(obj  = tm, number_words = 3L)
 
 
 # hierarchy ---------------------------------------------------------------

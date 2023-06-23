@@ -4,7 +4,7 @@
 \alias{bert_fit}
 \title{BERTopic Fit}
 \usage{
-bert_fit(obj, documents, embeddings = NULL, y = NULL)
+bert_fit(obj, documents, embeddings = NULL, y = NULL, images = images)
 }
 \arguments{
 \item{obj}{BERTopic Object}

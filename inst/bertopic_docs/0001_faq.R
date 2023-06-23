@@ -13,16 +13,17 @@ data <- sklearn$datasets
 docs <-
   data$fetch_20newsgroups(subset = 'all',
                           remove = c('headers', 'footers', 'quotes'))
-docs
+
 labels <- docs["target_names"]
 number_label <- docs[["target"]]
+
+news_docs <- docs[["data"]] |> stringr::str_trim()
+
 
 
 tbl_news_labels <-
   tibble(news_label = labels) |>
   mutate(number_label = 1:n() - 1)
-
-news_docs <- docs["data"] |> stringr::str_trim()
 
 tbl_news_docs <-
   tibble(number_label, document = news_docs) |>
@@ -30,7 +31,21 @@ tbl_news_docs <-
   mutate(number_document = 1:n()) |>
   select(number_document, number_label, news_label, everything())
 
+main_representation <-
+  keybert_inspired_representation(top_n_words = 1L, nr_repr_docs = 3)
+aspect_model1 <-
+  part_of_speech_representation(model = "en_core_web_sm")
 
+aspect_model2 <-
+  list(
+    keybert_inspired_representation(top_n_words = 30),
+    mmr_inspired_representation(diversity = .5)
+  )
+rep_model <- reticulate::dict(main = main_representation,
+                              aspect1 = aspect_model1,
+                              aspect2 = aspect_model2)
+
+# rep_model <- reticulate::dict(rep_model)
 
 # Intiate BT model
 topic_model <-
@@ -46,10 +61,26 @@ topic_model <-
     representation_model = mmr_inspired_representation(diversity = .75)
   )
 
+topic_model_rep <-
+  bert_topic(
+    calculate_probabilities = TRUE,
+    exclude_stop_words = FALSE,
+    vectorizer_model = NULL,
+    extra_stop_words = NULL,
+    use_key_phrase_vectorizer = FALSE,
+    n_gram_range = list(1L, 1L),
+    use_sklearn_vectorizer = F,
+    ctfidf_model = ctfidf(bm25_weighting = TRUE, reduce_frequent_words = TRUE),
+    representation_model = rep_model
+  )
+
 topic_model |> bert_parameters(deep = F)
 
 out <-
   topic_model$fit_transform(documents = news_docs)
+
+out_rep <-
+  topic_model_rep$fit_transform(documents = news_docs)
 
 
 
@@ -70,19 +101,19 @@ embeddings <-
 # explore -----------------------------------------------------------------
 
 tbl_info <-
-  topic_model |> bert_topic_info()
+  topic_model_rep |> bert_topic_info()
 
 #' Topic Counts
-topic_model |> bert_topic_count()
+topic_model_rep |> bert_topic_count()
 
 topic_model |> bert_topic_labels(number_words = 3L)
-topic_model |> bert_topic_labels(number_words = 3L, word_length = 1000)
+topic_model_rep |> bert_topic_labels(number_words = 3L, word_length = 1000)
 topic_model |> bert_topic_labels(number_words = 10L, separator = "_")
 
-tbl_bert_keywords <- topic_model |> bert_topics_keywords()
+tbl_bert_keywords <- topic_model_rep |> bert_topic_keywords(return_full_data = T)
 
 news_hier <-
-  topic_model |> bert_topic_hierarchy(docs = tbl_news_docs$document)
+  topic_model_rep |> bert_topic_hierarchy(docs = news_docs)
 
 
 print_bert_topic_tree(obj = topic_model, hierarchy = news_hier, tight_layout = TRUE, max_distance = NULL)
@@ -97,7 +128,9 @@ print_bert_topic_tree(
 topic_model |> bert_topic_keywords(bert_topics = 0)
 
 
-
+topic_model_rep |> bert_topic_labels(aspect = "main", number_words = 3)
+topic_model_rep |> bert_topic_labels(aspect = "aspect1", number_words = 3, separator = " ")
+topic_model_rep |> bert_topic_labels(aspect = "aspect2", number_words = 3, separator = " ")
 
 # visualizations ----------------------------------------------------------
 

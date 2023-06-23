@@ -2,25 +2,28 @@
 % Please edit documentation in R/utils.R
 \name{bert_similar_terms_topics}
 \alias{bert_similar_terms_topics}
-\title{Simllar Term Embeddings}
+\title{Find topics most similar to Search Terms}
 \usage{
 bert_similar_terms_topics(
-  topic_model,
+  obj,
   terms = NULL,
   top_n_terms = 10L,
   nest_data = F,
+  image = NULL,
   return_message = T
 )
 }
 \arguments{
-\item{topic_model}{Bertopic Model}
+\item{obj}{BERTopic Ojbect}
 
 \item{terms}{Vector of Terms to search}
 
 \item{top_n_terms}{the number of topics to return.  Default is 10}
 
 \item{nest_data}{if `TRUE` Nests data}
+
+\item{return_message}{}
 }
 \description{
-Simllar Term Embeddings
+Find topics most similar to Search Terms
 }

@@ -13,6 +13,7 @@ yake_keyword_extractor(
   max_ngram_size = 2,
   deduplication_thresold = 0.9,
   deduplication_algo = "seqm",
+  return_summary = TRUE,
   window_size = 1
 )
 }

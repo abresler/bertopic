@@ -4,10 +4,14 @@
 \alias{bert_topic_keywords}
 \title{Returns keywords for the topics}
 \usage{
-bert_topic_keywords(obj, bert_topics = NULL)
+bert_topic_keywords(obj, bert_topics = NULL, return_full_data = FALSE)
 }
 \arguments{
-\item{bert_topics}{}
+\item{obj}{Topic Model Object}
+
+\item{bert_topics}{if not `NULL` specific topics}
+
+\item{return_full_data}{If True, returns all different forms of topic representations for each topic, including aspects}
 }
 \description{
 Returns keywords for the topics

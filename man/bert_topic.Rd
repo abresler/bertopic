@@ -81,7 +81,10 @@ bert_topic(
 
 \item{max_df}{During fitting ignore keyphrases that have a document frequency strictly higher than the given threshold. Default `1L`}
 
-\item{pos_pattern}{Position patter for keyphrase.  Defaults to `pos_pattern = "<J.*>*<N.*>+",`}
+\item{pos_pattern}{Position patter for keyphrase.  Defaults to `pos_pattern = "<J.*>*<N.*>+",`
+\href{https://maartengr.github.io/KeyBERT/guides/countvectorizer.html#languages}{Position Pattern via KeyBERT}
+\href{https://keyphrase-vectorizers.readthedocs.io/en/latest/api.html}{KeyPhrase POS API}
+\href{https://github.com/TimSchopf/KeyphraseVectorizers#custom-pos-tagger}{Custom Tagger via KeyPhrase}}
 
 \item{seed_topic_list}{A list of seed words per topic to converge around.  Default is `NULL`}
 

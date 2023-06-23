@@ -395,37 +395,45 @@ import_bertopic <-
 #' @examples
 set_bert_attributes <-
   function(obj, representation_model = NULL) {
-    base_params <- obj |> bert_parameters(use_dfc_method = T, return_attributes = T)
+    base_params <-
+      obj |> bert_parameters(use_dfc_method = T, return_attributes = T)
 
-      attr(obj, "base_parameters") <- base_params
+    attr(obj, "base_parameters") <- base_params
 
-      hdbscan_params <-
-        obj$hdbscan_model |> bert_parameters(return_attributes = T)
+    hdbscan_params <-
+      obj$hdbscan_model |> bert_parameters(return_attributes = T)
 
-      attr(obj, "hdbscan_parameters") <- hdbscan_params
+    attr(obj, "hdbscan_parameters") <- hdbscan_params
 
-      ctfidf_params <-
-        obj$ctfidf_model$get_params() |> flatten_df() |>  tbl_bert_parameter_features_to_attribute()
+    ctfidf_params <-
+      obj$ctfidf_model$get_params() |> flatten_df() |>  tbl_bert_parameter_features_to_attribute()
 
-      attr(obj, "cftfidf_parameters") <- ctfidf_params
+    attr(obj, "cftfidf_parameters") <- ctfidf_params
 
-      umap_params <-
-        obj$umap_model |> bert_parameters(return_tibble = T, return_attributes = T)
+    umap_params <-
+      obj$umap_model |> bert_parameters(return_tibble = T, return_attributes = T)
 
-      attr(obj, "umap_parameters") <- umap_params
+    attr(obj, "umap_parameters") <- umap_params
 
-      vectorizer_params <- obj$vectorizer_model |> bert_parameters(return_tibble = T, use_dfc_method = T, return_attributes = T)
+    vectorizer_params <-
+      obj$vectorizer_model |> bert_parameters(
+        return_tibble = T,
+        use_dfc_method = T,
+        return_attributes = T
+      )
 
-      attr(obj, "vectorizer_parameters") <- vectorizer_params
-      if (length(representation_model) > 0) {
-        representation_method <- attributes(representation_model)[["representation_method"]]
-        attr(obj, "representation_model") <- representation_method
-        representation_method_parameters <-
-          attributes(representation_model)[["input_parameters"]]
+    attr(obj, "vectorizer_parameters") <- vectorizer_params
+    if (length(representation_model) > 0) {
+      representation_method <-
+        attributes(representation_model)[["representation_method"]]
+      attr(obj, "representation_model") <- representation_method
+      representation_method_parameters <-
+        attributes(representation_model)[["input_parameters"]]
 
-        attr(obj, "representation_method_parameters") <- representation_method_parameters
-      }
-      obj
+      attr(obj, "representation_method_parameters") <-
+        representation_method_parameters
+    }
+    obj
   }
 
 
@@ -460,6 +468,9 @@ set_bert_attributes <-
 #' @param max_df During fitting ignore keyphrases that have a document frequency strictly higher than the given threshold. Default `1L`
 #' @param min_df During fitting ignore keyphrases that have a document frequency strictly lower than the given threshold. This value is also called cut-off in the literature.  Default `1L`
 #' @param pos_pattern Position patter for keyphrase.  Defaults to `pos_pattern = "<J.*>*<N.*>+",`
+#' \href{https://maartengr.github.io/KeyBERT/guides/countvectorizer.html#languages}{Position Pattern via KeyBERT}
+#' \href{https://keyphrase-vectorizers.readthedocs.io/en/latest/api.html}{KeyPhrase POS API}
+#' \href{https://github.com/TimSchopf/KeyphraseVectorizers#custom-pos-tagger}{Custom Tagger via KeyPhrase}
 #' @param keyphrase_ngram_range If not `NULL` range for keyphrase
 #' @param vocabulary
 #' @param stopword_package_sources options if not `NULL` `c("snowball", "stopwords-iso", "smart", "nltk")`
@@ -602,7 +613,8 @@ bert_topic <-
     obj$vectorizer_model$ngram_range <- n_gram_range
 
     if (set_attributes) {
-      obj <- set_bert_attributes(obj = obj, representation_model = representation_model)
+      obj <-
+        set_bert_attributes(obj = obj, representation_model = representation_model)
     }
 
     obj
@@ -733,7 +745,6 @@ bert_parameters <-
           tibble(UQ(x) := value)
         })
     } else {
-
       out <-
         out |> purrr::flatten_df()
 
@@ -758,7 +769,10 @@ bert_parameters <-
 #'
 #' @examples
 tbl_bert_attributes <-
-  function(obj, return_clean = F, return_wide = F, parameter_filter = NULL) {
+  function(obj,
+           return_clean = F,
+           return_wide = F,
+           parameter_filter = NULL) {
     out <- attributes(obj)
 
     if (return_wide) {
@@ -817,7 +831,7 @@ tbl_bert_attributes <-
 
     if (return_wide) {
       dat <-
-        dat |> tidyr::unite(parameter, parameter, feature ,sep = "_") |> tidyr::spread(parameter, value, convert = TRUE)
+        dat |> tidyr::unite(parameter, parameter, feature , sep = "_") |> tidyr::spread(parameter, value, convert = TRUE)
     }
 
     names(dat) <-
@@ -861,10 +875,20 @@ bert_transform <-
 #'
 #' @examples
 bert_fit <-
-  function(obj, documents, embeddings = NULL, y = NULL) {
-    obj <- obj$fit(documents = documents, embeddings = embeddings, y = y)
+  function(obj,
+           documents,
+           embeddings = NULL,
+           y = NULL,
+           images = images) {
+    out <-
+      obj$fit(
+        documents = documents,
+        embeddings = embeddings,
+        y = y,
+        images = images
+      )
 
-    obj
+    out
   }
 
 #' BERTopic Fit and Transform
@@ -880,9 +904,76 @@ bert_fit <-
 #'
 #' @examples
 bert_fit_transform <-
-  function(obj, documents, embeddings = NULL, y = NULL) {
-    obj <- obj$fit_transform(documents = documents, embeddings = embeddings, y = y)
+  function(obj,
+           documents,
+           embeddings = NULL,
+           y = NULL) {
 
+    if (length(y) > 0) {
+      y <- as.numeric(y)
+    }
+    out <-
+      obj$fit_transform(documents = documents,
+                        embeddings = embeddings,
+                        y = y)
+
+    out
+
+
+  }
+
+#' BERTopic Fit and Transform from tibble.
+#'
+#' Fit the models on a collection of documents, generate topics, and return the docs with topics.
+#'
+#' @param obj BERTopic Object
+#' @param data a tibble
+#' @param text_field name of text field
+#' @param class_fields if not `NULL` `y` or `class` fields.
+#' @param embeddings If not `NULL` Pre-trained document embeddings. These can be used instead of the sentence-transformer model.
+#' @param images
+#'
+#' @return
+#' @export
+#'
+#' @examples
+tbl_bert_fit_transform <-
+  function(obj,
+           data = NULL,
+           text_field = NULL,
+           class_fields = NULL,
+           embeddings = NULL,
+           images = NULL) {
+
+    if (length(data) == 0) {
+      message("Requires data")
+      return(obj)
+    }
+
+    if (length(text_field) == 0) {
+      message("Requires text field")
+      return(obj)
+    }
+
+    data <- data |> filter(!is.na(!!sym(text_field)))
+
+    documents <- data[[text_field]]
+
+    if (length(class_fields) == 0) {
+      y <- NULL
+    }
+
+    if (length(class_fields) > 0) {
+      data <-
+        data |>
+        tbl_unite_features(unite_columns = class_fields, new_column = "class", to_factor = TRUE)
+
+      y <- data[["id_class"]] |> as.numeric()
+    }
+
+    out <- obj$fit_transform(documents = documents, embeddings = embeddings, images = images, y = y)
+
+    out
 
   }
 

@@ -55,6 +55,7 @@ yake_keyword_extractor <-
            max_ngram_size = 2,
            deduplication_thresold = 0.9,
            deduplication_algo = 'seqm',
+           return_summary = TRUE,
            window_size = 1) {
     if (length(obj) == 0) {
       obj <- import_yake(assign_to_environment = F)
@@ -75,5 +76,15 @@ yake_keyword_extractor <-
     if (assign_to_environment) {
       assign('ke', ke, envir = .GlobalEnv)
     }
-    .ke_doc_extractor(ke = ke, docs = docs)
+    dat <- .ke_doc_extractor(ke = ke, docs = docs)
+
+    if (return_summary) {
+      dat <- dat |>
+        group_by(number_document) |>
+        summarise(keyword_yake = keyword_yake |> str_flatten_comma(last = " and ")) |>
+        ungroup()
+
+    }
+
+    dat
   }

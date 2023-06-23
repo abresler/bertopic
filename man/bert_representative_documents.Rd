@@ -9,6 +9,7 @@ bert_representative_documents(
   topic_number = NULL,
   include_labels = T,
   number_words = 5L,
+  top_n_documents = NULL,
   sep = "_"
 )
 }

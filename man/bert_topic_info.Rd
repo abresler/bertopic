@@ -7,13 +7,15 @@
 bert_topic_info(
   obj,
   topic_number = NULL,
+  return_summary = TRUE,
   assign_to_environment = TRUE,
   concatenator = ".  ",
-  remove_list_columns = FALSE
+  top_n_aspect_words = NULL,
+  remove_list_columns = TRUE
 )
 }
 \arguments{
-\item{remove_list_columns}{}
+\item{top_n_aspect_words}{}
 }
 \description{
 BERT Topic Model Info
