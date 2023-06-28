@@ -2,31 +2,50 @@
 % Please edit documentation in R/utils.R
 \name{bert_reduce_outliers}
 \alias{bert_reduce_outliers}
-\title{Reduce BERTopics}
+\title{Reduce Bertopic Outliers}
 \usage{
-bert_reduce_outliers()
+bert_reduce_outliers(
+  obj,
+  docs,
+  update_topics = TRUE,
+  document_name = NULL,
+  topics = NULL,
+  images = NULL,
+  strategy = "embeddings",
+  probabilities = NULL,
+  threshold = 0L,
+  embeddings = NULL,
+  distributions_params = NULL
+)
 }
 \arguments{
-\item{obj}{BERTopic Topic Model}
+\item{update_topics}{If `TRUE` updates topics}
 
-\item{docs}{Vector of Documents}
+\item{document_name}{if not `NULL` new name for document column}
 
-\item{number_topics}{Number of topics to reduce to}
+\item{topics}{The topics that correspond to the documents.  IF `NULL` pulls from bertopic object}
 
-\item{number_words}{Top n words per topic to use.  Default is 4}
+\item{strategy}{When using HDBSCAN, DBSCAN, or OPTICS, a number of outlier documents might be createdthat do not fall within any of the created topics. These are labeled as -1. This function allows the user to match outlier documents with their nearest topic using one of the following strategies using the `strategy`. parameter: #' \itemize{
+\item{
+`probabilities` This uses the soft-clustering as performed by HDBSCAN to find the best matching topic for each outlier document. To use this, make sure to calculate the `probabilities` beforehand by instantiating BERTopic with `calculate_probabilities=True`.
+}
+\item{
+`distributions`  Use the topic distributions, as calculated with `.approximate_distribution` to find the most frequent topic in each outlier document. You can use the `distributions_params` variable to tweak the parameters of`.approximate_distribution`.
+}
+\item{
+`c-tf-idf` Calculate the c-TF-IDF representation for each outlier document and find the best matching c-TF-IDF topic representation using cosine similarity.
+}
+\item{
+`embeddings` Using the embeddings of each outlier documents, find the best matching topic embedding using cosine similarity.
+}
+}}
 
-\item{separator}{The string with which the words and topic prefix will be separated. Underscores are the default but a nice alternative is ", ".  Default `_`}
+\item{threshold}{The threshold for assigning topics to outlier documents. This value represents the minimum probability when `strategy="probabilities"`. For all other strategies, it represents the minimum similarity.}
 
-\item{word_length}{The maximum length of each word in the topic label. Some words might be relatively long and setting this value helps to make sure that all labels have relatively similar lengths.}
+\item{embeddings}{The pre-computed embeddings to be used when `strategy="embeddings"`. If this is None, then it will compute the embeddings for the outlier documents.}
 
-\item{topic_prefix}{Whether to use the topic ID as a prefix. If set to True, the topic ID will be separated using the separator}
-
-\item{append_number_words}{Append the number of words}
-
-\item{update_bert_labels}{If `TRUE` updates actual topic labels}
-
-\item{update_topic_model_labels}{if `TRUE` updates new label into a custom field}
+\item{distributions_params}{The parameters used in `.approximate_distribution` when using the strategy `"distributions"`.}
 }
 \description{
-Reduce BERTopics
+Reduce Bertopic Outliers
 }

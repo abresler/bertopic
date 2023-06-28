@@ -2,6 +2,7 @@
 
 
 
+
 # names -------------------------------------------------------------------
 
 .dict_doc_names <-
@@ -45,7 +46,7 @@
     tbl_names <- .dict_doc_names()
     actual_names <-
       names(data) |>
-      map_chr(function(x){
+      map_chr(function(x) {
         df_row <- tbl_names |> filter(name_bertopic == x)
         if (nrow(df_row) == 0) {
           return(janitor::make_clean_names(x))
@@ -92,27 +93,27 @@ list_to_tuple <-
 #' library(tidyverse)
 #' tbl_unite_features(diamonds, unite_columns = c("cut", "color", "clarity"))
 tbl_unite_features <-
-  function(data, unite_columns = NULL,
-         new_column = NULL,
-         sep = "@",
-         to_factor = TRUE,
-         remove = F) {
+  function(data,
+           unite_columns = NULL,
+           new_column = NULL,
+           sep = "@",
+           to_factor = TRUE,
+           remove = F) {
+    if (length(unite_columns) == 0) {
+      return(data)
+    }
 
-  if (length(unite_columns) == 0) {
-    return(data)
-  }
-
-  if (length(new_column) == 0) {
-    new_column <-
-    unite_columns |> str_c(collapse = "_")
-  }
+    if (length(new_column) == 0) {
+      new_column <-
+        unite_columns |> str_c(collapse = "_")
+    }
     data <-
       data |> tidyr::unite(
-      col = UQ(new_column),
-      all_of(unite_columns),
-      sep = sep,
-      remove = remove
-    )
+        col = UQ(new_column),
+        all_of(unite_columns),
+        sep = sep,
+        remove = remove
+      )
 
     if (to_factor) {
       data <- data |>
@@ -125,8 +126,8 @@ tbl_unite_features <-
 
     }
 
-  data
-}
+    data
+  }
 
 # load_save ---------------------------------------------------------------
 
@@ -326,7 +327,11 @@ select_correct_python <-
       return(invisible())
     }
     similar_topics <-
-      obj$find_topics(search_term = term, top_n = as.integer(top_n_terms),image = image)
+      obj$find_topics(
+        search_term = term,
+        top_n = as.integer(top_n_terms),
+        image = image
+      )
 
     tibble(topic_bert = similar_topics[[1]],
            score_c_tfidf = similar_topics[[2]] |> flatten_dbl()) |>
@@ -368,18 +373,18 @@ bert_similar_terms_topics <-
           glue::glue("Finding {top_n_terms} similar term topic embeddings for {x}") |> message()
         }
 
-        .bert_similar_term_topics(obj = obj,
-                                  term = x,
-                                  top_n_terms = top_n_terms,
-                                  image = image  )
+        .bert_similar_term_topics(
+          obj = obj,
+          term = x,
+          top_n_terms = top_n_terms,
+          image = image
+        )
       })
-    tbl_count <- obj |> bert_topic_info(remove_list_columns = T) |> rename(count_documents_in_topic = count)
+    tbl_count <-
+      obj |> bert_topic_info(remove_list_columns = T) |> rename(count_documents_in_topic = count)
     data <- data |>
-      left_join(
-
-        tbl_count ,
-        by = c("topic_bert", "is_outlier_bert_topic")
-      ) |>
+      left_join(tbl_count ,
+                by = c("topic_bert", "is_outlier_bert_topic")) |>
       select(term, topic_bert, names(tbl_count), everything())
 
 
@@ -405,6 +410,7 @@ bert_similar_terms_topics <-
            assign_to_environment = TRUE) {
     aspect_num_slug <-
       aspect_column |> str_extract_all("[0-9]") |> flatten_chr() |> .pad_zeros(number_zeros = 3)
+    aspect_num_slug <- aspect_num_slug[[1]]
 
     other_aspect <-
       aspect_column |> str_remove_all("^aspect") |>
@@ -431,14 +437,54 @@ bert_similar_terms_topics <-
 
 
     tbl_aspect <-
-      data |> select(topic_bert, label_bertopic, !!sym(aspect_column)) |>  unnest() |>
-      mutate(id = 1:n()) |>
-      unnest()
+      data |> select(topic_bert, label_bertopic, !!sym(aspect_column))
+
+    types <- tbl_aspect[[aspect_column]] |> map(class) |> as.character()
+
+    tbl_aspect <- tbl_aspect |> mutate(type = types) |>
+      mutate(id = 1:n())
+
+    types <- tbl_aspect$type |> unique()
+
+    tbl_aspect <- types |>
+      map_dfr(function(x){
+
+        if (x == "character") {
+          dat <- tbl_aspect |>
+            filter(type == x) |>
+            select(-type) |>
+            unnest()
+
+          dat <- dat |> filter(!(!!sym(aspect_column)) == "")
+          return(dat)
+        }
+
+        if (x == "list") {
+          dat <-
+            tbl_aspect |>
+            filter(type == x) |>
+            select(-type) |>
+            unnest()  |>
+            unnest()
+
+          dat <- dat |> filter(!(!!sym(aspect_column)) == "")
+          return(dat)
+        }
+
+
+      })
+
 
     tbl_aspect <-
       tbl_aspect |>
       mutate(type = !!sym(aspect_column),
              type = type |> map_chr(class))
+
+    no_data <- tbl_aspect |> filter(!!sym(aspect_column) != "") |> nrow() == 0
+
+    if (no_data) {
+      return(NULL)
+    }
 
     has_no_int <-
       tbl_aspect |> filter(type %in% c("integer", "numeric")) |> unnest() |> nrow() == 0
@@ -509,7 +555,9 @@ bert_similar_terms_topics <-
   }
 
 .munge_respresentation <-
-  function(data, assign_to_environment = T, return_summary = TRUE,
+  function(data,
+           assign_to_environment = T,
+           return_summary = TRUE,
            top_n_aspect_words = NULL) {
     rep_column <-
       data |> select(matches("representation")) |>
@@ -540,7 +588,6 @@ bert_similar_terms_topics <-
     }
 
     if (return_summary) {
-
       dat <- dat |>
         group_by(topic_bert, label_bertopic) |>
         summarise(representation := word |> str_flatten_comma(last = " and ")) |>
@@ -602,7 +649,7 @@ bert_topic_info <-
       mutate(is_outlier_bert_topic = topic_bert == -1) |>
       mutate_if(is.character, str_squish) |>
       select(-count, everything()) |>
-      select_if(~ !any(is.na(.)))
+      select_if( ~ !any(is.na(.)))
 
     aspect_cols <- data |> select(matches("aspect")) |> names()
 
@@ -617,6 +664,9 @@ bert_topic_info <-
             top_n_aspect_words = top_n_aspect_words,
             return_summary = return_summary
           )
+        }) |>
+        discard(function(x) {
+          length(x) == 0
         }) |>
         reduce(left_join, by = c("topic_bert", "label_bertopic"))
 
@@ -657,14 +707,18 @@ bert_topic_info <-
 
     list_cols <- data |> select_if(is.list) |> names()
 
-    if (data |> hasName("label_bertopic") & data |> hasName("representation")) {
+    if (data |> hasName("label_bertopic") &
+        data |> hasName("representation")) {
       n_row_same <- data |>
         select(label_bertopic, representation) |>
         mutate(is_same = representation == label_bertopic) |>
         filter(is_same) |> nrow()
 
       if (nrow(data) == n_row_same) {
-        data <- data |> select(-one_of(c("representation", "data_representation")))
+        data <-
+          data |> select(-one_of(c(
+            "representation", "data_representation"
+          )))
       }
     }
 
@@ -1086,15 +1140,15 @@ extract_bert_topics <-
            docs = NULL,
            id_columns = NULL,
            text_column = NULL,
-           topic_model = NULL,
            include_labels = T,
            number_words = 4L,
            arrange_topics = F) {
     topics <-
-      obj[[1]]
+      obj$topics_ |> as.integer()
 
     tbl_prob <-
-      obj[[2]] |> as_tibble() |> janitor::clean_names() |>
+      obj$probabilities_ |>
+      as_tibble() |> janitor::clean_names() |>
       select(v1) |>
       rename(pct_probability_topic_bert = v1)
 
@@ -1129,7 +1183,7 @@ extract_bert_topics <-
       select(topic_bert, names(data), everything())
 
     if (include_labels) {
-      tbl_labels <- bert_topic_labels(obj = topic_model,
+      tbl_labels <- bert_topic_labels(obj = obj,
                                       number_words = as.integer(number_words))
       data <-
         data |>
@@ -1152,17 +1206,17 @@ extract_bert_topics <-
 
 #' Topics Per Structured Class
 #'
-#' @param topic_model
-#' @param docs
-#' @param classes
-#' @param global_tuning
+#' @param obj BERTopic Object
+#' @param docs Vector of texts
+#' @param classes vector of classes
+#' @param global_tuning Fine-tune each topic representation for class c t by averaging its c-TF-IDF matrix with the global c-TF-IDF matrix. Turn this off if you want to prevent words in topic representations that could not be found in the documents for class c. Default `TRUE`
 #'
 #' @return
 #' @export
 #'
 #' @examples
 bert_topic_per_class <-
-  function(topic_model,
+  function(obj,
            docs = NULL,
            classes = NULL,
            global_tuning = TRUE) {
@@ -1175,9 +1229,9 @@ bert_topic_per_class <-
     }
 
     dat <-
-      topic_model$topics_per_class(docs = docs,
-                                   classes = classes,
-                                   global_tuning = global_tuning)
+      obj$topics_per_class(docs = docs,
+                           classes = classes,
+                           global_tuning = global_tuning)
 
     dat <-
       as_tibble(dat)
@@ -1185,8 +1239,8 @@ bert_topic_per_class <-
     dat <-
       dat |> setNames(c("topic_bert", "top_words", "count", "class"))
     dat <-
-      dat |> left_join(bert_topic_info(obj = topic_model) |>
-                         select(topic_bert, label_bertopic)
+      dat |> left_join(bert_topic_info(obj = obj) |>
+                         select(topic_bert, label_bertopic, matches("aspect"))
 
                        ,
                        by = "topic_bert") |>
@@ -1198,11 +1252,11 @@ bert_topic_per_class <-
 
 #' Find Topics from Class via Tibble
 #'
-#' @param data
-#' @param topic_model
-#' @param document_name
-#' @param class_name
-#' @param global_tuning
+#' @param data Data with text and features
+#' @param topic_model BERT topic model object
+#' @param document_name name of the text feature
+#' @param class_name name of the class feature(s)
+#' @param global_tuning Fine-tune each topic representation for class c t by averaging its c-TF-IDF matrix with the global c-TF-IDF matrix. Turn this off if you want to prevent words in topic representations that could not be found in the documents for class c.  Default `TRUE`
 #'
 #' @return
 #' @export
@@ -1233,7 +1287,7 @@ tbl_bert_topic_per_class <-
 
     dat <-
       bert_topic_per_class(
-        topic_model = topic_model,
+        obj = topic_model,
         docs = data[[document_name]],
         classes = data[["class"]],
         global_tuning = global_tuning
@@ -1291,12 +1345,119 @@ bert_merge_topics <-
       topics_to_merge <- as.integer(topics_to_merge)
       topics_to_merge <- list(topics_to_merge)
     }
-    obj <- obj$merge_topics(docs = docs, topics_to_merge = topics_to_merge)
+    obj <-
+      obj$merge_topics(docs = docs, topics_to_merge = topics_to_merge)
     obj
   }
 
+# reduce_outliers ---------------------------------------------------------
+
+
+#' Reduce Bertopic Outliers
+#'
+#' @param obj
+#' @param docs
+#' @param topics The topics that correspond to the documents.  IF `NULL` pulls from bertopic object
+#' @param images
+#' @param strategy  When using HDBSCAN, DBSCAN, or OPTICS, a number of outlier documents might be createdthat do not fall within any of the created topics. These are labeled as -1. This function allows the user to match outlier documents with their nearest topic using one of the following strategies using the `strategy`. parameter: #' \itemize{
+#' \item{
+#' `probabilities` This uses the soft-clustering as performed by HDBSCAN to find the best matching topic for each outlier document. To use this, make sure to calculate the `probabilities` beforehand by instantiating BERTopic with `calculate_probabilities=True`.
+#' }
+#' \item{
+#' `distributions`  Use the topic distributions, as calculated with `.approximate_distribution` to find the most frequent topic in each outlier document. You can use the `distributions_params` variable to tweak the parameters of`.approximate_distribution`.
+#' }
+#' \item{
+#' `c-tf-idf` Calculate the c-TF-IDF representation for each outlier document and find the best matching c-TF-IDF topic representation using cosine similarity.
+#' }
+#' \item{
+#' `embeddings` Using the embeddings of each outlier documents, find the best matching topic embedding using cosine similarity.
+#' }
+#' }
+#' @param probabilities
+#' @param threshold The threshold for assigning topics to outlier documents. This value represents the minimum probability when `strategy="probabilities"`. For all other strategies, it represents the minimum similarity.
+#' @param embeddings The pre-computed embeddings to be used when `strategy="embeddings"`. If this is None, then it will compute the embeddings for the outlier documents.
+#' @param distributions_params The parameters used in `.approximate_distribution` when using the strategy `"distributions"`.
+#' @param document_name if not `NULL` new name for document column
+#' @param update_topics If `TRUE` updates topics
+#'
+#' @return
+#' @export
+#'
+#' @examples
 bert_reduce_outliers <-
-  function()
+  function(obj,
+           docs,
+           update_topics = TRUE,
+           document_name = NULL,
+           topics = NULL,
+           images = NULL,
+           strategy = "embeddings",
+           probabilities = NULL,
+           threshold = 0L,
+           embeddings = NULL,
+           distributions_params = NULL) {
+
+    if (length(docs) ==0) {
+      "Enter documents" |> message()
+      return(invisible())
+    }
+
+    if (length(topics) == 0) {
+      topics <- as.integer(obj$topics_)
+    }
+
+
+    out <-
+      obj$reduce_outliers(
+      documents = docs,
+      topics = topics,
+      images = images,
+      strategy = strategy,
+      probabilities = probabilities,
+      threshold = threshold,
+      embeddings = embeddings,
+      distributions_params = distributions_params
+    )
+
+
+
+    new_topics <- out |> as.numeric()
+
+    if (update_topics) {
+      message("Updating topics inside topic model")
+      obj <- obj$update_topics(docs = docs, topics = new_topics)
+      return(invisible())
+    }
+
+    dat <- tibble(topic_bert_reduced = new_topics) |>
+      mutate(number_document = 1:n(),
+             strategy) |>
+      select(number_document, strategy, everything())
+
+    dat_old <- obj |> bert_document_info(docs = docs) |>
+      mutate(number_document = 1:n())
+
+    dat <-
+      dat |>
+      left_join(
+        dat_old |> distinct(
+          topic_bert_reduced = topic_bert,
+          label_bertopic_reduced = label_bertopic
+        ),
+        by = "topic_bert_reduced"
+      ) |>
+      left_join(dat_old, by = "number_document") |>
+      mutate(is_reduced_topic = label_bertopic_reduced != label_bertopic,
+             .after = "strategy")
+
+    if (length(document_name) > 0) {
+      dat |>
+        rename(UQ(document_name) := document)
+    }
+
+    dat
+
+  }
 
 #' Reduce BERTopics
 #'
@@ -1354,6 +1515,10 @@ bert_reduce_topics <-
 
   }
 
+# update_topics -----------------------------------------------------------
+
+
+
 #' Updates the topic representation by recalculating c-TF-IDF with the new parameters as defined in this function.
 #'
 #' @param obj BERTopic Object
@@ -1387,6 +1552,7 @@ bert_update_topics <-
            docs = NULL,
            topics = NULL,
            top_n_words = 10,
+           images = NULL,
            n_gram_range = list(1L, 1L),
            vectorizer_model = NULL,
            ctfidf_model = NULL,
@@ -1464,7 +1630,8 @@ bert_update_topics <-
       n_gram_range = n_gram_range,
       vectorizer_model = vectorizer_model,
       representation_model = representation_model,
-      ctfidf_model = ctfidf_model
+      ctfidf_model = ctfidf_model,
+      images = images
     )
 
     obj <-

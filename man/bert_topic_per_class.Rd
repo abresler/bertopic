@@ -4,15 +4,16 @@
 \alias{bert_topic_per_class}
 \title{Topics Per Structured Class}
 \usage{
-bert_topic_per_class(
-  topic_model,
-  docs = NULL,
-  classes = NULL,
-  global_tuning = TRUE
-)
+bert_topic_per_class(obj, docs = NULL, classes = NULL, global_tuning = TRUE)
 }
 \arguments{
-\item{global_tuning}{}
+\item{obj}{BERTopic Object}
+
+\item{docs}{Vector of texts}
+
+\item{classes}{vector of classes}
+
+\item{global_tuning}{Fine-tune each topic representation for class c t by averaging its c-TF-IDF matrix with the global c-TF-IDF matrix. Turn this off if you want to prevent words in topic representations that could not be found in the documents for class c. Default `TRUE`}
 }
 \description{
 Topics Per Structured Class

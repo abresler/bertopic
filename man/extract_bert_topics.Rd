@@ -9,7 +9,6 @@ extract_bert_topics(
   docs = NULL,
   id_columns = NULL,
   text_column = NULL,
-  topic_model = NULL,
   include_labels = T,
   number_words = 4L,
   arrange_topics = F

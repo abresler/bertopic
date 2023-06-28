@@ -9,6 +9,7 @@ bert_update_topics(
   docs = NULL,
   topics = NULL,
   top_n_words = 10,
+  images = NULL,
   n_gram_range = list(1L, 1L),
   vectorizer_model = NULL,
   ctfidf_model = NULL,

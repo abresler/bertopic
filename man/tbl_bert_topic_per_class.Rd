@@ -14,7 +14,15 @@ tbl_bert_topic_per_class(
 )
 }
 \arguments{
-\item{global_tuning}{}
+\item{data}{Data with text and features}
+
+\item{topic_model}{BERT topic model object}
+
+\item{document_name}{name of the text feature}
+
+\item{class_name}{name of the class feature(s)}
+
+\item{global_tuning}{Fine-tune each topic representation for class c t by averaging its c-TF-IDF matrix with the global c-TF-IDF matrix. Turn this off if you want to prevent words in topic representations that could not be found in the documents for class c.  Default `TRUE`}
 }
 \description{
 Find Topics from Class via Tibble
