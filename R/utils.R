@@ -667,8 +667,11 @@ bert_topic_info <-
         }) |>
         discard(function(x) {
           length(x) == 0
-        }) |>
-        reduce(left_join, by = c("topic_bert", "label_bertopic"))
+        })
+
+      tbl_aspect <-
+        tbl_aspect |>
+        reduce(full_join,  by = c("topic_bert", "label_bertopic"))
 
       data <-
         data |>
@@ -686,9 +689,15 @@ bert_topic_info <-
           return_summary = return_summary
         )
 
-      data <- data |>
-        select(-one_of(rep_cols)) |>
-        left_join(tbl_rep,  by = c("topic_bert", "label_bertopic"))
+      has_actual_rep <-
+        tbl_rep |> filter(label_bertopic != representation) |> nrow() > 0
+
+      if (has_actual_rep) {
+        data <- data |>
+          select(-one_of(rep_cols)) |>
+          left_join(tbl_rep,  by = c("topic_bert", "label_bertopic"))
+      }
+
 
     }
 
