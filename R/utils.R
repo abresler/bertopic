@@ -670,7 +670,8 @@ bert_topic_info <-
         }) |>
         reduce(left_join, by = c("topic_bert", "label_bertopic"))
 
-      data <- data |>
+      data <-
+        data |>
         select(-one_of(aspect_cols)) |>
         left_join(tbl_aspect, by = c("topic_bert", "label_bertopic"))
     }
@@ -730,6 +731,8 @@ bert_topic_info <-
         data <- data |> select(-one_of(list_cols))
       }
     }
+
+    data <- data |> janitor::remove_empty(which = "cols")
 
 
     data
@@ -1718,6 +1721,10 @@ bert_document_info <-
     tbl_info <-
       obj |> bert_topic_info(assign_to_environment = assign_to_environment,
                              remove_list_columns = TRUE) |> select(-count)
+
+    if (data |> hasName("representation") & tbl_info |> hasName("representation")) {
+      data <- data |> select(-representation)
+    }
 
     join_cols <- names(tbl_info)[names(tbl_info) %in% names(data)]
 
