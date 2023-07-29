@@ -7,6 +7,7 @@
 yake_keyword_extractor(
   docs = NULL,
   obj = NULL,
+  text_column = NULL,
   top_features = 10,
   language = "english",
   assign_to_environment = T,

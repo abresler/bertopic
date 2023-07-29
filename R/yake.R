@@ -21,13 +21,22 @@ import_yake <-
 
 .ke_doc_extractor <-
   function(ke, docs) {
-    1:length(docs) |>
-      map_dfr(function(x){
+    data <-
+      seq_along(docs) |>
+      map_dfr(function(x) {
+        x |> message()
         out <- ke$extract_keywords(docs[[x]]) |> unlist()
-        keywords <- out[c(T,F)]
-        score <- out[c(F,T)] |> as.numeric()
-        tibble(number_document = x, keyword_yake = keywords, score_yake = score)
+        keywords <- out[c(T, F)]
+        score <- out[c(F, T)] |> as.numeric()
+        tibble(
+          number_document = x,
+          text = docs[[x]],
+          keyword_yake = keywords,
+          score_yake = score
+        )
       })
+
+    data
   }
 
 #' Yake Keyword Extractor
@@ -49,6 +58,7 @@ import_yake <-
 yake_keyword_extractor <-
   function(docs = NULL,
            obj = NULL,
+           text_column = NULL,
            top_features = 10,
            language = "english",
            assign_to_environment = T,
@@ -80,10 +90,15 @@ yake_keyword_extractor <-
 
     if (return_summary) {
       dat <- dat |>
-        group_by(number_document) |>
+        group_by(number_document, text) |>
         summarise(keyword_yake = keyword_yake |> str_flatten_comma(last = " and ")) |>
         ungroup()
 
+    }
+
+    if (length(text_column) > 0) {
+      dat <- dat |>
+        rename(UQ(text_column) := text)
     }
 
     dat
