@@ -90,6 +90,8 @@ bert_topic(
 \item{seed_topic_list}{A list of seed words per topic to converge around.  Default is `NULL`}
 
 \item{verbose}{if `TRUE` verbose output}
+
+\item{set_attributes}{}
 }
 \value{
 python object

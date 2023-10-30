@@ -57,6 +57,7 @@ bertopic_representations <-
 #' @param nr_candidate_words The number of candidate words per cluster.  Default `100`.
 #' @param random_state The random state for randomly sampling candidate documents.  Default `42`.
 #' @param obj Bertopic Module
+#' @param numba_threads
 #'
 #' @return
 #' @export
@@ -71,7 +72,7 @@ keybert_inspired_representation <-
            numba_threads = 1,
            obj = NULL) {
     numba <- import_numba()
-    numba$set_num_threads(as.integer(numba_threads))
+    numba$set_num_threads(n = as.integer(numba_threads))
     obj <- bertopic_representations(obj = obj)
     out <-
       obj$KeyBERTInspired(

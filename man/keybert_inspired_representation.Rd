@@ -25,6 +25,8 @@ keybert_inspired_representation(
 
 \item{random_state}{The random state for randomly sampling candidate documents.  Default `42`.}
 
+\item{numba_threads}{}
+
 \item{obj}{Bertopic Module}
 }
 \description{

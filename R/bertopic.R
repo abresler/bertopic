@@ -363,6 +363,8 @@ bert_stop_words <-
 #' \href{https://maartengr.github.io/BERTopic}{BERTopic API from python} and other examples \href{https://github.com/MaartenGr/BERTopic}{here}
 #'
 #' @param assign_to_environment if \code{TRUE} assigns to environment
+#' @param path
+#' @param numba_threads
 #'
 #' @return python object
 #' @export
@@ -372,13 +374,17 @@ bert_stop_words <-
 #' import_bertopic()
 import_bertopic <-
   function(assign_to_environment = T,
-           path = NULL) {
+           path = NULL,
+           numba_threads = 1) {
     select_correct_python(path = path)
     obj <- reticulate::import("bertopic")
     ! 'bertopic' %>% exists() & assign_to_environment
     if (assign_to_environment) {
       assign('bertopic', obj, envir = .GlobalEnv)
     }
+    numba <- import_numba()
+    numba$set_num_threads(as.integer(numba_threads))
+
     obj
   }
 
@@ -497,6 +503,8 @@ set_bert_attributes <-
 #' @param stopword_package_sources options if not `NULL` `c("snowball", "stopwords-iso", "smart", "nltk")`
 #' @param use_sklearn_vectorizer if `TRUE` uses SKLearn vetorizer
 #' @param representation_model The base representation model for fine-tuning topic representations
+#' @param numba_threads
+#' @param set_attributes
 #'
 #' @return python object
 #' @export

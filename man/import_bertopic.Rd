@@ -4,10 +4,12 @@
 \alias{import_bertopic}
 \title{Import Bert Topic}
 \usage{
-import_bertopic(assign_to_environment = T, path = NULL)
+import_bertopic(assign_to_environment = T, path = NULL, numba_threads = 1)
 }
 \arguments{
 \item{assign_to_environment}{if \code{TRUE} assigns to environment}
+
+\item{numba_threads}{}
 }
 \value{
 python object
