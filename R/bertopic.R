@@ -382,6 +382,27 @@ import_bertopic <-
     obj
   }
 
+#' Import Numba
+#'
+#' @param assign_to_environment
+#' @param path
+#'
+#' @return
+#' @export
+#'
+#' @examples
+import_numba <-
+  function(assign_to_environment = T,
+           path = NULL) {
+    select_correct_python(path = path)
+    obj <- reticulate::import("numba")
+    ! 'numba' %>% exists() & assign_to_environment
+    if (assign_to_environment) {
+      assign('numba', obj, envir = .GlobalEnv)
+    }
+    obj
+  }
+
 
 # stup --------------------------------------------------------------------
 #' Set BERTopic Model Attriubtes
@@ -517,8 +538,12 @@ bert_topic <-
            seed_topic_list = NULL,
            verbose = T,
            vocabulary = NULL,
+           numba_threads = 1,
            set_attributes = TRUE) {
     bertopic <- import_bertopic(assign_to_environment = F)
+    numba <- import_numba()
+    numba$set_num_threads(as.integer(numba_threads))
+
 
     if (length(n_gram_range) > 0) {
       n_gram_range <- reticulate::tuple(n_gram_range)

@@ -24,7 +24,6 @@ import_yake <-
     data <-
       seq_along(docs) |>
       map_dfr(function(x) {
-        x |> message()
         out <- ke$extract_keywords(docs[[x]]) |> unlist()
         keywords <- out[c(T, F)]
         score <- out[c(F, T)] |> as.numeric()

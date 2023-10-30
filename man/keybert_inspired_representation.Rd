@@ -10,6 +10,7 @@ keybert_inspired_representation(
   nr_samples = 500,
   nr_candidate_words = 10,
   random_state = 42,
+  numba_threads = 1,
   obj = NULL
 )
 }

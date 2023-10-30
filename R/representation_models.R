@@ -68,7 +68,10 @@ keybert_inspired_representation <-
            nr_samples = 500,
            nr_candidate_words = 10,
            random_state = 42,
+           numba_threads = 1,
            obj = NULL) {
+    numba <- import_numba()
+    numba$set_num_threads(as.integer(numba_threads))
     obj <- bertopic_representations(obj = obj)
     out <-
       obj$KeyBERTInspired(

@@ -31,6 +31,7 @@ bert_topic(
   seed_topic_list = NULL,
   verbose = T,
   vocabulary = NULL,
+  numba_threads = 1,
   set_attributes = TRUE
 )
 }
