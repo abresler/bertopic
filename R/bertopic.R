@@ -527,6 +527,8 @@ bert_topic <-
            use_sklearn_vectorizer = F,
            is_lower_case = T,
            n_gram_range = list(1L, 1L),
+           zeroshot_topic_list = NULL,
+           zeroshot_min_similarity = .7,
            keyphrase_ngram_range = list(1L, 1L),
            min_topic_size = 10L,
            umap_model = NULL,
@@ -548,10 +550,14 @@ bert_topic <-
            vocabulary = NULL,
            numba_threads = 1,
            set_attributes = TRUE) {
-    bertopic <- import_bertopic(assign_to_environment = F)
-    numba <- import_numba()
-    numba$set_num_threads(as.integer(numba_threads))
+    bertopic <- import_bertopic(assign_to_environment = F, numba_threads = numba_threads)
 
+
+    if (length(zeroshot_topic_list) > 0) {
+      if (class(zeroshot_topic_list) != "list") {
+        zeroshot_topic_list <- as.list(zeroshot_topic_list)
+      }
+    }
 
     if (length(n_gram_range) > 0) {
       n_gram_range <- reticulate::tuple(n_gram_range)
@@ -615,7 +621,9 @@ bert_topic <-
         hdbscan_model = hdbscan_model,
         vectorizer_model = vectorizer_model,
         ctfidf_model = ctfidf_model,
-        embedding_model = embedding_model
+        embedding_model = embedding_model,
+        zeroshot_min_similarity = zeroshot_min_similarity,
+        zeroshot_topic_list = zeroshot_topic_list
       )
 
 
@@ -941,7 +949,6 @@ bert_fit_transform <-
            documents,
            embeddings = NULL,
            y = NULL) {
-
     if (length(y) > 0) {
       y <- as.numeric(y)
     }
@@ -977,7 +984,6 @@ tbl_bert_fit_transform <-
            class_fields = NULL,
            embeddings = NULL,
            images = NULL) {
-
     if (length(data) == 0) {
       message("Requires data")
       return(obj)
@@ -999,12 +1005,22 @@ tbl_bert_fit_transform <-
     if (length(class_fields) > 0) {
       data <-
         data |>
-        tbl_unite_features(unite_columns = class_fields, new_column = "class", to_factor = TRUE)
+        tbl_unite_features(
+          unite_columns = class_fields,
+          new_column = "class",
+          to_factor = TRUE
+        )
 
       y <- data[["id_class"]] |> as.numeric()
     }
 
-    out <- obj$fit_transform(documents = documents, embeddings = embeddings, images = images, y = y)
+    out <-
+      obj$fit_transform(
+        documents = documents,
+        embeddings = embeddings,
+        images = images,
+        y = y
+      )
 
     out
 
@@ -1017,6 +1033,8 @@ tbl_bert_fit_transform <-
 #'
 #' @param bm25_weighting Uses BM25-inspired idf-weighting procedure instead of the procedure as defined in the c-TF-IDF formula. It uses the following weighting scheme: log(1+((avg_nr_samples - df + 0.5) / (df+0.5))).  Defaults to `FALSE`
 #' @param reduce_frequent_words Takes the square root of the bag-of-words after normalizing the matrix. Helps to reduce the impact of words that appear too frequently. Defaults to `FALSE`
+#' @param seed_words Specific words that will have their idf value increased by the value of seed_multiplier. NOTE: This will only increase the value of words that have an exact match
+#' @param seed_multiplier The value with which the idf values of the words in seed_words are multiplied.  Default 2
 #'
 #' @return
 #' @export
@@ -1027,11 +1045,18 @@ tbl_bert_fit_transform <-
 #' transformer
 class_tfidf_transformer <-
   function(bm25_weighting = F,
+           seed_words = NULL,
+           seed_multiplier = 2,
            reduce_frequent_words = F) {
     bertopic <- import_bertopic(assign_to_environment = F)
+
     obj <-
-      bertopic$vectorizers$ClassTfidfTransformer(bm25_weighting = bm25_weighting,
-                                                 reduce_frequent_words = reduce_frequent_words)
+      bertopic$vectorizers$ClassTfidfTransformer(
+        bm25_weighting = bm25_weighting,
+        reduce_frequent_words = reduce_frequent_words,
+        seed_words = ,
+        seed_multiplier =
+      )
     obj
   }
 
@@ -1133,4 +1158,40 @@ word_doc_embedder <-
     obj <-
       bertopic$backend$WordDocEmbedder
     obj
+  }
+
+
+# merge -------------------------------------------------------------------
+
+
+#' Merge multiple pre-trained BERTopic models into a single model
+#'
+#' @param obj BERTopic object
+#' @param models A list of fitted BERTopic models
+#' @param min_similarity The minimum similarity for when topics are merged.  Default .7
+#' @param embedding_model Additionally load in an embedding model if necessary.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+bert_merge_models <-
+  function(obj,
+           models = NULL,
+           min_similarity = .7,
+           embedding_model = NULL) {
+    if (length(models) == 0) {
+      "Provide models" |> message()
+      return(invisible())
+    }
+
+    if (class(models) != "list") {
+      models <- list(models)
+    }
+
+    obj$merge_models(
+      models = models,
+      min_similarity = min_similarity,
+      embedding_model = embedding_model
+    )
   }

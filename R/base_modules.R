@@ -324,3 +324,46 @@ import_use <-
     }
     obj
   }
+
+
+#' OpenAI
+#'
+#' @param assign_to_environment
+#' @param path
+#'
+#' @return
+#' @export
+#'
+#' @examples
+import_openai <-
+  function(assign_to_environment = T,
+           path = NULL) {
+    select_correct_python(path = path)
+    obj <- reticulate::import("openai")
+    ! 'obj' %>% exists() & assign_to_environment
+    if (assign_to_environment) {
+      assign('openai', obj, envir = .GlobalEnv)
+    }
+    obj
+  }
+
+#' Import Llama CPP
+#'
+#' @param assign_to_environment
+#' @param path
+#'
+#' @return
+#' @export
+#'
+#' @examples
+import_llama_cpp <-
+  function(assign_to_environment = T,
+           path = NULL) {
+    select_correct_python(path = path)
+    obj <- reticulate::import("llama_cpp")
+    ! 'obj' %>% exists() & assign_to_environment
+    if (assign_to_environment) {
+      assign('llama_cpp', obj, envir = .GlobalEnv)
+    }
+    obj
+  }

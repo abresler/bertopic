@@ -4,7 +4,16 @@
 \alias{langchain_representation}
 \title{Lang Chain Representation}
 \usage{
-langchain_representation(chain = NULL, prompt = NULL, obj = NULL)
+langchain_representation(
+  chain = NULL,
+  prompt = NULL,
+  nr_docs = 4,
+  diversity = NULL,
+  doc_length = NULL,
+  tokenizer = NULL,
+  chain_config = NULL,
+  obj = NULL
+)
 }
 \arguments{
 \item{obj}{}

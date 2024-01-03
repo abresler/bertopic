@@ -12,6 +12,8 @@ bert_topic(
   use_sklearn_vectorizer = F,
   is_lower_case = T,
   n_gram_range = list(1L, 1L),
+  zeroshot_topic_list = NULL,
+  zeroshot_min_similarity = 0.7,
   keyphrase_ngram_range = list(1L, 1L),
   min_topic_size = 10L,
   umap_model = NULL,

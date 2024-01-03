@@ -6,20 +6,45 @@
 \usage{
 open_ai_representation(
   model = "gpt-3.5-turbo",
+  open_ai_key = NULL,
   prompt = NULL,
+  generator_kwargs = NULL,
   delay_in_seconds = 10,
-  chat = TRUE,
+  exponential_backoff = FALSE,
+  chat = FALSE,
+  nr_docs = 4L,
+  diversity = NULL,
+  doc_length = NULL,
+  tokenizer = NULL,
   obj = NULL
 )
 }
 \arguments{
 \item{model}{Open AI model NAME}
 
-\item{prompt}{Prompt.  For example: `I have a topic that contains the following documents: [DOCUMENTS]The topic is described by the following keywords: [KEYWORDS]Based on the information above, extract a short topic label in the following format:topic: <topic label>`}
+\item{open_ai_key}{API key}
+
+\item{prompt}{Set this to True if a GPT-3.5 model is used."  For example: `I have a topic that contains the following documents: [DOCUMENTS]The topic is described by the following keywords: [KEYWORDS]Based on the information above, extract a short topic label in the following format:topic: <topic label>`}
+
+\item{generator_kwargs}{Kwargs passed to `openai.Completion.create}
 
 \item{delay_in_seconds}{How Long to Wait?}
 
+\item{exponential_backoff}{Retry requests with a random exponential backoff}
+
 \item{chat}{If `TRUE` enter chat mode.}
+
+\item{nr_docs}{The number of documents to pass to OpenAI if a prompt.}
+
+\item{diversity}{The diversity of documents to pass to OpenAI.  Accepts values between 0 and 1. A higher values results in passing more diverse documents whereas lower values passes more similar documents.}
+
+\item{doc_length}{The maximum length of each document. If a document is longer, it will be truncated. If None, the entire document is passed..}
+
+\item{tokenizer}{The tokenizer used to calculate to split the document into segments" used to count the length of a document.
+If tokenizer is 'char', then the document is split up into characters which are counted to adhere to `doc_length`
+ If tokenizer is 'whitespace', the document is split up into words separated by whitespaces. These words are counted and truncated depending on `doc_length`
+If tokenizer is 'vectorizer', then the internal CountVectorizer is used to tokenize the document. These tokens are counted and trunctated depending on `doc_length`
+If tokenizer is a callable, then that callable is used to tokenize the document. These tokens are counted and truncated depending on `doc_length`}
 
 \item{obj}{BERTopic Object}
 }

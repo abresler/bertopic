@@ -4,10 +4,19 @@
 \alias{class_tfidf_transformer}
 \title{Class TFIDF Transformer}
 \usage{
-class_tfidf_transformer(bm25_weighting = F, reduce_frequent_words = F)
+class_tfidf_transformer(
+  bm25_weighting = F,
+  seed_words = NULL,
+  seed_multiplier = 2,
+  reduce_frequent_words = F
+)
 }
 \arguments{
 \item{bm25_weighting}{Uses BM25-inspired idf-weighting procedure instead of the procedure as defined in the c-TF-IDF formula. It uses the following weighting scheme: log(1+((avg_nr_samples - df + 0.5) / (df+0.5))).  Defaults to `FALSE`}
+
+\item{seed_words}{Specific words that will have their idf value increased by the value of seed_multiplier. NOTE: This will only increase the value of words that have an exact match}
+
+\item{seed_multiplier}{The value with which the idf values of the words in seed_words are multiplied.  Default 2}
 
 \item{reduce_frequent_words}{Takes the square root of the bag-of-words after normalizing the matrix. Helps to reduce the impact of words that appear too frequently. Defaults to `FALSE`}
 }

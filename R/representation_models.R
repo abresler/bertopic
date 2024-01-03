@@ -1,5 +1,7 @@
 
 
+
+
 # utils -------------------------------------------------------------------
 
 #' Convert Spacy Matching Pattern to Dictionary
@@ -17,9 +19,9 @@ spacy_matching_pattern_dict_to_list <-
       pattern |>
       str_remove_all("^pattern = ") |>
       str_remove_all("\n") |>
-      str_replace_all("\\[","list(") |>
+      str_replace_all("\\[", "list(") |>
       str_replace_all("\\]", "\\)") |>
-      str_replace_all("\\{","list(") |>
+      str_replace_all("\\{", "list(") |>
       str_replace_all("\\}", "\\)") |>
       str_replace_all("\\:", "=")
 
@@ -91,6 +93,74 @@ keybert_inspired_representation <-
     out
   }
 
+#' A llama.cpp implementation to use as a representation model.
+#'
+#' @param model Either a string pointing towards a local LLM or a  `llama_cpp.Llama` object.
+#' @param prompt
+#' @param pipeline_kwargs
+#' @param nr_docs
+#' @param diversity
+#' @param doc_length
+#' @param tokenizer
+#' @param numba_threads
+#' @param obj
+#'
+#' @return
+#' @export
+#'
+#' @examples
+llama_cpp_representation <-
+  function(model = "zephyr-7b-alpha.Q4_K_M.gguf",
+           prompt = NULL,
+           pipeline_kwargs = NULL,
+           nr_docs = 4,
+           diversity = NULL,
+           doc_length = NULL,
+           tokenizer = NULL,
+           numba_threads = 1,
+           obj = NULL) {
+    numba <- import_numba()
+    numba$set_num_threads(n = as.integer(numba_threads))
+    obj <- bertopic_representations(obj = obj)
+
+    if (length(doc_length) > 0) {
+      doc_length <- as.integer(doc_length)
+    }
+
+    is_model_char <-
+      "character" %in% class(model)
+    if (is_model_char) {
+      oldwd <- getwd()
+      setwd("~")
+
+    }
+
+    out <-
+      obj$LlamaCPP(
+        model = model,
+        prompt = prompt,
+        nr_docs = as.integer(nr_docs),
+        diversity = diversity,
+        doc_length = doc_length,
+        tokenizer = tokenizer
+      )
+    if (is_model_char) {
+      if (getwd() != oldwd) {
+        setwd(oldwd)
+      }
+    }
+
+
+
+    attr(out, "representation_method") <- c("llama_cpp")
+    input_parameters <-
+      bert_parameters(obj = out, return_attributes = TRUE)
+    attr(out, "input_parameters") <- input_parameters
+
+    out
+
+  }
+
 #' Calculate Maximal Marginal Relevance (MMR) between candidate keywords and the document.
 #' MMR considers the similarity of keywords/keyphrases with the document, along with the similarity of already selected keywords and keyphrases. This results in a selection of keywords that maximize their within diversity with respect to the document.
 #'
@@ -159,10 +229,21 @@ cohere_representation <-
 #' See \href{https://maartengr.github.io/BERTopic/getting_started/representation/representation.html#chatgpt}{API Example} and  \href{https://maartengr.github.io/BERTopic/changelog.html#version-0141}{Change Log Example}
 #'
 #' @param model Open AI model NAME
-#' @param prompt Prompt.  For example: `I have a topic that contains the following documents: [DOCUMENTS]The topic is described by the following keywords: [KEYWORDS]Based on the information above, extract a short topic label in the following format:topic: <topic label>`
+#' @param prompt Set this to True if a GPT-3.5 model is used."  For example: `I have a topic that contains the following documents: [DOCUMENTS]The topic is described by the following keywords: [KEYWORDS]Based on the information above, extract a short topic label in the following format:topic: <topic label>`
 #' @param obj BERTopic Object
 #' @param delay_in_seconds How Long to Wait?
 #' @param chat If `TRUE` enter chat mode.
+#' @param open_ai_key API key
+#' @param generator_kwargs Kwargs passed to `openai.Completion.create
+#' @param exponential_backoff Retry requests with a random exponential backoff
+#' @param nr_docs The number of documents to pass to OpenAI if a prompt.
+#' @param diversity The diversity of documents to pass to OpenAI.  Accepts values between 0 and 1. A higher values results in passing more diverse documents whereas lower values passes more similar documents.
+#' @param doc_length The maximum length of each document. If a document is longer, it will be truncated. If None, the entire document is passed..
+#' @param tokenizer The tokenizer used to calculate to split the document into segments" used to count the length of a document.
+#' If tokenizer is 'char', then the document is split up into characters which are counted to adhere to `doc_length`
+#'  If tokenizer is 'whitespace', the document is split up into words separated by whitespaces. These words are counted and truncated depending on `doc_length`
+#' If tokenizer is 'vectorizer', then the internal CountVectorizer is used to tokenize the document. These tokens are counted and trunctated depending on `doc_length`
+#' If tokenizer is a callable, then that callable is used to tokenize the document. These tokens are counted and truncated depending on `doc_length`
 #'
 #' @return
 #' @export
@@ -170,17 +251,37 @@ cohere_representation <-
 #' @examples
 open_ai_representation <-
   function(model = "gpt-3.5-turbo",
+           open_ai_key = NULL,
            prompt = NULL,
+           generator_kwargs = NULL,
            delay_in_seconds = 10,
-           chat = TRUE,
+           exponential_backoff = FALSE,
+           chat = FALSE,
+           nr_docs = 4L,
+           diversity = NULL,
+           doc_length = NULL,
+           tokenizer = NULL,
            obj = NULL) {
+    open_ai <- import_openai()
+    client <- open_ai$OpenAI
+    if (length(open_ai_key) == 0) {
+      open_ai_key <- Sys.getenv("OPENAI_API_KEY")
+    }
+    client <- client(api_key = open_ai_key)
     obj <- bertopic_representations(obj = obj)
     out <-
       obj$OpenAI(
+        client = cleint,
         model = model,
-        prompt = prompt ,
+        prompt = prompt,
+        generator_kwargs = generator_kwargs,
         delay_in_seconds = as.integer(delay_in_seconds),
-        chat = chat
+        exponential_backoff = exponential_backoff,
+        chat = chat,
+        nr_docs = nr_docs,
+        diversity = diversity,
+        doc_length = doc_length,
+        tokenizer = tokenizer
       )
 
     attr(out, "representation_method") <- c("openai")
@@ -320,10 +421,28 @@ transformer_representation <-
 langchain_representation <-
   function(chain = NULL,
            prompt = NULL,
+           nr_docs = 4,
+           diversity = NULL,
+           doc_length = NULL,
+           tokenizer = NULL,
+           chain_config = NULL,
            obj = NULL) {
     obj <- bertopic_representations(obj = obj)
+
+    if (length(doc_length) > 0) {
+      doc_length <- as.integer(doc_length)
+    }
+
     out <-
-      obj$LangChain(chain = chain, prompt = prompt, )
+      obj$LangChain(
+        chain = chain,
+        prompt = prompt,
+        nr_docs = as.integer(nr_docs),
+        diversity = diversity,
+        doc_length = doc_length,
+        tokenizer = tokenizer,
+        chain_config = chain_config
+      )
 
     attr(out, "representation_method") <- c("langchain")
     input_parameters <-
