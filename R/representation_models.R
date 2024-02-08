@@ -2,6 +2,7 @@
 
 
 
+
 # utils -------------------------------------------------------------------
 
 #' Convert Spacy Matching Pattern to Dictionary
@@ -451,3 +452,29 @@ langchain_representation <-
     out
 
   }
+
+
+
+# langchain ---------------------------------------------------------------
+
+function(prompt = "What are these documents about? Please give a single label.",
+         temperature = 0,
+         openai_api_key = NULL,
+         chain_type = "stuff") {
+  lc <- reticulate::import("langchain")
+  load_qa_chain <-
+    lc$chains$question_answering$load_qa_chain
+  langchain <-
+    reticulate::import("langchain.chains.question_answering")
+  OpenAI <- lc$llms$openai$OpenAI
+
+  chain <-
+    load_qa_chain(
+      OpenAI(temperature = 0, openai_api_key = "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"),
+      chain_type = "stuff"
+    )
+  bert_rep <- bertopic_representations()
+
+  representation_model = bert_rep$LangChain(chain, prompt = prompt)
+
+}

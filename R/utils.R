@@ -645,6 +645,10 @@ bert_topic_info <-
       tidyr::separate(name,
                       into = c("remove", "label_bertopic"),
                       sep = "\\+") |>
+      mutate(label_bertopic = case_when(
+        is.na(label_bertopic) ~ remove,
+        TRUE ~ label_bertopic
+      ) |> str_to_lower()) |>
       select(-remove) |>
       mutate(is_outlier_bert_topic = topic_bert == -1) |>
       mutate_if(is.character, str_squish) |>
@@ -1078,7 +1082,7 @@ bert_topic_keywords <-
       data <-
         seq_along(topics) |>
         map_dfr(function(x) {
-          topic_number <- x - 2
+          topic_number <- x - 1
           all_values <- topics[[x]] |> unlist()
           word <- all_values[c(T, F)]
           score <- all_values[c(F, T)] |> readr::parse_number()
