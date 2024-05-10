@@ -13,7 +13,7 @@ keybert_keywords(
   stopword_package_sources = NULL,
   extra_stop_words = NULL,
   exclude_stop_words = T,
-  assign_to_environment = T,
+  assign_to_environment = F,
   keyphrase_ngram_range = list(1L, 1L),
   use_future = TRUE,
   use_embeddings = F,

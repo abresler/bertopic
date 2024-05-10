@@ -2,8 +2,20 @@
 % Please edit documentation in R/bertopic-package.r
 \docType{package}
 \name{bertopic}
+\alias{bertopic-package}
 \alias{bertopic}
 \title{R port of the Python bertopic module}
+\description{
+R port of the python bertopic and other python nlp modules
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/abresler/bertopic}
+  \item Report bugs at \url{https://github.com/abresler/bertopic/issues}
+}
+
+}
 \author{
 Alex Bresler (abresler@asbcllc.com)
 }

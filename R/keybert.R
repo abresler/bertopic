@@ -2,6 +2,7 @@
 
 
 
+
 # https://github.com/MaartenGr/KeyBERT
 
 
@@ -48,8 +49,7 @@ import_keybert <-
                                        use_mmr,
                                        diversity,
                                        nr_candidates,
-                                       top_n_words = 5
-) {
+                                       top_n_words = 5) {
   obj$extract_keywords(
     docs = doc,
     candidates = candidates,
@@ -154,7 +154,7 @@ keybert_keywords <-
            stopword_package_sources = NULL,
            extra_stop_words = NULL,
            exclude_stop_words = T,
-           assign_to_environment = T,
+           assign_to_environment = F,
            keyphrase_ngram_range = list(1L, 1L),
            use_future = TRUE,
            use_embeddings = F,
@@ -181,6 +181,8 @@ keybert_keywords <-
     }
     if (length(obj) == 0) {
       obj <- keybert_model(model = model)
+    } else {
+      obj <- obj$KeyBERT(model = model)
     }
     if (use_key_phrase_vectorizer) {
       "Using keyphrase vectorizer" |> message()
@@ -252,53 +254,53 @@ keybert_keywords <-
         purrr::possibly(.extract_document_keywords, list())
 
       out <-
-          seq_along(docs) |>
-          map(function(x) {
-            if (return_message) {
-              glue("Extracting Keywords from Document # {x}") |> message()
-            }
-            .extract_document_keywords_safe(
-              obj = obj,
-              doc = docs[[x]],
-              candidates = candidates,
-              keyphrase_ngram_range = keyphrase_ngram_range,
-              stop_words = stop_words,
-              top_n_words = top_n_words,
-              min_df = min_df,
-              use_maxsum = use_maxsum,
-              word_embeddings = word_embeddings,
-              doc_embeddings = doc_embeddings,
-              seed_keywords = seed_keywords,
-              highlight = highlight,
-              vectorizer_model = vectorizer_model,
-              use_mmr = use_mmr,
-              diversity = diversity,
-              nr_candidates = nr_candidates
-            )
+        seq_along(docs) |>
+        map(function(x) {
+          if (return_message) {
+            glue("Extracting Keywords from Document # {x}") |> message()
+          }
+          .extract_document_keywords_safe(
+            obj = obj,
+            doc = docs[[x]],
+            candidates = candidates,
+            keyphrase_ngram_range = keyphrase_ngram_range,
+            stop_words = stop_words,
+            top_n_words = top_n_words,
+            min_df = min_df,
+            use_maxsum = use_maxsum,
+            word_embeddings = word_embeddings,
+            doc_embeddings = doc_embeddings,
+            seed_keywords = seed_keywords,
+            highlight = highlight,
+            vectorizer_model = vectorizer_model,
+            use_mmr = use_mmr,
+            diversity = diversity,
+            nr_candidates = nr_candidates
+          )
 
-          })
+        })
     }
 
 
     if (!iterate_individually) {
       out <-
-      obj$extract_keywords(
-        docs = docs,
-        candidates = candidates,
-        keyphrase_ngram_range = reticulate::tuple(keyphrase_ngram_range),
-        stop_words = stop_words,
-        top_n = as.integer(top_n_words),
-        min_df = min_df,
-        use_maxsum = use_maxsum,
-        word_embeddings = word_embeddings,
-        doc_embeddings = doc_embeddings,
-        seed_keywords = seed_keywords,
-        highlight = highlight,
-        vectorizer = vectorizer_model,
-        use_mmr = use_mmr,
-        diversity = diversity,
-        nr_candidates = nr_candidates
-      )
+        obj$extract_keywords(
+          docs = docs,
+          candidates = candidates,
+          keyphrase_ngram_range = reticulate::tuple(keyphrase_ngram_range),
+          stop_words = stop_words,
+          top_n = as.integer(top_n_words),
+          min_df = min_df,
+          use_maxsum = use_maxsum,
+          word_embeddings = word_embeddings,
+          doc_embeddings = doc_embeddings,
+          seed_keywords = seed_keywords,
+          highlight = highlight,
+          vectorizer = vectorizer_model,
+          use_mmr = use_mmr,
+          diversity = diversity,
+          nr_candidates = nr_candidates
+        )
     }
 
     if (assign_to_environment) {
@@ -333,7 +335,7 @@ keybert_keywords <-
 
     dat
 
-    }
+  }
 
 #' Extract Embeddings from Documents
 #'
