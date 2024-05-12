@@ -6,12 +6,20 @@
 c-TF-IDF can best be explained as a TF-IDF formula adopted for multiple classes by joining all documents per class. Thus, each class is converted to a single document instead of set of documents. The frequency of each word x is extracted for each class c and is l1 normalized. This constitutes the term frequency.
 Then, the term frequency is multiplied with IDF which is the logarithm of 1 plus the average number of words per class A divided by the frequency of word x across all classes.}
 \usage{
-ctfidf(bm25_weighting = FALSE, reduce_frequent_words = FALSE, obj = NULL)
+ctfidf(
+  bm25_weighting = FALSE,
+  reduce_frequent_words = FALSE,
+  seed_words = NULL,
+  seed_multiplier = 2,
+  obj = NULL
+)
 }
 \arguments{
 \item{bm25_weighting}{Uses BM25-inspired idf-weighting procedure instead of the procedure as defined in the c-TF-IDF formula. It uses the following weighting scheme: log(1+((avg_nr_samples - df + 0.5) / (df+0.5))). Default is `FALSE`}
 
 \item{reduce_frequent_words}{Takes the square root of the bag-of-words after normalizing the matrix. Helps to reduce the impact of words that appear too frequently. Default is `FALSE`}
+
+\item{seed_multiplier}{}
 
 \item{obj}{bertopic object}
 }

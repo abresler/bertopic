@@ -38,6 +38,8 @@ import_keyphrase <-
 #' @param custom_pos_tagger  A callable function which expects a list of strings in a ‘raw_documents’ parameter and returns a list of (word token, POS-tag) tuples. If this parameter is not None, the custom tagger function is used to tag words with parts-of-speech, while the spaCy pipeline is ignored.
 #' @param binary If True, all non zero counts are set to 1. This is useful for discrete probabilistic models that model binary events rather than integer counts.
 #' @param stopword_package_sources list of stopwords sources from `stopwords` packages
+#' @param decay
+#' @param delete_min_df
 #'
 #' @return
 #' @export
@@ -59,11 +61,14 @@ keyphrase_vectorizer <-
            spacy_exclude = NULL,
            max_df = NULL,
            min_df = NULL,
-           workers = 1L,
+           workers = 6L,
            pos_pattern = "<J.*>*<N.*>+",
            spacy_pipeline = "en_core_web_sm",
            custom_pos_tagger = NULL,
-           binary = FALSE)  {
+           binary = FALSE,
+           decay = NULL,
+           delete_min_df = NULL
+           )  {
     if (length(obj) == 0) {
       obj <- import_keyphrase(assign_to_environment = F)
     }
@@ -81,6 +86,8 @@ keyphrase_vectorizer <-
     vectorizer_model$spacy_exclude <- spacy_exclude
     vectorizer_model$custom_pos_tagger <- custom_pos_tagger
     vectorizer_model$binary <- binary
+    vectorizer_model$decay <- decay
+    vectorizer_model$delete_min_df <- delete_min_df
 
     if (exclude_stop_words | length(extra_stop_words) > 0) {
       all_stop <-

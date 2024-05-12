@@ -505,6 +505,11 @@ set_bert_attributes <-
 #' @param representation_model The base representation model for fine-tuning topic representations
 #' @param numba_threads
 #' @param set_attributes
+#' @param zeroshot_topic_list
+#' @param zeroshot_min_similarity
+#' @param workers
+#' @param decay
+#' @param delete_min_df
 #'
 #' @return python object
 #' @export
@@ -548,7 +553,10 @@ bert_topic <-
            seed_topic_list = NULL,
            verbose = T,
            vocabulary = NULL,
-           numba_threads = 1,
+           workers = 6L,
+           decay = NULL,
+           delete_min_df = NULL,
+           numba_threads = 1L,
            set_attributes = TRUE) {
     bertopic <- import_bertopic(assign_to_environment = F, numba_threads = numba_threads)
 
@@ -572,7 +580,10 @@ bert_topic <-
           exclude_stop_words = exclude_stop_words,
           language = language,
           pos_pattern = pos_pattern,
-          extra_stop_words = extra_stop_words
+          extra_stop_words = extra_stop_words,
+          workers = workers,
+          decay = decay,
+          delete_min_df  = delete_min_df
         )
     }
 
@@ -1054,8 +1065,8 @@ class_tfidf_transformer <-
       bertopic$vectorizers$ClassTfidfTransformer(
         bm25_weighting = bm25_weighting,
         reduce_frequent_words = reduce_frequent_words,
-        seed_words = ,
-        seed_multiplier =
+        seed_words = seed_words,
+        seed_multiplier = as.integer(seed_multiplier)
       )
     obj
   }
@@ -1091,6 +1102,8 @@ online_count_vectorizer <- function(decay = NULL,
 #' @param bm25_weighting  Uses BM25-inspired idf-weighting procedure instead of the procedure as defined in the c-TF-IDF formula. It uses the following weighting scheme: log(1+((avg_nr_samples - df + 0.5) / (df+0.5))). Default is `FALSE`
 #' @param reduce_frequent_words Takes the square root of the bag-of-words after normalizing the matrix. Helps to reduce the impact of words that appear too frequently. Default is `FALSE`
 #' @param obj bertopic object
+#' @param seed_words
+#' @param seed_multiplier
 #'
 #' @return
 #' @export
@@ -1101,13 +1114,17 @@ online_count_vectorizer <- function(decay = NULL,
 ctfidf <-
   function(bm25_weighting = FALSE,
            reduce_frequent_words = FALSE,
+           seed_words = NULL,
+           seed_multiplier = 2,
            obj = NULL) {
     if (length(obj) == 0)   {
       obj <- import_bertopic(assign_to_environment = F)
     }
 
     obj$vectorizers$ClassTfidfTransformer(bm25_weighting = bm25_weighting,
-                                          reduce_frequent_words = reduce_frequent_words)
+                                          reduce_frequent_words = reduce_frequent_words,
+                                          seed_words = seed_words,
+                                          seed_multiplier = as.integer(seed_multiplier))
   }
 
 

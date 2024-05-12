@@ -26,6 +26,9 @@ bert_update_topics(
   max_df = 1L,
   pos_pattern = "<J.*>*<N.*>+",
   seed_topic_list = NULL,
+  decay = NULL,
+  delete_min_df = NULL,
+  workers = 6L,
   vocabulary = NULL
 )
 }

@@ -128,6 +128,14 @@ keybert_model <-
 #' @param stopword_package_sources if not `NULL` c("snowball","stopword -iso", "smart", "nltk"))
 #' @param assign_to_environment if `TRUE` assigns objec to environment
 #' @param language Language to use.  Default `english`
+#' @param iterate_individually
+#' @param return_message
+#' @param use_future
+#' @param decay
+#' @param delete_min_df
+#' @param workers
+#' @param spacy_pipeline
+#' @param custom_pos_tagger
 #'
 #' @return `tibble` of keywords
 #' @export
@@ -175,7 +183,13 @@ keybert_keywords <-
            pos_pattern = "<J.*>*<N.*>+",
            use_maxsum = FALSE,
            vocabulary = NULL,
-           highlight = F) {
+           highlight = F,
+           decay = NULL,
+           delete_min_df = NULL,
+           workers = 6L,
+           spacy_pipeline = "en_core_web_sm",
+           custom_pos_tagger = NULL
+           ) {
     if (length(docs) == 0) {
       "Enter documents"
     }
@@ -194,7 +208,12 @@ keybert_keywords <-
           exclude_stop_words = exclude_stop_words,
           extra_stop_words = extra_stop_words,
           language = language,
-          pos_pattern = pos_pattern
+          pos_pattern = pos_pattern,
+          workers = workers,
+          decay = decay,
+          delete_min_df = delete_min_df,
+          spacy_pipeline = spacy_pipeline,
+          custom_pos_tagger = custom_pos_tagger
         )
 
       slug <-
@@ -486,6 +505,11 @@ keybert_embeddings <-
                                   highlight = F,
                                   return_summary = F,
                                   join_to_original_data = F,
+                                  decay = NULL,
+                                  delete_min_df = NULL,
+                                  workers = 6L,
+                                  spacy_pipeline = "en_core_web_sm",
+                                  custom_pos_tagger = NULL,
                                   nest_data = F) {
   if (length(document_column) == 0) {
     "Enter Document Column" |> message()
@@ -529,7 +553,11 @@ keybert_embeddings <-
     word_embeddings = word_embeddings,
     highlight = highlight,
     use_future = use_future,
-    return_message = return_message
+    return_message = return_message,
+    decay = decay,
+    delete_min_df = delete_min_df,
+    spacy_pipeline = spacy_pipeline,
+    custom_pos_tagger = custom_pos_tagger
   )
 
   if (return_summary) {
@@ -625,8 +653,12 @@ keybert_embeddings <-
 #' @param include_both_vectorizers if `TRUE` returns keybert and sklearn methods
 #' @param use_future if `TRUE` uses parallel processing
 #' @param return_message if `TRUE` returns a message
-#' @param use_future_individually
 #' @param iterate_individually
+#' @param decay
+#' @param delete_min_df
+#' @param workers
+#' @param spacy_pipeline
+#' @param custom_pos_tagger
 #'
 #' @return `tibble` of keywords
 #'
@@ -667,6 +699,11 @@ tbl_keybert_keywords <- function(data,
                                  highlight = F,
                                  return_summary = F,
                                  join_to_original_data = F,
+                                 decay = NULL,
+                                 delete_min_df = NULL,
+                                 workers = 6L,
+                                 spacy_pipeline = "en_core_web_sm",
+                                 custom_pos_tagger = NULL,
                                  nest_data = F) {
   if (!include_both_vectorizers) {
     data <-
@@ -703,6 +740,10 @@ tbl_keybert_keywords <- function(data,
         highlight = highlight,
         return_summary = return_summary,
         join_to_original_data = join_to_original_data,
+        decay = decay,
+        delete_min_df = delete_min_df,
+        spacy_pipeline = spacy_pipeline,
+        custom_pos_tagger = custom_pos_tagger,
         nest_data = nest_data
       )
 

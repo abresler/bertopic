@@ -82,7 +82,7 @@ keybert_inspired_representation <-
         top_n_words = as.integer(top_n_words),
         nr_repr_docs = as.integer(nr_repr_docs),
         nr_samples = as.integer(nr_samples),
-        nr_candidate_words = as.integer(nr_samples),
+        nr_candidate_words = as.integer(nr_candidate_words),
         random_state = as.integer(random_state)
       )
 

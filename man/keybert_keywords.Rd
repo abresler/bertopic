@@ -34,7 +34,12 @@ keybert_keywords(
   pos_pattern = "<J.*>*<N.*>+",
   use_maxsum = FALSE,
   vocabulary = NULL,
-  highlight = F
+  highlight = F,
+  decay = NULL,
+  delete_min_df = NULL,
+  workers = 6L,
+  spacy_pipeline = "en_core_web_sm",
+  custom_pos_tagger = NULL
 )
 }
 \arguments{
@@ -91,6 +96,8 @@ keybert_keywords(
 \item{vocabulary}{`SKLearn` vocabulary}
 
 \item{highlight}{Whether to print the document and highlight its keywords/keyphrases. NOTE: This does not work if multiple documents are passed.}
+
+\item{custom_pos_tagger}{}
 }
 \value{
 `tibble` of keywords

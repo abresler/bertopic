@@ -38,6 +38,11 @@ tbl_keybert_keywords(
   highlight = F,
   return_summary = F,
   join_to_original_data = F,
+  decay = NULL,
+  delete_min_df = NULL,
+  workers = 6L,
+  spacy_pipeline = "en_core_web_sm",
+  custom_pos_tagger = NULL,
   nest_data = F
 )
 }
@@ -47,8 +52,6 @@ tbl_keybert_keywords(
 \item{document_column}{name of `document` column}
 
 \item{obj}{Keybert Object}
-
-\item{iterate_individually}{}
 
 \item{include_both_vectorizers}{if `TRUE` returns keybert and sklearn methods}
 
@@ -107,6 +110,8 @@ tbl_keybert_keywords(
 \item{return_summary}{if `TRUE` returns concatanated list of matched keywords}
 
 \item{join_to_original_data}{if `TRUE` joins to original data}
+
+\item{custom_pos_tagger}{}
 
 \item{nest_data}{if `TRUE` nests data}
 }

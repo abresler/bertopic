@@ -33,7 +33,10 @@ bert_topic(
   seed_topic_list = NULL,
   verbose = T,
   vocabulary = NULL,
-  numba_threads = 1,
+  workers = 6L,
+  decay = NULL,
+  delete_min_df = NULL,
+  numba_threads = 1L,
   set_attributes = TRUE
 )
 }
@@ -93,7 +96,7 @@ bert_topic(
 
 \item{verbose}{if `TRUE` verbose output}
 
-\item{set_attributes}{}
+\item{delete_min_df}{}
 }
 \value{
 python object

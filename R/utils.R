@@ -1586,6 +1586,9 @@ bert_update_topics <-
            max_df = 1L,
            pos_pattern = "<J.*>*<N.*>+",
            seed_topic_list = NULL,
+           decay = NULL,
+           delete_min_df = NULL,
+           workers = 6L,
            vocabulary = NULL) {
     if (length(docs) == 0) {
       "Enter documents to fit" |> message()
@@ -1605,7 +1608,10 @@ bert_update_topics <-
           exclude_stop_words = exclude_stop_words,
           language = language,
           pos_pattern = pos_pattern,
-          extra_stop_words = extra_stop_words
+          extra_stop_words = extra_stop_words,
+          workers = workers,
+          decay = decay,
+          delete_min_df = delete_min_df
         )
     }
 

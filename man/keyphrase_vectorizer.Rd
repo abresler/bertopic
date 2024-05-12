@@ -14,11 +14,13 @@ keyphrase_vectorizer(
   spacy_exclude = NULL,
   max_df = NULL,
   min_df = NULL,
-  workers = 1L,
+  workers = 6L,
   pos_pattern = "<J.*>*<N.*>+",
   spacy_pipeline = "en_core_web_sm",
   custom_pos_tagger = NULL,
-  binary = FALSE
+  binary = FALSE,
+  decay = NULL,
+  delete_min_df = NULL
 )
 }
 \arguments{
@@ -49,6 +51,8 @@ keyphrase_vectorizer(
 \item{custom_pos_tagger}{A callable function which expects a list of strings in a ‘raw_documents’ parameter and returns a list of (word token, POS-tag) tuples. If this parameter is not None, the custom tagger function is used to tag words with parts-of-speech, while the spaCy pipeline is ignored.}
 
 \item{binary}{If True, all non zero counts are set to 1. This is useful for discrete probabilistic models that model binary events rather than integer counts.}
+
+\item{delete_min_df}{}
 }
 \description{
 Build a Keyphrase Vectorizer
