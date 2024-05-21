@@ -2,7 +2,9 @@
 % Please edit documentation in R/utils.R
 \name{bert_approximate_distribution}
 \alias{bert_approximate_distribution}
-\title{Get a string representation of the current object.}
+\title{Get a string representation of the current object.
+¶
+A post-hoc approximation of topic distributions across documents.}
 \usage{
 bert_approximate_distribution(
   obj,
@@ -39,5 +41,5 @@ bert_approximate_distribution(
 \item{separator}{The separator used to merge tokens into tokensets.}
 }
 \description{
-Get a string representation of the current object.
+In order to perform this approximation, each document is split into tokens according to the provided tokenizer in the CountVectorizer. Then, a sliding window is applied on each document creating subsets of the document. For example, with a window size of 3 and stride of 1, the sentence:
 }

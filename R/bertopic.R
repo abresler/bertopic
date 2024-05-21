@@ -365,6 +365,8 @@ bert_stop_words <-
 #' @param assign_to_environment if \code{TRUE} assigns to environment
 #' @param path
 #' @param numba_threads
+#' @param use_token_parallel
+#' @param use_kmp_fork
 #'
 #' @return python object
 #' @export
@@ -375,15 +377,19 @@ bert_stop_words <-
 import_bertopic <-
   function(assign_to_environment = T,
            path = NULL,
-           numba_threads = 1) {
+           numba_threads = 1,
+           use_token_parallel = TRUE,
+           use_kmp_fork = FALSE) {
     select_correct_python(path = path)
+    numba <- import_numba()
+    numba$set_num_threads(as.integer(numba_threads))
     obj <- reticulate::import("bertopic")
+    os <- reticulate::import("os")
+    os$environ["TOKENIZERS_PARALLELISM"] = as.character(use_token_parallel)
     ! 'bertopic' %>% exists() & assign_to_environment
     if (assign_to_environment) {
       assign('bertopic', obj, envir = .GlobalEnv)
     }
-    numba <- import_numba()
-    numba$set_num_threads(as.integer(numba_threads))
 
     obj
   }
@@ -442,14 +448,19 @@ set_bert_attributes <-
 
     attr(obj, "umap_parameters") <- umap_params
 
-    vectorizer_params <-
-      obj$vectorizer_model |> bert_parameters(
-        return_tibble = T,
-        use_dfc_method = T,
-        return_attributes = T
-      )
+    # vectorizer_params <-
+    #   obj$vectorizer_model |>
+    #   bert_parameters(
+    #     return_tibble = T,
+    #     use_dfc_method = T,
+    #     return_attributes = T
+    #   )
 
-    attr(obj, "vectorizer_parameters") <- vectorizer_params
+    # if (length(vectorizer_params) > 0) {
+    #   attr(obj, "vectorizer_parameters") <- vectorizer_params
+    # }
+
+
     if (length(representation_model) > 0) {
       representation_method <-
         attributes(representation_model)[["representation_method"]]
@@ -510,6 +521,8 @@ set_bert_attributes <-
 #' @param workers
 #' @param decay
 #' @param delete_min_df
+#' @param obj
+#' @param use_token_parallel
 #'
 #' @return python object
 #' @export
@@ -517,7 +530,7 @@ set_bert_attributes <-
 #' @examples
 #' import_bertopic()
 #' data <- sklearn::sk_datasets()
-#' docs_all <- data$fetch_20newsgroups(subset = 'all', remove = c('headers', 'footers', 'quotes'))
+#' docs_all <-  data$fetch_20newsgroups(subset = 'all', remove = reticulate::tuple('headers', 'footers', 'quotes'))
 #' docs <- docs_all["data"]
 #' tm <- bert_topic()
 #' topic_model <- tm$fit_transform(documents = docs)
@@ -525,7 +538,14 @@ set_bert_attributes <-
 #'
 
 bert_topic <-
-  function(language = "english",
+  function(obj = NULL,
+           umap_model = NULL,
+           hdbscan_model = NULL,
+           vectorizer_model = NULL,
+           embedding_model = NULL,
+           ctfidf_model = NULL,
+           nr_topics = NULL,
+           language = "english",
            representation_model = NULL,
            top_n_words = 10L,
            use_key_phrase_vectorizer = F,
@@ -536,12 +556,6 @@ bert_topic <-
            zeroshot_min_similarity = .7,
            keyphrase_ngram_range = list(1L, 1L),
            min_topic_size = 10L,
-           umap_model = NULL,
-           hdbscan_model = NULL,
-           vectorizer_model = NULL,
-           embedding_model = NULL,
-           ctfidf_model = NULL,
-           nr_topics = NULL,
            low_memory = F,
            exclude_stop_words = T,
            stopword_package_sources = NULL,
@@ -557,8 +571,16 @@ bert_topic <-
            decay = NULL,
            delete_min_df = NULL,
            numba_threads = 1L,
+           use_token_parallel = TRUE,
            set_attributes = TRUE) {
-    bertopic <- import_bertopic(assign_to_environment = F, numba_threads = numba_threads)
+    if (length(obj) == 0) {
+      obj <- import_bertopic(
+        assign_to_environment = F,
+        numba_threads = numba_threads,
+        use_token_parallel = use_token_parallel
+      )
+    }
+
 
 
     if (length(zeroshot_topic_list) > 0) {
@@ -571,7 +593,13 @@ bert_topic <-
       n_gram_range <- reticulate::tuple(n_gram_range)
     }
 
-    if (use_key_phrase_vectorizer) {
+    has_override_vectorizer <- length(vectorizer_model) > 0
+
+    if (has_override_vectorizer) {
+      override_vectorizer_model <- vectorizer_model
+    }
+
+    if (use_key_phrase_vectorizer | !has_override_vectorizer) {
       "Using keyphrase vectorizer" |> message()
       vectorizer_model <-
         keyphrase_vectorizer(
@@ -588,7 +616,7 @@ bert_topic <-
     }
 
     if (!use_key_phrase_vectorizer &
-        length(vectorizer_model) == 0 & use_sklearn_vectorizer) {
+        length(vectorizer_model) == 0 & use_sklearn_vectorizer & !has_override_vectorizer) {
       "Using sklearn vectorizer" |> message()
       vectorizer_model <-
         sklearn_vectorizer(
@@ -601,9 +629,19 @@ bert_topic <-
           extra_stop_words = extra_stop_words
         )
     }
+
+    if (has_override_vectorizer) {
+      "Using overriden vectorizer" |> message()
+      vectorizer_model <- override_vectorizer_model
+      vectorizer_model$min_df <- as.integer(min_df)
+      vectorizer_model$max_df <- as.integer(max_df)
+      vectorizer_model$decay <- decay
+    }
+
     uses_vectorizer <-
       use_sklearn_vectorizer |
-      use_key_phrase_vectorizer
+      use_key_phrase_vectorizer |
+      has_override_vectorizer
     if (uses_vectorizer & exclude_stop_words) {
       stop_words <-
         bert_stopwords(
@@ -617,13 +655,13 @@ bert_topic <-
     }
 
     obj <-
-      bertopic$BERTopic(
+      obj$BERTopic(
         representation_model = representation_model,
         language = language,
         top_n_words = as.integer(top_n_words),
         n_gram_range = n_gram_range,
         min_topic_size = as.integer(min_topic_size),
-        nr_topics = nr_topics,
+        nr_topics = as.integer(nr_topics),
         low_memory = low_memory,
         calculate_probabilities = calculate_probabilities,
         seed_topic_list = seed_topic_list,
@@ -656,13 +694,14 @@ bert_topic <-
           extra_stop_words = extra_stop_words,
           stopword_package_sources = stopword_package_sources
         )
-
+      existing <- obj$vectorizer_model$stop_words
+      all_stop <- c(existing, stop_words) |> unique()
       obj$vectorizer_model$stop_words <-
-        stop_words
+        all_stop
     }
 
-    # Fix ngramrange
-    obj$vectorizer_model$ngram_range <- n_gram_range
+    # # Fix ngramrange
+    # obj$vectorizer_model$ngram_range <- n_gram_range
 
     if (set_attributes) {
       obj <-
@@ -752,6 +791,9 @@ bert_parameters <-
            use_dfc_method = FALSE,
            return_attributes = FALSE) {
     out <- obj$get_params(deep = deep)
+    # if (out |> flatten_df() |> nrow() == 0) {
+    #   return(NULL)
+    # }
 
     if (return_attributes) {
       return_tibble <- TRUE
@@ -909,6 +951,24 @@ tbl_bert_attributes <-
 bert_transform <-
   function(obj, documents, embeddings = NULL) {
     obj <- obj$transform(documents = documents, embeddings = embeddings)
+
+    obj
+  }
+
+#' Fit BERTopic on a subset of the data and perform online learning with batch-like data.
+#'
+#' @param obj Topic Model Object
+#' @param documents A list of documents to fit on
+#' @param embeddings Pre-trained document embeddings. These can be used instead of the sentence-transformer model
+#' @param y The target class for (semi)-supervised modeling. Use -1 if no class for a specific instance is specified
+#'
+#' @return
+#' @export
+#'
+#' @examples
+bert_partial_fit <-
+  function(obj, documents, embeddings = NULL, y = NULL) {
+    obj <- obj$partial_fit(documents = documents, embeddings = embeddings, y = y)
 
     obj
   }
@@ -1088,10 +1148,24 @@ class_tfidf_transformer <-
 #' @examples
 online_count_vectorizer <- function(decay = NULL,
                                     delete_min_df = NULL,
+                                    stop_words = NULL,
+                                    numba_threads = 1,
+                                    use_token_parallel = F,
+                                    obj = NULL,
                                     ...) {
-  bertopic <- import_bertopic(assign_to_environment = F)
-  obj <- bertopic$vectorizers$OnlineCountVectorizer(decay = decay,
-                                                    delete_min_df = delete_min_df, ...)
+  if (length(obj) == 0)   {
+    obj <- import_bertopic(
+      assign_to_environment = F,
+      numba_threads = ,
+      use_token_parallel =
+    )
+  }
+  obj <- obj$vectorizers$OnlineCountVectorizer(
+    decay = decay,
+    delete_min_df = delete_min_df,
+    stop_words = stop_words,
+    ...
+  )
   obj
 }
 
@@ -1121,10 +1195,12 @@ ctfidf <-
       obj <- import_bertopic(assign_to_environment = F)
     }
 
-    obj$vectorizers$ClassTfidfTransformer(bm25_weighting = bm25_weighting,
-                                          reduce_frequent_words = reduce_frequent_words,
-                                          seed_words = seed_words,
-                                          seed_multiplier = as.integer(seed_multiplier))
+    obj$vectorizers$ClassTfidfTransformer(
+      bm25_weighting = bm25_weighting,
+      reduce_frequent_words = reduce_frequent_words,
+      seed_words = seed_words,
+      seed_multiplier = as.integer(seed_multiplier)
+    )
   }
 
 

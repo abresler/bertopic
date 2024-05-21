@@ -11,6 +11,7 @@ bert_update_topics(
   top_n_words = 10,
   images = NULL,
   n_gram_range = list(1L, 1L),
+  use_empty_vectorizer = FALSE,
   vectorizer_model = NULL,
   ctfidf_model = NULL,
   representation_model = NULL,
@@ -71,7 +72,7 @@ bert_update_topics(
 
 \item{seed_topic_list}{A list of seed words per topic to converge around.  Default is `NULL`}
 
-\item{vocabulary}{}
+\item{workers}{}
 }
 \description{
 Updates the topic representation by recalculating c-TF-IDF with the new parameters as defined in this function.

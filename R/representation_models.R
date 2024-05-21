@@ -39,15 +39,21 @@ spacy_matching_pattern_dict_to_list <-
 #' Import Bertopic Representations
 #'
 #' @param obj Bertopic Module
+#' @param numba_threads
+#' @param use_token_parallel
 #'
 #' @return
 #' @export
 #'
 #' @examples
 bertopic_representations <-
-  function(obj = NULL) {
+  function(obj = NULL,
+           numba_threads = 1,
+           use_token_parallel = TRUE) {
     if (length(obj) == 0) {
-      obj <- import_bertopic(assign_to_environment = F)
+      obj <-
+        import_bertopic(assign_to_environment = F, numba_threads = numba_threads,
+                        use_token_parallel = use_token_parallel)
     }
     obj$representation
   }
@@ -70,12 +76,10 @@ keybert_inspired_representation <-
   function(top_n_words = 10,
            nr_repr_docs = 5,
            nr_samples = 500,
-           nr_candidate_words = 10,
+           nr_candidate_words = 100,
            random_state = 42,
            numba_threads = 1,
            obj = NULL) {
-    numba <- import_numba()
-    numba$set_num_threads(n = as.integer(numba_threads))
     obj <- bertopic_representations(obj = obj)
     out <-
       obj$KeyBERTInspired(
@@ -120,8 +124,8 @@ llama_cpp_representation <-
            tokenizer = NULL,
            numba_threads = 1,
            obj = NULL) {
-    numba <- import_numba()
-    numba$set_num_threads(n = as.integer(numba_threads))
+    # numba <- import_numba()
+    # numba$set_num_threads(n = as.integer(numba_threads))
     obj <- bertopic_representations(obj = obj)
 
     if (length(doc_length) > 0) {

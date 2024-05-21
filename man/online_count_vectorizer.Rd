@@ -4,7 +4,15 @@
 \alias{online_count_vectorizer}
 \title{An Online Vectorizer}
 \usage{
-online_count_vectorizer(decay = NULL, delete_min_df = NULL, ...)
+online_count_vectorizer(
+  decay = NULL,
+  delete_min_df = NULL,
+  stop_words = NULL,
+  numba_threads = 1,
+  use_token_parallel = F,
+  obj = NULL,
+  ...
+)
 }
 \arguments{
 \item{...}{}

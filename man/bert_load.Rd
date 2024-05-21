@@ -4,10 +4,16 @@
 \alias{bert_load}
 \title{Load BERTopic Model}
 \usage{
-bert_load(model_path = NULL, obj = NULL, embedding_model = NULL)
+bert_load(
+  model_path = NULL,
+  obj = NULL,
+  numba_threads = 1,
+  use_token_parallel = TRUE,
+  embedding_model = NULL
+)
 }
 \arguments{
-\item{embedding_model}{}
+\item{use_token_parallel}{}
 }
 \description{
 Load BERTopic Model

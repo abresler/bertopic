@@ -6,7 +6,7 @@
 \usage{
 bert_topic_hierarchy(
   obj,
-  docs,
+  docs = NULL,
   linkage_function = NULL,
   distance_function = NULL,
   tight_layout = F,

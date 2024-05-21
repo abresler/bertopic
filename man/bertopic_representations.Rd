@@ -4,10 +4,16 @@
 \alias{bertopic_representations}
 \title{Import Bertopic Representations}
 \usage{
-bertopic_representations(obj = NULL)
+bertopic_representations(
+  obj = NULL,
+  numba_threads = 1,
+  use_token_parallel = TRUE
+)
 }
 \arguments{
 \item{obj}{Bertopic Module}
+
+\item{use_token_parallel}{}
 }
 \description{
 Import Bertopic Representations

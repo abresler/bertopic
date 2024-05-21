@@ -7,7 +7,6 @@
 bert_reduce_outliers(
   obj,
   docs,
-  update_topics = TRUE,
   document_name = NULL,
   topics = NULL,
   images = NULL,
@@ -15,12 +14,11 @@ bert_reduce_outliers(
   probabilities = NULL,
   threshold = 0L,
   embeddings = NULL,
+  update_topics = TRUE,
   distributions_params = NULL
 )
 }
 \arguments{
-\item{update_topics}{If `TRUE` updates topics}
-
 \item{document_name}{if not `NULL` new name for document column}
 
 \item{topics}{The topics that correspond to the documents.  IF `NULL` pulls from bertopic object}
@@ -43,6 +41,8 @@ bert_reduce_outliers(
 \item{threshold}{The threshold for assigning topics to outlier documents. This value represents the minimum probability when `strategy="probabilities"`. For all other strategies, it represents the minimum similarity.}
 
 \item{embeddings}{The pre-computed embeddings to be used when `strategy="embeddings"`. If this is None, then it will compute the embeddings for the outlier documents.}
+
+\item{update_topics}{If `TRUE` updates topics}
 
 \item{distributions_params}{The parameters used in `.approximate_distribution` when using the strategy `"distributions"`.}
 }

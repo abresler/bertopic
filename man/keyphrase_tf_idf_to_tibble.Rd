@@ -4,7 +4,7 @@
 \alias{keyphrase_tf_idf_to_tibble}
 \title{Keyphrase TFIDF to Tibble}
 \usage{
-keyphrase_tf_idf_to_tibble(tfidf, raw_documents = docs, return_wide = T)
+keyphrase_tf_idf_to_tibble(tfidf, docs, return_wide = T)
 }
 \arguments{
 \item{return_wide}{}

@@ -45,7 +45,7 @@ import_keyphrase <-
 #' @export
 #'
 #' @examples
-#' vectorizer_model <- keyphrase_vectorizer()
+#' vectorizer_model <- keyphrase_vectorizer(pos_pattern = "<J.*>*<N.*>+")
 #' docs <- c('This is the first document.', 'This document is the second document.', 'And this is the third one.', 'Is this the first document?')
 #' vectorizer_model$fit_transform(raw_documents = docs)
 #' vectorizer_model$get_feature_names_out()
@@ -58,10 +58,10 @@ keyphrase_vectorizer <-
            exclude_stop_words = T,
            extra_stop_words = NULL,
            is_lower_case = TRUE,
-           spacy_exclude = NULL,
+           spacy_exclude = list('parser', 'attribute_ruler', 'lemmatizer', 'ner'),
            max_df = NULL,
            min_df = NULL,
-           workers = 6L,
+           workers = 1,
            pos_pattern = "<J.*>*<N.*>+",
            spacy_pipeline = "en_core_web_sm",
            custom_pos_tagger = NULL,
@@ -78,9 +78,9 @@ keyphrase_vectorizer <-
 
 
     vectorizer_model$lowercase <- is_lower_case
-    vectorizer_model$max_df <- max_df
-    vectorizer_model$min_df <- min_df
-    vectorizer_model$workers <- workers
+    vectorizer_model$max_df <- as.integer(max_df)
+    vectorizer_model$min_df <- as.integer(min_df)
+    vectorizer_model$workers <- as.integer(workers)
     vectorizer_model$spacy_pipeline <- spacy_pipeline
     vectorizer_model$pos_pattern <- pos_pattern
     vectorizer_model$spacy_exclude <- spacy_exclude
@@ -162,9 +162,9 @@ keyphrase_tf_idf <-
 
 
     vectorizer_model$lowercase <- is_lower_case
-    vectorizer_model$max_df <- max_df
-    vectorizer_model$min_df <- min_df
-    vectorizer_model$workers <- workers
+    vectorizer_model$max_df <- as.integer(max_df)
+    vectorizer_model$min_df <- as.integer(min_df)
+    vectorizer_model$workers <- as.integer(workers)
     vectorizer_model$spacy_pipeline <- spacy_pipeline
     vectorizer_model$pos_pattern <- pos_pattern
     vectorizer_model$spacy_exclude <- spacy_exclude
@@ -193,7 +193,7 @@ keyphrase_tf_idf <-
 #' Keyphrase TFIDF to Tibble
 #'
 #' @param tfidf
-#' @param raw_documents
+#' @param docs
 #' @param return_wide
 #'
 #' @return
@@ -206,19 +206,20 @@ keyphrase_tf_idf <-
 
 keyphrase_tf_idf_to_tibble <-
   function(tfidf,
-           raw_documents = docs,
+           docs,
            return_wide = T) {
     mat <- tfidf$fit_transform(raw_documents = docs)
     phrases <- tfidf$keyphrases
     mat <- as.matrix(mat)
     data <-
       as_tibble(mat) |> setNames(janitor::make_clean_names(phrases)) |>
-      mutate(number_document = 1:n()) |>
-      select(number_document, everything())
+      mutate(text = docs,
+             number_document = 1:n()) |>
+      select(number_document, text, everything())
 
     if (!return_wide) {
       data <- data |>
-        gather(phrase, score, -number_document) |>
+        gather(phrase, score, -c(number_document, text)) |>
         filter(score != 0)
     }
 

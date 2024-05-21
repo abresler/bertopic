@@ -37,7 +37,7 @@ keybert_keywords(
   highlight = F,
   decay = NULL,
   delete_min_df = NULL,
-  workers = 6L,
+  workers = 1L,
   spacy_pipeline = "en_core_web_sm",
   custom_pos_tagger = NULL
 )

@@ -136,6 +136,8 @@ tbl_unite_features <-
 #' @param model_path
 #' @param obj
 #' @param embedding_model
+#' @param numba_threads
+#' @param use_token_parallel
 #'
 #' @return
 #' @export
@@ -144,12 +146,15 @@ tbl_unite_features <-
 bert_load <-
   function(model_path = NULL,
            obj = NULL,
+           numba_threads = 1,
+           use_token_parallel = TRUE,
            embedding_model = NULL) {
     if (length(model_path) == 0) {
       stop("Enter Path")
     }
     if (length(obj) == 0) {
-      obj <- import_bertopic()
+      obj <- import_bertopic(numba_threads = numba_threads,
+                             use_token_parallel = use_token_parallel)
     }
 
     oldwd <- getwd()
@@ -410,7 +415,13 @@ bert_similar_terms_topics <-
            assign_to_environment = TRUE) {
     aspect_num_slug <-
       aspect_column |> str_extract_all("[0-9]") |> flatten_chr() |> .pad_zeros(number_zeros = 3)
-    aspect_num_slug <- aspect_num_slug[[1]]
+
+    if (length(aspect_num_slug) > 0) {
+      aspect_num_slug <- aspect_num_slug[[1]]
+    } else {
+      aspect_num_slug <- ""
+    }
+
 
     other_aspect <-
       aspect_column |> str_remove_all("^aspect") |>
@@ -655,7 +666,12 @@ bert_topic_info <-
       select(-count, everything()) |>
       select_if( ~ !any(is.na(.)))
 
-    aspect_cols <- data |> select(matches("aspect")) |> names()
+    aspect_cols <-
+      data |> select(matches("aspect")) |> names()
+
+    list_cols <-
+      data |> map(class) |> flatten_chr() %in% c("list")
+    aspect_cols <- names(data)[list_cols]
 
     if (length(aspect_cols) > 0) {
       tbl_aspect <-
@@ -747,6 +763,14 @@ bert_topic_info <-
 
     data <- data |> janitor::remove_empty(which = "cols")
 
+    names(data) <-    names(data) |> str_replace_all("\\__", "\\_") |> str_remove_all("\\_$")
+
+    if (data |> hasName("custom_name")) {
+      data <- data |>
+        rename(label_bertopic_original = label_bertopic,
+               label_bertopic = custom_name)
+    }
+
 
     data
   }
@@ -779,7 +803,8 @@ bert_topic_labels <-
       word_length <- as.integer(word_length)
     }
 
-    label_bertopic <- obj$generate_topic_labels(
+    label_bertopic <-
+      obj$generate_topic_labels(
       nr_words = as.integer(number_words),
       separator = separator,
       topic_prefix = topic_prefix,
@@ -790,7 +815,7 @@ bert_topic_labels <-
     if (length(aspect) == 0) {
       dat <-
         tibble(label_bertopic) |>
-        mutate(topic_bert = 1:n() - 2) |>
+        mutate(topic_bert = 1:n() - 1) |>
         select(topic_bert, everything()) |>
         mutate(is_outlier_bert_topic = topic_bert == -1) |>
         mutate_if(is.character, stringr::str_squish)
@@ -853,21 +878,54 @@ bert_topic_count <-
            topic_number = NULL,
            include_representative_documents = F,
            join_labels = TRUE,
+           only_label = TRUE,
            include_parameters = FALSE,
            parameter_filters = NULL) {
+
+    custom_labels <-
+      obj$custom_labels_
+
+    has_custom_labels <- length(custom_labels) > 0
+
     data <-
       obj$get_topic_freq(topic = topic_number) |>
       janitor::clean_names() |> as_tibble() |>
       rename(topic_bert = topic) |>
-      mutate(is_outlier_bert_topic = topic_bert == -1)
+      mutate(is_outlier_bert_topic = topic_bert == -1) |>
+      arrange(topic_bert)
 
     if (include_representative_documents) {
       join_labels <- T
     }
 
     if (join_labels) {
-      data <- data |>
-        left_join(obj |> bert_topic_info() |> select(1:2), by = "topic_bert")
+
+      if (!has_custom_labels) {
+        if (only_label) {
+          tbl_labels <- obj |> bert_topic_info() |> select(1:2)
+        }
+
+
+        data <-
+          data |>
+          left_join(tbl_labels, by = "topic_bert")
+      }
+
+      if (has_custom_labels) {
+        data <- data |>
+          mutate(label_bertopic = custom_labels)
+      }
+
+      if (!only_label) {
+        tbl_labels <-
+          obj |> bert_topic_info() |> select(-matches("docs$"))
+
+        data <- data |>
+          left_join(tbl_labels, by = "topic_bert")
+      }
+
+
+
     }
 
     if (include_parameters) {
@@ -895,6 +953,7 @@ bert_topic_count <-
 
     }
 
+    data <- data |> mutate_if(is.character, str_squish)
 
     data
 
@@ -984,11 +1043,17 @@ bert_representative_documents <-
 #' @examples
 bert_topic_hierarchy <-
   function(obj,
-           docs,
+           docs = NULL,
            linkage_function = NULL,
            distance_function = NULL,
            tight_layout = F,
            print_tree = FALSE) {
+
+    if (length(docs) == 0) {
+      message("No documents")
+      return(invisible())
+    }
+
     out <-
       obj$hierarchical_topics(
         docs = docs,
@@ -1403,7 +1468,6 @@ bert_merge_topics <-
 bert_reduce_outliers <-
   function(obj,
            docs,
-           update_topics = TRUE,
            document_name = NULL,
            topics = NULL,
            images = NULL,
@@ -1411,6 +1475,7 @@ bert_reduce_outliers <-
            probabilities = NULL,
            threshold = 0L,
            embeddings = NULL,
+           update_topics = TRUE,
            distributions_params = NULL) {
 
     if (length(docs) ==0) {
@@ -1487,6 +1552,7 @@ bert_reduce_outliers <-
 #' @param append_number_words Append the number of words
 #' @param update_bert_labels If `TRUE` updates actual topic labels
 #' @param update_topic_model_labels if `TRUE` updates new label into a custom field
+#' @param images
 #'
 #' @return
 #' @export
@@ -1502,6 +1568,7 @@ bert_reduce_topics <-
            word_length = NULL,
            update_topic_model_labels = TRUE,
            append_number_words = FALSE,
+           images = NULL,
            topic_prefix = FALSE) {
     if (length(number_topics) == 0) {
       "Enter number of reduced topics" |> message()
@@ -1511,7 +1578,7 @@ bert_reduce_topics <-
       "Enter Documents" |> message()
       return(obj)
     }
-    obj$reduce_topics(docs = docs, nr_topics = as.integer(number_topics))
+    obj$reduce_topics(docs = docs, nr_topics = as.integer(number_topics), images = images)
 
     if (!update_bert_labels) {
       return(obj)
@@ -1558,6 +1625,11 @@ bert_reduce_topics <-
 #' @param seed_topic_list A list of seed words per topic to converge around.  Default is `NULL`
 #' @param max_df
 #' @param vocabulary
+#' @param images
+#' @param use_empty_vectorizer
+#' @param decay
+#' @param delete_min_df
+#' @param workers
 #'
 #' @return
 #' @export
@@ -1570,6 +1642,7 @@ bert_update_topics <-
            top_n_words = 10,
            images = NULL,
            n_gram_range = list(1L, 1L),
+           use_empty_vectorizer = FALSE,
            vectorizer_model = NULL,
            ctfidf_model = NULL,
            representation_model = NULL,
@@ -1594,12 +1667,32 @@ bert_update_topics <-
       "Enter documents to fit" |> message()
       return(obj)
     }
-
     if (length(n_gram_range) > 0) {
       n_gram_range <- reticulate::tuple(n_gram_range)
     }
 
-    if (use_key_phrase_vectorizer) {
+    if (use_empty_vectorizer) {
+      "Using empty vectorizer" |> message()
+      obj$update_topics(
+        docs = docs,
+        topics = topics,
+        top_n_words = as.integer(top_n_words),
+        n_gram_range = n_gram_range,
+        vectorizer_model = NULL,
+        representation_model = representation_model,
+        ctfidf_model = ctfidf_model,
+        images = images
+      )
+      return(obj)
+    }
+
+    has_override_vectorizer <- length(vectorizer_model) > 0
+
+    if (has_override_vectorizer) {
+      override_vectorizer_model <- vectorizer_model
+    }
+
+    if (use_key_phrase_vectorizer & !has_override_vectorizer) {
       "Using keyphrase vectorizer" |> message()
       vectorizer_model <-
         keyphrase_vectorizer(
@@ -1616,7 +1709,7 @@ bert_update_topics <-
     }
 
     if (!use_key_phrase_vectorizer &
-        length(vectorizer_model) == 0) {
+        length(vectorizer_model) == 0 & !has_override_vectorizer) {
       "Using sklearn vectorizer" |> message()
       use_sklearn_vectorizer <- T
       vectorizer_model <-
@@ -1632,8 +1725,19 @@ bert_update_topics <-
     }
     uses_vectorizer <-
       use_sklearn_vectorizer |
-      use_key_phrase_vectorizer
+      use_key_phrase_vectorizer |
+      has_override_vectorizer
+
+    if (has_override_vectorizer) {
+      "Using overriden vectorizer" |> message()
+      vectorizer_model <- override_vectorizer_model
+      vectorizer_model$min_df <- as.integer(min_df)
+      vectorizer_model$max_df <- as.integer(max_df)
+      vectorizer_model$decay <- decay
+    }
+
     if (uses_vectorizer & exclude_stop_words) {
+      "Adding stopwords" |> message()
       stop_words <-
         bert_stopwords(
           language = language,
@@ -1656,8 +1760,8 @@ bert_update_topics <-
       images = images
     )
 
-    obj <-
-      set_bert_attributes(obj = obj, representation_model = representation_model)
+    # obj <-
+    #   set_bert_attributes(obj = obj, representation_model = representation_model)
 
     obj
   }
@@ -1783,6 +1887,11 @@ bert_document_info <-
     if (length(list_cols) > 0 & exclude_list_columns) {
       data <- data |>
         select(-one_of(list_cols))
+    }
+
+    if (data |> hasName("custom_name")) {
+      data <- data |>
+        rename(label_bertopic_custom = custom_name)
     }
 
     data
@@ -2332,6 +2441,10 @@ munge_bert_topics_per_class <-
 # approx_distribution -----------------------------------------------------
 
 #' Get a string representation of the current object.
+#' ¶
+#' A post-hoc approximation of topic distributions across documents.
+#'
+#' In order to perform this approximation, each document is split into tokens according to the provided tokenizer in the CountVectorizer. Then, a sliding window is applied on each document creating subsets of the document. For example, with a window size of 3 and stride of 1, the sentence:
 #'
 #' @param obj Topic Model Object
 #' @param docs Vector of Documents

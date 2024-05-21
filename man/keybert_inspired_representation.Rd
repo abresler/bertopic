@@ -8,7 +8,7 @@ keybert_inspired_representation(
   top_n_words = 10,
   nr_repr_docs = 5,
   nr_samples = 500,
-  nr_candidate_words = 10,
+  nr_candidate_words = 100,
   random_state = 42,
   numba_threads = 1,
   obj = NULL

@@ -23,9 +23,12 @@
 #' import_keybert()
 import_keybert <-
   function(assign_to_environment = T,
+           use_token_parallel = FALSE,
            path = NULL) {
     select_correct_python(path = path)
     obj <- reticulate::import("keybert")
+    os <- reticulate::import("os")
+    os$environ["TOKENIZERS_PARALLELISM"] = as.character(use_token_parallel)
     ! 'keybert' %>% exists() & assign_to_environment
     if (assign_to_environment) {
       assign('keybert', obj, envir = .GlobalEnv)
@@ -186,7 +189,7 @@ keybert_keywords <-
            highlight = F,
            decay = NULL,
            delete_min_df = NULL,
-           workers = 6L,
+           workers = 1L,
            spacy_pipeline = "en_core_web_sm",
            custom_pos_tagger = NULL
            ) {

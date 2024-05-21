@@ -4,7 +4,11 @@
 \alias{import_keybert}
 \title{Import Keybert Module}
 \usage{
-import_keybert(assign_to_environment = T, path = NULL)
+import_keybert(
+  assign_to_environment = T,
+  use_token_parallel = FALSE,
+  path = NULL
+)
 }
 \arguments{
 \item{assign_to_environment}{if `TRUE` assigns to environment}

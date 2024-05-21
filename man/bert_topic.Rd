@@ -5,6 +5,13 @@
 \title{Initiate BERT Topic Model}
 \usage{
 bert_topic(
+  obj = NULL,
+  umap_model = NULL,
+  hdbscan_model = NULL,
+  vectorizer_model = NULL,
+  embedding_model = NULL,
+  ctfidf_model = NULL,
+  nr_topics = NULL,
   language = "english",
   representation_model = NULL,
   top_n_words = 10L,
@@ -16,12 +23,6 @@ bert_topic(
   zeroshot_min_similarity = 0.7,
   keyphrase_ngram_range = list(1L, 1L),
   min_topic_size = 10L,
-  umap_model = NULL,
-  hdbscan_model = NULL,
-  vectorizer_model = NULL,
-  embedding_model = NULL,
-  ctfidf_model = NULL,
-  nr_topics = NULL,
   low_memory = F,
   exclude_stop_words = T,
   stopword_package_sources = NULL,
@@ -37,10 +38,25 @@ bert_topic(
   decay = NULL,
   delete_min_df = NULL,
   numba_threads = 1L,
+  use_token_parallel = TRUE,
   set_attributes = TRUE
 )
 }
 \arguments{
+\item{umap_model}{Pass in a UMAP model to be used instead of the default. NOTE: You can also pass in any dimensionality reduction algorithm as long as it has .fit and .transform functions.}
+
+\item{hdbscan_model}{Pass in a hdbscan.HDBSCAN model to be used instead of the default NOTE: You can also pass in any clustering algorithm as long as it has .fit and .predict functions along with the .labels_ variable. Default `NULL`}
+
+\item{vectorizer_model}{Pass in a custom CountVectorizer instead of the default model. Default `NULL`}
+
+\item{embedding_model}{type of embedding model - either an object or `NULL` options include \itemize{
+\item \href{https://www.sbert.net/docs/pretrained_models.html}{sbert}
+} and it defaults to `all-MiniLM-L6-v2`}
+
+\item{ctfidf_model}{Pass in a custom ClassTfidfTransformer instead of the default model. Default `NULL`}
+
+\item{nr_topics}{Specifying the number of topics will reduce the initial number of topics to the value specified. This reduction can take a while as each reduction in topics (-1) activates a c-TF-IDF calculation. If this is set to None, no reduction is applied. Use `auto` to automatically reduce topics using HDBSCAN.}
+
 \item{language}{The main language used in your documents. The default sentence-transformers model for "english" is all-MiniLM-L6-v2. For a full overview of supported languages see bertopic.backend.languages. Select "multilingual" to load in the paraphrase-multilingual-MiniLM-L12-v2 sentence-tranformers model that supports 50+ languages. Default `english`}
 
 \item{representation_model}{The base representation model for fine-tuning topic representations}
@@ -58,20 +74,6 @@ bert_topic(
 \item{keyphrase_ngram_range}{If not `NULL` range for keyphrase}
 
 \item{min_topic_size}{The minimum size of the topic. Increasing this value will lead to a lower number of clusters/topics. NOTE: This param will not be used if you are not using HDBSCAN. Default 10}
-
-\item{umap_model}{Pass in a UMAP model to be used instead of the default. NOTE: You can also pass in any dimensionality reduction algorithm as long as it has .fit and .transform functions.}
-
-\item{hdbscan_model}{Pass in a hdbscan.HDBSCAN model to be used instead of the default NOTE: You can also pass in any clustering algorithm as long as it has .fit and .predict functions along with the .labels_ variable. Default `NULL`}
-
-\item{vectorizer_model}{Pass in a custom CountVectorizer instead of the default model. Default `NULL`}
-
-\item{embedding_model}{type of embedding model - either an object or `NULL` options include \itemize{
-\item \href{https://www.sbert.net/docs/pretrained_models.html}{sbert}
-} and it defaults to `all-MiniLM-L6-v2`}
-
-\item{ctfidf_model}{Pass in a custom ClassTfidfTransformer instead of the default model. Default `NULL`}
-
-\item{nr_topics}{Specifying the number of topics will reduce the initial number of topics to the value specified. This reduction can take a while as each reduction in topics (-1) activates a c-TF-IDF calculation. If this is set to None, no reduction is applied. Use `auto` to automatically reduce topics using HDBSCAN.}
 
 \item{low_memory}{Sets UMAP low memory to True to make sure less memory is used. NOTE: This is only used in UMAP. For example, if you use PCA instead of UMAP this parameter will not be used. Default `FALSE`}
 
@@ -96,7 +98,7 @@ bert_topic(
 
 \item{verbose}{if `TRUE` verbose output}
 
-\item{delete_min_df}{}
+\item{use_token_parallel}{}
 }
 \value{
 python object
@@ -112,7 +114,7 @@ Functions for unsupervised clustering algorithms.
 \examples{
 import_bertopic()
 data <- sklearn::sk_datasets()
-docs_all <- data$fetch_20newsgroups(subset = 'all', remove = c('headers', 'footers', 'quotes'))
+docs_all <-  data$fetch_20newsgroups(subset = 'all', remove = reticulate::tuple('headers', 'footers', 'quotes'))
 docs <- docs_all["data"]
 tm <- bert_topic()
 topic_model <- tm$fit_transform(documents = docs)

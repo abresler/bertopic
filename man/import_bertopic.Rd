@@ -4,12 +4,18 @@
 \alias{import_bertopic}
 \title{Import Bert Topic}
 \usage{
-import_bertopic(assign_to_environment = T, path = NULL, numba_threads = 1)
+import_bertopic(
+  assign_to_environment = T,
+  path = NULL,
+  numba_threads = 1,
+  use_token_parallel = TRUE,
+  use_kmp_fork = FALSE
+)
 }
 \arguments{
 \item{assign_to_environment}{if \code{TRUE} assigns to environment}
 
-\item{numba_threads}{}
+\item{use_kmp_fork}{}
 }
 \value{
 python object

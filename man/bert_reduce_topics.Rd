@@ -14,6 +14,7 @@ bert_reduce_topics(
   word_length = NULL,
   update_topic_model_labels = TRUE,
   append_number_words = FALSE,
+  images = NULL,
   topic_prefix = FALSE
 )
 }
@@ -35,6 +36,8 @@ bert_reduce_topics(
 \item{update_topic_model_labels}{if `TRUE` updates new label into a custom field}
 
 \item{append_number_words}{Append the number of words}
+
+\item{images}{}
 
 \item{topic_prefix}{Whether to use the topic ID as a prefix. If set to True, the topic ID will be separated using the separator}
 }
