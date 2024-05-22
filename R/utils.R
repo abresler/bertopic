@@ -643,6 +643,10 @@ bert_topic_info <-
            concatenator = ".  ",
            top_n_aspect_words = NULL,
            remove_list_columns = TRUE) {
+    custom_labels <-
+      obj$custom_labels_
+
+    has_custom_labels <- length(custom_labels) > 0
     df <-
       obj$get_topic_info(topic = topic_number)
 
@@ -766,9 +770,15 @@ bert_topic_info <-
     names(data) <-    names(data) |> str_replace_all("\\__", "\\_") |> str_remove_all("\\_$")
 
     if (data |> hasName("custom_name")) {
+      data <-
+        data |>
+        rename(label_bertopic_original = label_bertopic) |>
+        select(-custom_name)
+    }
+
+    if (has_custom_labels) {
       data <- data |>
-        rename(label_bertopic_original = label_bertopic,
-               label_bertopic = custom_name)
+        mutate(label_bertopic = custom_labels, .after = "topic_bert")
     }
 
 
