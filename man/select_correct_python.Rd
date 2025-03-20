@@ -4,7 +4,7 @@
 \alias{select_correct_python}
 \title{Select Correct Python}
 \usage{
-select_correct_python(path = "/usr/local/bin/python3")
+select_correct_python(path = "/opt/anaconda3/bin/python")
 }
 \arguments{
 \item{path}{}
