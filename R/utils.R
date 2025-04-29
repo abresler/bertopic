@@ -312,7 +312,7 @@ bert_stopwords <-
 #'
 #' @examples
 select_correct_python <-
-  function(path = "/opt/anaconda3/bin/python") {
+  function(path = "/opt/miniconda3//bin/python") {
     if (length(path) == 0) {
       return(invisible())
     }

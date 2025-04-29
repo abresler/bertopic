@@ -1,0 +1,17 @@
+{
+    "editor.unicodeHighlight.nonBasicASCII": true,
+    "workbench.externalBrowser": "brave",
+    "open-in-browser.default": "brave",
+    "python.REPL.enableREPLSmartSend": false,
+    "workbench.editor.autoLockGroups": {
+        "workbench.editor.chatSession": false
+    },
+    "workbench.commandPalette.experimental.askChatLocation": "quickChat",
+    "chat.agent.enabled": true,
+    "chat.commandCenter.enabled": true,
+    "chat.detectParticipant.enabled": true,
+    "chat.edits2.enabled": true,
+    "chat.extensionTools.enabled": false,
+    "chat.focusWindowOnConfirmation": false,
+    "chat.mcp.discovery.enabled": true
+}

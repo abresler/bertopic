@@ -14,7 +14,11 @@ topics, probs = topic_model.fit_transform(docs)
 topic_model.get_topic_info()
 
 topic_model.get_topic(0)
+viz = topic_model.visualize_topics()
+viz.write_html
 
 #' https://maartengr.github.io/BERTopic/getting_started/quickstart/quickstart.html
 
 vectorizer_model = CountVectorizer(ngram_range=(1, 2), stop_words="english")
+
+topic_model.visualize_document_datamap(docs, reduced_embeddings=reduced_embeddings, interactive=True)

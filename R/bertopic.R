@@ -616,7 +616,8 @@ bert_topic <-
     }
 
     if (!use_key_phrase_vectorizer &
-        length(vectorizer_model) == 0 & use_sklearn_vectorizer & !has_override_vectorizer) {
+        length(vectorizer_model) == 0 &
+        use_sklearn_vectorizer & !has_override_vectorizer) {
       "Using sklearn vectorizer" |> message()
       vectorizer_model <-
         sklearn_vectorizer(
@@ -967,8 +968,13 @@ bert_transform <-
 #'
 #' @examples
 bert_partial_fit <-
-  function(obj, documents, embeddings = NULL, y = NULL) {
-    obj <- obj$partial_fit(documents = documents, embeddings = embeddings, y = y)
+  function(obj,
+           documents,
+           embeddings = NULL,
+           y = NULL) {
+    obj <- obj$partial_fit(documents = documents,
+                           embeddings = embeddings,
+                           y = y)
 
     obj
   }
