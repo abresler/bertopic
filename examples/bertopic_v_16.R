@@ -15,7 +15,11 @@ all_docs <- dataset$train[["abstract"]]
 
 docs = all_docs[1:5000]
 
-zeroshot_topic_list <- list("Clustering", "Topic Modeling", "Large Language Models")
+zeroshot_topic_list <- list(
+  "Clustering",
+  "Topic Modeling",
+  "Large Language Models"
+)
 zeroshot_topic_list <- NULL
 
 # basic -------------------------------------------------------------------
@@ -25,7 +29,9 @@ topic_model_base <- bertopic$BERTopic(
   min_topic_size = 15L,
   zeroshot_topic_list = zeroshot_topic_list,
   zeroshot_min_similarity = .85,
-  representation_model = keybert_inspired_representation(nr_candidate_words = 100L),
+  representation_model = keybert_inspired_representation(
+    nr_candidate_words = 100L
+  ),
   verbose = TRUE
 )
 
@@ -39,9 +45,10 @@ tbl_count <-
 
 topic_model_base$update_topics(docs = docs, top_n_words = 5L, )
 
-topic_model_base |> bert_topic_info()
-topic_model_base |> bert_topic_keywords()
-topic_model_base |> bert_similar_terms_topics(terms = "Topological Data Analysis")
+topic_model_base |> bert_topic_info() |> View()
+topic_model_base |> bert_topic_keywords() |> View()
+topic_model_base |>
+  bert_similar_terms_topics(terms = "Topological Data Analysis")
 
 
 # pkg ---------------------------------------------------------------------
@@ -51,7 +58,9 @@ topic_model <- bert_topic(
   min_topic_size = 15L,
   zeroshot_topic_list = zeroshot_topic_list,
   zeroshot_min_similarity = .85,
-  representation_model = bertopic::keybert_inspired_representation(nr_candidate_words = 100L),
+  representation_model = bertopic::keybert_inspired_representation(
+    nr_candidate_words = 100L
+  ),
   verbose = TRUE
 )
 
@@ -61,7 +70,6 @@ out_pkg <- topic_model$fit_transform(documents = docs)
 topic_model |> bert_topic_info()
 topic_model |> bert_topic_keywords()
 topic_model |> bert_similar_terms_topics(terms = "Topological Data Analysis")
-
 
 
 # try_langchain -----------------------------------------------------------
@@ -74,7 +82,10 @@ OpenAI <- lc$llms$openai$OpenAI
 
 chain <-
   load_qa_chain(
-    OpenAI(temperature = 0, openai_api_key = "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"),
+    OpenAI(
+      temperature = 0,
+      openai_api_key = "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"
+    ),
     chain_type = "stuff"
   )
 bert_rep <- bertopic_representations()
@@ -91,7 +102,6 @@ topic_model <- bert_topic(
 )
 
 out <- topic_model$fit_transform(documents = docs |> sample(1000))
-
 
 # llama -------------------------------------------------------------------
 
