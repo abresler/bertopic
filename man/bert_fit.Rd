@@ -4,7 +4,7 @@
 \alias{bert_fit}
 \title{BERTopic Fit}
 \usage{
-bert_fit(obj, documents, embeddings = NULL, y = NULL, images = images)
+bert_fit(obj, documents, embeddings = NULL, y = NULL, images = NULL)
 }
 \arguments{
 \item{obj}{BERTopic Object}
@@ -14,6 +14,8 @@ bert_fit(obj, documents, embeddings = NULL, y = NULL, images = images)
 \item{embeddings}{If not `NULL` Pre-trained document embeddings. These can be used instead of the sentence-transformer model.}
 
 \item{y}{If Not `NULL` The target class for (semi)-supervised modeling. Use -1 if no class for a specific instance is specified.}
+
+\item{images}{A list of paths to the images to fit on or the images themselves}
 }
 \description{
 Fit the models (Bert, UMAP, and, HDBSCAN) on a collection of documents and generate topics

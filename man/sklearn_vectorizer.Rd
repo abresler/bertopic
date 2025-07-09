@@ -23,17 +23,21 @@ sklearn_vectorizer(
 )
 }
 \arguments{
-\item{ngram_range}{list The lower and upper boundary of the range of n-values for different word n-grams or char n-grams to be extracted. All values of n such such that min_n <= n <= max_n will be used. For example an ngram_range of (1, 1) means only unigrams, (1, 2) means unigrams and bigrams, and (2, 2) means only bigrams. Only applies if analyzer is not callab}
+\item{obj}{sklearn library object}
 
-\item{analyzer}{Remove accents and perform other character normalization during the preprocessing step. ‘ascii’ is a fast method that only works on characters that have a direct ASCII mapping. ‘unicode’ is a slightly slower method that works on any characters. None (default) does nothing.}
+\item{ngram_range}{`list` The lower and upper boundary of the range of n-values for different word n-grams or char n-grams to be extracted. All values of n such such that min_n <= n <= max_n will be used. For example an ngram_range of (1, 1) means only unigrams, (1, 2) means unigrams and bigrams, and (2, 2) means only bigrams. Only applies if analyzer is not callable.}
 
-\item{exclude_stop_words}{if `TRUE` excludes stopwords}
+\item{analyzer}{`{‘word’, ‘char’, ‘char_wb’} or callable, default=’word’` Whether the feature should be made of word n-gram or character n-grams. Option ‘char_wb’ creates character n-grams only from text inside word boundaries; n-grams at the edges of words are padded with space. If a callable is passed it is used to extract the sequence of features out of the raw, unprocessed input.}
 
-\item{extra_stop_words}{if `TRUE` other stopwords to exclude}
+\item{strip_accents}{`{‘ascii’, ‘unicode’} or callable, default=None`  Remove accents and perform other character normalization during the preprocessing step. ‘ascii’ is a fast method that only works on characters that have a direct ASCII mapping. ‘unicode’ is a slightly slower method that works on any characters. None (default) means no character normalization is performed.`}
+
+\item{exclude_stop_words}{if `TRUE` excludes stopwords.  Default is `TRUE`}
+
+\item{extra_stop_words}{Vector of extra stop wwords}
 
 \item{token_pattern}{Regular expression denoting what constitutes a “token”, only used if analyzer == 'word'. The default regexp select tokens of 2 or more alphanumeric characters (punctuation is completely ignored and always treated as a token separator).}
 
-\item{vocabulary}{}
+\item{vocabulary}{Either a Mapping (e.g., a dict) where keys are terms and values are indices in the feature matrix, or an iterable over terms. If not given, a vocabulary is determined from the input documents. Indices in the mapping should not be repeated and should not have any gap between 0 and the largest index.}
 
 \item{is_lower_case}{if `TRUE` all to lower case}
 

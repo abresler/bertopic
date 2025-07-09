@@ -4,7 +4,7 @@
 \alias{bert_transform}
 \title{BERTopic Transform}
 \usage{
-bert_transform(obj, documents, embeddings = NULL)
+bert_transform(obj, documents, embeddings = NULL, images = NULL)
 }
 \arguments{
 \item{obj}{BERTopic Object}
@@ -12,6 +12,8 @@ bert_transform(obj, documents, embeddings = NULL)
 \item{documents}{A single document or a list of documents to fit on}
 
 \item{embeddings}{If not `NULL` Pre-trained document embeddings. These can be used instead of the sentence-transformer model.}
+
+\item{images}{A list of paths to the images to predict on or the images themselves}
 }
 \description{
 After having fit a model, use transform to predict new instances

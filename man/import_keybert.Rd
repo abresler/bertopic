@@ -6,7 +6,7 @@
 \usage{
 import_keybert(
   assign_to_environment = T,
-  use_token_parallel = FALSE,
+  use_token_parallel = TRUE,
   path = NULL
 )
 }

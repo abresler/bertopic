@@ -381,8 +381,8 @@ import_bertopic <-
            use_token_parallel = TRUE,
            use_kmp_fork = FALSE) {
     select_correct_python(path = path)
-    numba <- import_numba()
-    numba$set_num_threads(as.integer(numba_threads))
+    # numba <- import_numba()
+    # numba$set_num_threads(as.integer(numba_threads))
     obj <- reticulate::import("bertopic")
     os <- reticulate::import("os")
     os$environ["TOKENIZERS_PARALLELISM"] = as.character(use_token_parallel)
@@ -599,7 +599,7 @@ bert_topic <-
       override_vectorizer_model <- vectorizer_model
     }
 
-    if (use_key_phrase_vectorizer | !has_override_vectorizer) {
+    if (use_key_phrase_vectorizer) {
       "Using keyphrase vectorizer" |> message()
       vectorizer_model <-
         keyphrase_vectorizer(
@@ -944,14 +944,15 @@ tbl_bert_attributes <-
 #' @param obj BERTopic Object
 #' @param documents  A single document or a list of documents to fit on
 #' @param embeddings If not `NULL` Pre-trained document embeddings. These can be used instead of the sentence-transformer model.
+#' @param images A list of paths to the images to predict on or the images themselves
 #'
 #' @return
 #' @export
 #'
 #' @examples
 bert_transform <-
-  function(obj, documents, embeddings = NULL) {
-    obj <- obj$transform(documents = documents, embeddings = embeddings)
+  function(obj, documents, embeddings = NULL, images = NULL) {
+    obj <- obj$transform(documents = documents, embeddings = embeddings, images = images)
 
     obj
   }
@@ -987,6 +988,7 @@ bert_partial_fit <-
 #' @param documents  A single document or a list of documents to fit on
 #' @param embeddings If not `NULL` Pre-trained document embeddings. These can be used instead of the sentence-transformer model.
 #' @param y If Not `NULL` The target class for (semi)-supervised modeling. Use -1 if no class for a specific instance is specified.
+#' @param images  A list of paths to the images to fit on or the images themselves
 #'
 #' @return
 #' @export
@@ -997,7 +999,7 @@ bert_fit <-
            documents,
            embeddings = NULL,
            y = NULL,
-           images = images) {
+           images = NULL) {
     out <-
       obj$fit(
         documents = documents,

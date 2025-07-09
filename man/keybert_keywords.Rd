@@ -26,11 +26,12 @@ keybert_keywords(
   doc_embeddings = NULL,
   word_embeddings = NULL,
   candidates = NULL,
+  threshold = NULL,
   use_yake_candidates = F,
   language = "english",
   is_lower_case = T,
-  min_df = 1L,
-  max_df = 1L,
+  min_df = 1,
+  max_df = 1,
   pos_pattern = "<J.*>*<N.*>+",
   use_maxsum = FALSE,
   vocabulary = NULL,
@@ -43,7 +44,7 @@ keybert_keywords(
 )
 }
 \arguments{
-\item{docs}{The document(s) for which to extract keywords/keyphrases}
+\item{docs}{The document(s) for which to extract keywords/keyphrases.   This is simply your text! It's the document (or a list of documents) from which you want to extract keywords.}
 
 \item{obj}{Keybert Object}
 
@@ -57,27 +58,27 @@ keybert_keywords(
 
 \item{assign_to_environment}{if `TRUE` assigns objec to environment}
 
-\item{keyphrase_ngram_range}{Length, in words, of the extracted keywords/keyphrases. NOTE: This is not used if you passed a vectorizer.}
+\item{keyphrase_ngram_range}{Length, in words, of the extracted keywords/keyphrases. NOTE: This is not used if you passed a vectorizer.  This tells KeyBERT how long the keywords should be in terms of the number of words.}
 
 \item{use_embeddings}{if `TRUE` uses embeddings}
 
 \item{use_key_phrase_vectorizer}{if `TRUE` uses kephrase vectorizer}
 
-\item{top_n_words}{Number of top words to return}
+\item{top_n_words}{Number of top words to return.  This is simply "how many of the best keywords do you want me to give you?" If you set it to 5, you'll get the top 5 most relevant keywords. If 10, you get the top 10.}
 
-\item{use_mmr}{if `TRUE` Calculate Maximal Marginal Relevance (MMR) between candidate keywords and the document. and default is `TRUE`}
+\item{use_mmr}{if `TRUE` Calculate Maximal Marginal Relevance (MMR) between candidate keywords and the document. and default is `TRUE`.  Stands for Maximal Marginal Relevance. Similar to use_maxsum, this also tries to give you a diverse set of keywords. It works by picking keywords that are relevant to the document but also different from the keywords already selected.}
 
-\item{diversity}{How diverse the select keywords/keyphrases are. Values between 0 and 1 with 0 being not diverse at all and 1 being most diverse. Default is `0.5`}
+\item{diversity}{How diverse the select keywords/keyphrases are. Values between 0 and 1 with 0 being not diverse at all and 1 being most diverse. Default is `0.5`.  : Only used if use_mmr is True. This number (between 0 and 1) controls how much diversity you want.  A higher number (e.g., 0.7-0.9) means you want keywords that are more different from each other, even if they are slightly less relevant to the overall document.  A lower number (e.g., 0.1-0.3) means you prioritize relevance more, and diversity less.}
 
-\item{nr_candidates}{The number of candidates to consider default `20L`}
+\item{nr_candidates}{The number of candidates to consider default `20L`.  When use_maxsum or use_mmr is active (for diversity), KeyBERT first considers a larger pool of potential keywords (this many) and then selects the final top_n diverse set from this pool.}
 
-\item{seed_keywords}{Seed keywords that may guide the extraction of keywords by steering the similarities towards the seeded keywords. Default `NULL`}
+\item{seed_keywords}{Seed keywords that may guide the extraction of keywords by steering the similarities towards the seeded keywords. Default `NULL`. : If you have some specific words or topics you are particularly interested in, you can list them here. KeyBERT will then try to find keywords in your document that are semantically related or similar in meaning to these "seed" words. It's like giving KeyBERT a hint about what kind of keywords to look for.}
 
-\item{doc_embeddings}{The embeddings of each document. Default `NULL`}
+\item{doc_embeddings}{The embeddings of each document. Default `NULL`.   KeyBERT works by turning your document and candidate keywords into lists of numbers (called "embeddings") to compare them. If you've already done this conversion for your main document(s) using the same method KeyBERT would use, you can provide those numbers here.}
 
-\item{word_embeddings}{Word embeddings to use if not `NULL`}
+\item{word_embeddings}{Word embeddings to use if not `NULL`.   Similar to doc_embeddings, but for the candidate keywords. If you have pre-computed the numerical representations (embeddings) for your candidate keywords (either those you provided with candidates or those KeyBERT might generate), you can pass them here.}
 
-\item{candidates}{Candidate keywords/keyphrases to use instead of extracting them from the document(s) NOTE: This is not used if you passed a vectorizer.}
+\item{candidates}{Candidate keywords/keyphrases to use instead of extracting them from the document(s) NOTE: This is not used if you passed a vectorizer.  If you already have a specific list of words or phrases you think might be keywords, you can give that list to KeyBERT here. KeyBERT will then only choose the best keywords from your provided list that are relevant to your document.}
 
 \item{use_yake_candidates}{if `TRUE` uses Yake Keyword Extractor.  Default  `FALSE`}
 
@@ -85,13 +86,13 @@ keybert_keywords(
 
 \item{is_lower_case}{if  `TRUE` lower cases}
 
-\item{min_df}{Minimum document frequency of a word across all documents if keywords for multiple documents need to be extracted. NOTE: This is not used if you passed a vectorizer.}
+\item{min_df}{Minimum document frequency of a word across all documents if keywords for multiple documents need to be extracted. NOTE: This is not used if you passed a vectorizer.  (Mostly relevant when KeyBERT generates candidates itself and you're processing multiple documents). "A word must appear in at least this many documents to even be considered as a candidate keyword." If you're processing just one document, this usually doesn't have much effect unless set higher than 1 (which would mean no words are considered).}
 
 \item{max_df}{Maximum number of documents.  Default `1`}
 
 \item{pos_pattern}{KeyphraseVectorizers extracts the part-of-speech tags from the documents and then applies a regex pattern to extract keyphrases that fit within that pattern. The default pattern is <J.*>*<N.*>+ which means that it extract keyphrases that have 0 or more adjectives followed by 1 or more nouns.}
 
-\item{use_maxsum}{if `TRUE` Calculate Max Sum Distance for extraction of keywords We take the 2 x top_n most similar words/phrases to the document. Then, we take all top_n combinations from the 2 x top_n words and extract the combination that are the least similar to each other by cosine similarity. This is O(n^2) and therefore not advised if you use a large top_n.}
+\item{use_maxsum}{if `TRUE` Calculate Max Sum Distance for extraction of keywords We take the 2 x top_n most similar words/phrases to the document. Then, we take all top_n combinations from the 2 x top_n words and extract the combination that are the least similar to each other by cosine similarity. This is O(n^2) and therefore not advised if you use a large top_n.  If set to True, KeyBERT tries to pick keywords that are not too similar to each other. It aims for a diverse set of keywords that cover different aspects of your document, rather than picking several keywords that mean almost the same thing.}
 
 \item{vocabulary}{`SKLearn` vocabulary}
 
@@ -108,8 +109,8 @@ Keybert Keywords
 \examples{
  doc <- "Sources tell us that Google is acquiring Kaggle, a platform that hosts data science and machine learning competitions. Details about the transaction remain somewhat vague, but given that Google is hosting its Cloud Next conference in San Francisco this week, the official announcement could come as early as tomorrow. Reached by phone, Kaggle co-founder CEO Anthony Goldbloom declined to deny that the acquisition is happening. Google itself declined 'to comment on rumors'. Kaggle, which has about half a million data scientists on its platform, was founded by Goldbloom  and Ben Hamner in 2010. The service got an early start and even though it has a few competitors like DrivenData, TopCoder and HackerRank, it has managed to stay well ahead of them by focusing on its specific niche. The service is basically the de facto home for running data science and machine learning competitions. With Kaggle, Google is buying one of the largest and most active communities for data scientists - and with that, it will get increased mindshare in this community, too (though it already has plenty of that thanks to Tensorflow and other projects). Kaggle has a bit of a history with Google, too, but that's pretty recent. Earlier this month, Google and Kaggle teamed up to host a $100,000 machine learning competition around classifying YouTube videos. That competition had some deep integrations with the Google Cloud Platform, too. Our understanding is that Google will keep the service running - likely under its current name. While the acquisition is probably more about Kaggle's community than technology, Kaggle did build some interesting tools for hosting its competition and 'kernels', too. On Kaggle, kernels are basically the source code for analyzing data sets and developers can share this code on the platform (the company previously called them 'scripts'). Like similar competition-centric sites, Kaggle also runs a job board, too. It's unclear what Google will do with that part of the service. According to Crunchbase, Kaggle raised $12.5 million (though PitchBook says it's $12.75) since its   launch in 2010. Investors in Kaggle include Index Ventures, SV Angel, Max Levchin, Naval Ravikant, Google chief economist Hal Varian, Khosla Ventures and Yuri Milner."
 
-keybert_keywords(docs = doc, top_n_words = 10)
-keybert_keywords(docs = doc, top_n_words = 10, return_message = T)
+keybert_keywords(docs = doc, top_n_words = 10, use_key_phrase_vectorizer = TRUE)
+keybert_keywords(docs = doc, top_n_words = 10, use_key_phrase_vectorizer = FALSE)
 keybert_keywords(docs = doc, top_n_words = 10, pos_pattern='<N.*>') # only nouns
 doc_sample <-  "Supervised learning is the machine learning task of learning a function that maps an input to an output based on example input-output pairs. It infers a function from labeled training data consisting of a set of training examples. In supervised learning, each example is a pair consisting of an input object (typically a vector) and a desired output value (also called the supervisory signal). A supervised learning algorithm analyzes the training data and produces an inferred function, which can be used for mapping new examples. An optimal scenario will allow for the algorithm to correctly determine the class labels for unseen instances. This requires the learning algorithm to generalize from the training data to unseen situations in a 'reasonable' way (see inductive bias)."
 

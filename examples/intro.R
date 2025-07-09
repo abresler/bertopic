@@ -19,32 +19,29 @@ data <- sklearn::sk_datasets()
 # example_01 --------------------------------------------------------------
 
 
-docs <-
-  data$fetch_20newsgroups(subset = 'all',
-                          remove = c('headers', 'footers', 'quotes'))
-docs <- docs["data"]
+docs_all <-  data$fetch_20newsgroups(subset = 'all', remove = reticulate::tuple('headers', 'footers', 'quotes'))
+docs <- docs_all["data"]
 
 # fit ---------------------------------------------------------------------
 
 tm <-
   bert_topic(
     verbose = T,
-    embedding_model = sentence_transformer(), # try  distilbert_embedding_transformer - e
+    embedding_model = sentence_transformer(),
+    # try  distilbert_embedding_transformer - e
     low_memory = T
   )
 
 
-topic_model <- tm$fit_transform(documents = docs |> sample(10))
+topic_model <- tm$fit_transform(documents = docs)
 
 # Embeddings
 embeddings <-
   tm$embedding_model$embed(documents = docs, verbose = T)
 
 
-
-
 test_term <-
-  bert_similar_terms_topics(obj = tm, terms = "crime", 10)
+  bert_similar_terms_topics(obj = tm, terms = "homosexual", 10)
 
 
 # topic_info --------------------------------------------------------------
@@ -57,11 +54,10 @@ bert_topic_count(obj = tm)
 
 # topics ------------------------------------------------------------------
 
-bert_similar_terms_topics(obj = tm,
-                          terms = c("iran", "israel", "sex")) |> group_by(term) |> slice_max(score, n = 3)
+bert_similar_terms_topics(obj = tm, terms = c("iran", "israel", "sex")) |> group_by(term) |> slice_max(score_c_tfidf, n = 3)
 
 
-tm$visualize_barchart()
+tm$visualize_barchart() |> write_bert_viz()
 
 viz <-
   tm$visualize_documents(

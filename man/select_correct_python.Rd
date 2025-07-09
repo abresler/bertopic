@@ -4,7 +4,7 @@
 \alias{select_correct_python}
 \title{Select Correct Python}
 \usage{
-select_correct_python(path = "/opt/miniconda3//bin/python")
+select_correct_python(path = "/opt/miniconda3/bin/python3.12")
 }
 \arguments{
 \item{path}{}
