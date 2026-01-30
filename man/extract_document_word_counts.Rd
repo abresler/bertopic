@@ -7,8 +7,23 @@
 extract_document_word_counts(obj, docs = NULL, filter_zero = T)
 }
 \arguments{
-\item{filter_zero}{}
+\item{obj}{BERTopic model object with vectorizer_model.}
+
+\item{docs}{Character vector of documents.}
+
+\item{filter_zero}{Logical. If TRUE, filters out zero counts. Default TRUE.}
+}
+\value{
+A tibble with document number, word, and count columns.
 }
 \description{
-Extract Document Word Coutns
+Extract Document Word Counts
+}
+\details{
+Extract word counts from documents using the vectorizer model.
+}
+\examples{
+\dontrun{
+word_counts <- extract_document_word_counts(tm, docs)
+}
 }

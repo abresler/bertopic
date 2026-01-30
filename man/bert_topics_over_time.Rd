@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{bert_topics_over_time}
 \alias{bert_topics_over_time}
-\title{Extract Topcis Over Time}
+\title{Extract Topics Over Time}
 \usage{
 bert_topics_over_time(
   obj,
@@ -16,8 +16,30 @@ bert_topics_over_time(
 )
 }
 \arguments{
-\item{return_tibble}{}
+\item{obj}{BERTopic model object.}
+
+\item{docs}{Character vector of documents.}
+
+\item{timestamps}{Vector of timestamps corresponding to documents.}
+
+\item{nr_bins}{Integer. Number of time bins. Default NULL.}
+
+\item{datetime_format}{Character. Format string for datetime. Default NULL.}
+
+\item{evolution_tuning}{Logical. Enable evolution tuning. Default TRUE.}
+
+\item{global_tuning}{Logical. Enable global tuning. Default TRUE.}
+
+\item{return_tibble}{Logical. Return as tibble. Default TRUE.}
+}
+\value{
+Topics over time data, as tibble if return_tibble is TRUE.
 }
 \description{
-Extract Topcis Over Time
+Analyze how topics change over time using timestamps.
+}
+\examples{
+\dontrun{
+topics_time <- bert_topics_over_time(tm, docs, timestamps)
+}
 }

@@ -7,8 +7,18 @@
 import_yake(assign_to_environment = T, path = NULL)
 }
 \arguments{
-\item{path}{}
+\item{assign_to_environment}{Logical. If TRUE, assigns the yake module to the global environment. Default TRUE.}
+
+\item{path}{Optional path to Python executable. If NULL, uses default Python.}
+}
+\value{
+A Python yake module object.
 }
 \description{
-Import yake
+Imports the YAKE (Yet Another Keyword Extractor) Python module via reticulate.
+}
+\examples{
+\dontrun{
+yake <- import_yake()
+}
 }

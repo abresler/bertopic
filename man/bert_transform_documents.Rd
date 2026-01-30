@@ -7,12 +7,21 @@
 bert_transform_documents(obj, documents = NULL, embeddings = NULL)
 }
 \arguments{
-\item{obj}{bertopic objects}
+\item{obj}{BERTopic model object.}
 
-\item{documents}{vector of documents}
+\item{documents}{Character vector of documents to transform.}
 
-\item{embeddings}{if not `NULL` matrix or dataframe of embeddings}
+\item{embeddings}{If not NULL, matrix or dataframe of pre-computed embeddings.}
+}
+\value{
+A tibble with topic assignments and info for each document.
 }
 \description{
-Transform New Documents
+Transform new documents using an existing BERTopic model to predict topics.
+}
+\examples{
+\dontrun{
+new_docs <- c("New document about machine learning")
+results <- bert_transform_documents(obj = tm, documents = new_docs)
+}
 }

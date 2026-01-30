@@ -7,8 +7,20 @@
 munge_bert_topics_per_class(data, class_name = NULL, topic_model = NULL)
 }
 \arguments{
-\item{topic_model}{}
+\item{data}{Output from bert_topic_per_class function.}
+
+\item{class_name}{Optional character. Custom name for the class column.}
+
+\item{topic_model}{Optional BERTopic model to add topic labels.}
+}
+\value{
+A tibble with cleaned topics per class data.
 }
 \description{
-Munge Topics Per Class Output
+Transform topics per class output into a tidy tibble format.
+}
+\examples{
+\dontrun{
+tidy_class <- munge_bert_topics_per_class(class_data, "category", tm)
+}
 }

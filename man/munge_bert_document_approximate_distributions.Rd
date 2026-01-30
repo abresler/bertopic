@@ -2,17 +2,26 @@
 % Please edit documentation in R/utils.R
 \name{munge_bert_document_approximate_distributions}
 \alias{munge_bert_document_approximate_distributions}
-\title{Munge Document Topic Proability Distributions}
+\title{Munge Document Topic Probability Distributions}
 \usage{
 munge_bert_document_approximate_distributions(out, obj = NULL, return_wide = F)
 }
 \arguments{
-\item{out}{Approximate Distribution Output}
+\item{out}{Approximate Distribution Output from bert_approximate_distribution.}
 
-\item{obj}{Bertopic Object}
+\item{obj}{Bertopic Object. If provided, adds topic labels to output.}
 
-\item{return_wide}{}
+\item{return_wide}{Logical. If TRUE, returns wide format. Default FALSE.}
+}
+\value{
+A tibble with document topic probability distributions in long or wide format.
 }
 \description{
-Munge Document Topic Proability Distributions
+Transforms approximate distribution output into a tidy tibble format.
+}
+\examples{
+\dontrun{
+distributions <- bert_approximate_distribution(obj = tm, docs = docs)
+tidy_dist <- munge_bert_document_approximate_distributions(distributions, obj = tm)
+}
 }

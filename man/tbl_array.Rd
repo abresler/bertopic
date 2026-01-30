@@ -2,17 +2,26 @@
 % Please edit documentation in R/utils.R
 \name{tbl_array}
 \alias{tbl_array}
-\title{Covert Arry to Tibble}
+\title{Convert Array to Tibble}
 \usage{
 tbl_array(data, output_type = NULL, number_zeros = 3)
 }
 \arguments{
-\item{data}{a matrix or array}
+\item{data}{A matrix or array to convert.}
 
-\item{output_type}{output type for columns}
+\item{output_type}{Output type prefix for columns. If NULL, uses default names.}
 
-\item{number_zeros}{padding for zeros.  Default `3`}
+\item{number_zeros}{Padding for zeros in column names. Default 3.}
+}
+\value{
+A tibble with the converted array data.
 }
 \description{
-Covert Arry to Tibble
+Convert a matrix or array to a tibble with optional column naming.
+}
+\examples{
+\dontrun{
+mat <- matrix(1:6, nrow = 2)
+tbl <- tbl_array(mat, output_type = "col")
+}
 }

@@ -7,8 +7,23 @@
 write_bert_viz(viz, base_path = NULL, viz_name = NULL, browse_url = T)
 }
 \arguments{
-\item{browse_url}{}
+\item{viz}{A BERTopic visualization object.}
+
+\item{base_path}{Base directory path for output. If NULL, shows in browser.}
+
+\item{viz_name}{Name for the visualization folder.}
+
+\item{browse_url}{Logical. If TRUE, opens in browser after writing. Default TRUE.}
+}
+\value{
+Invisible NULL. Side effect: writes HTML file.
 }
 \description{
-Write a BERT Visualization
+Write a BERTopic visualization to HTML file.
+}
+\examples{
+\dontrun{
+viz <- tm$visualize_topics()
+write_bert_viz(viz, "~/visualizations", "topics")
+}
 }

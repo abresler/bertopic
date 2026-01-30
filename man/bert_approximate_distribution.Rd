@@ -40,6 +40,14 @@ bert_approximate_distribution(
 
 \item{separator}{The separator used to merge tokens into tokensets.}
 }
+\value{
+A list containing approximate topic distributions for documents.
+}
 \description{
 In order to perform this approximation, each document is split into tokens according to the provided tokenizer in the CountVectorizer. Then, a sliding window is applied on each document creating subsets of the document. For example, with a window size of 3 and stride of 1, the sentence:
+}
+\examples{
+\dontrun{
+distributions <- bert_approximate_distribution(obj = tm, docs = documents)
+}
 }

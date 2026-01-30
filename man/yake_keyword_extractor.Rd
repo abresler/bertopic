@@ -19,8 +19,39 @@ yake_keyword_extractor(
 )
 }
 \arguments{
-\item{window_size}{}
+\item{docs}{Character vector of documents to extract keywords from. If NULL, returns the KeywordExtractor object.}
+
+\item{obj}{Optional yake module object. If NULL, imports yake automatically.}
+
+\item{text_column}{Optional name to rename the text column in output.}
+
+\item{top_features}{Integer. Number of top keywords to extract per document. Default 10.}
+
+\item{language}{Character. Language of the documents. Default "english".}
+
+\item{assign_to_environment}{Logical. If TRUE, assigns the KeywordExtractor to global environment. Default TRUE.}
+
+\item{max_ngram_size}{Integer. Maximum n-gram size for keywords. Default 2.}
+
+\item{deduplication_thresold}{Numeric. Threshold for deduplication (0-1). Default 0.9.}
+
+\item{deduplication_algo}{Character. Deduplication algorithm. Default "seqm".}
+
+\item{return_summary}{Logical. If TRUE, returns summarized keywords per document. Default TRUE.}
+
+\item{window_size}{Integer. Window size for keyword extraction. Default 1.}
+}
+\value{
+A tibble with extracted keywords per document, or a KeywordExtractor object if docs is NULL.
 }
 \description{
-Yake Keyword Extractor
+Extract keywords from documents using YAKE (Yet Another Keyword Extractor).
+}
+\examples{
+\dontrun{
+# Extract keywords from documents
+docs <- c("Machine learning is a subset of artificial intelligence.",
+          "Natural language processing enables text analysis.")
+keywords <- yake_keyword_extractor(docs = docs, top_features = 5)
+}
 }

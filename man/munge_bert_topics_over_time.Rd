@@ -7,8 +7,18 @@
 munge_bert_topics_over_time(data, topic_model = NULL)
 }
 \arguments{
-\item{topic_model}{}
+\item{data}{Output from bert_topics_over_time function.}
+
+\item{topic_model}{Optional BERTopic model to add topic labels.}
+}
+\value{
+A tibble with cleaned topics over time data.
 }
 \description{
-Munge Topic Over Time
+Transform topics over time output into a tidy tibble format.
+}
+\examples{
+\dontrun{
+tidy_time <- munge_bert_topics_over_time(topics_time_data, tm)
+}
 }

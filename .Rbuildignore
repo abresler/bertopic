@@ -11,3 +11,9 @@ dev$
 ^dev/
 ^inst/
 ^examples/
+^\.DS_Store$
+^CLAUDE\.md$
+^CLEANUP_MANIFEST\.json$
+^\.vscode/
+^\.gitignore$
+^\.github/

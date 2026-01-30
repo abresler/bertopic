@@ -2,7 +2,8 @@
 % Please edit documentation in R/utils.R
 \name{tbl_bert_topics_over_time}
 \alias{tbl_bert_topics_over_time}
-\title{Extract BERT Topics Over Time from a Tibble}
+\title{Extract BERT Topics Over Time from a Tibble
+Get Topics Over Time from Tibble}
 \usage{
 tbl_bert_topics_over_time(
   data,
@@ -17,8 +18,32 @@ tbl_bert_topics_over_time(
 )
 }
 \arguments{
-\item{return_tibble}{}
+\item{data}{A data frame containing documents and timestamps.}
+
+\item{topic_model}{A BERTopic model object.}
+
+\item{document_name}{Character. Name of the column containing documents.}
+
+\item{time_feature}{Character. Name of the column containing timestamps.}
+
+\item{nr_bins}{Integer. Number of time bins. Default NULL.}
+
+\item{datetime_format}{Character. Format string for datetime parsing. Default NULL.}
+
+\item{evolution_tuning}{Logical. Enable evolution tuning. Default TRUE.}
+
+\item{global_tuning}{Logical. Enable global tuning. Default TRUE.}
+
+\item{return_tibble}{Logical. Return as tibble. Default TRUE.}
+}
+\value{
+A tibble with topics over time analysis.
 }
 \description{
-Extract BERT Topics Over Time from a Tibble
+Analyze how topics evolve over time from a data frame input.
+}
+\examples{
+\dontrun{
+topics_time <- tbl_bert_topics_over_time(data, tm, "text", "date")
+}
 }

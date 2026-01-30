@@ -1,12 +1,17 @@
 #' Import yake
 #'
-#' @param assign_to_environment
-#' @param path
+#' Imports the YAKE (Yet Another Keyword Extractor) Python module via reticulate.
 #'
-#' @return
+#' @param assign_to_environment Logical. If TRUE, assigns the yake module to the global environment. Default TRUE.
+#' @param path Optional path to Python executable. If NULL, uses default Python.
+#'
+#' @return A Python yake module object.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' yake <- import_yake()
+#' }
 import_yake <-
   function(assign_to_environment = T,
            path = NULL) {
@@ -40,20 +45,30 @@ import_yake <-
 
 #' Yake Keyword Extractor
 #'
-#' @param obj
-#' @param docs
-#' @param top_features
-#' @param language
-#' @param assign_to_environment
-#' @param max_ngram_size
-#' @param deduplication_thresold
-#' @param deduplication_algo
-#' @param window_size
+#' Extract keywords from documents using YAKE (Yet Another Keyword Extractor).
 #'
-#' @return
+#' @param docs Character vector of documents to extract keywords from. If NULL, returns the KeywordExtractor object.
+#' @param obj Optional yake module object. If NULL, imports yake automatically.
+#' @param text_column Optional name to rename the text column in output.
+#' @param top_features Integer. Number of top keywords to extract per document. Default 10.
+#' @param language Character. Language of the documents. Default "english".
+#' @param assign_to_environment Logical. If TRUE, assigns the KeywordExtractor to global environment. Default TRUE.
+#' @param max_ngram_size Integer. Maximum n-gram size for keywords. Default 2.
+#' @param deduplication_thresold Numeric. Threshold for deduplication (0-1). Default 0.9.
+#' @param deduplication_algo Character. Deduplication algorithm. Default "seqm".
+#' @param return_summary Logical. If TRUE, returns summarized keywords per document. Default TRUE.
+#' @param window_size Integer. Window size for keyword extraction. Default 1.
+#'
+#' @return A tibble with extracted keywords per document, or a KeywordExtractor object if docs is NULL.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' # Extract keywords from documents
+#' docs <- c("Machine learning is a subset of artificial intelligence.",
+#'           "Natural language processing enables text analysis.")
+#' keywords <- yake_keyword_extractor(docs = docs, top_features = 5)
+#' }
 yake_keyword_extractor <-
   function(docs = NULL,
            obj = NULL,

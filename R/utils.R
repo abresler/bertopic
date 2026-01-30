@@ -2297,14 +2297,21 @@ tbl_bert_label_cosine_similarity <-
 
 #' Extract Document Word Coutns
 #'
-#' @param obj
-#' @param docs
-#' @param filter_zero
+#' Extract Document Word Counts
 #'
-#' @return
+#' Extract word counts from documents using the vectorizer model.
+#'
+#' @param obj BERTopic model object with vectorizer_model.
+#' @param docs Character vector of documents.
+#' @param filter_zero Logical. If TRUE, filters out zero counts. Default TRUE.
+#'
+#' @return A tibble with document number, word, and count columns.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' word_counts <- extract_document_word_counts(tm, docs)
+#' }
 extract_document_word_counts <-
   function(obj,
            docs = NULL,
@@ -2335,15 +2342,21 @@ extract_document_word_counts <-
 
 #' Write a BERT Visualization
 #'
-#' @param viz
-#' @param base_path
-#' @param viz_name
-#' @param browse_url
+#' Write a BERTopic visualization to HTML file.
 #'
-#' @return
+#' @param viz A BERTopic visualization object.
+#' @param base_path Base directory path for output. If NULL, shows in browser.
+#' @param viz_name Name for the visualization folder.
+#' @param browse_url Logical. If TRUE, opens in browser after writing. Default TRUE.
+#'
+#' @return Invisible NULL. Side effect: writes HTML file.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' viz <- tm$visualize_topics()
+#' write_bert_viz(viz, "~/visualizations", "topics")
+#' }
 write_bert_viz <-
   function(viz,
            base_path = NULL,
@@ -2372,16 +2385,22 @@ write_bert_viz <-
   }
 
 
-#' Covert Arry to Tibble
+#' Convert Array to Tibble
 #'
-#' @param data a matrix or array
-#' @param output_type output type for columns
-#' @param number_zeros padding for zeros.  Default `3`
+#' Convert a matrix or array to a tibble with optional column naming.
 #'
-#' @return
+#' @param data A matrix or array to convert.
+#' @param output_type Output type prefix for columns. If NULL, uses default names.
+#' @param number_zeros Padding for zeros in column names. Default 3.
+#'
+#' @return A tibble with the converted array data.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' mat <- matrix(1:6, nrow = 2)
+#' tbl <- tbl_array(mat, output_type = "col")
+#' }
 tbl_array <-
   function(data,
            output_type = NULL,
@@ -2402,21 +2421,26 @@ tbl_array <-
 # Topics Over Time --------------------------------------------------------
 
 
-#' Extract Topcis Over Time
+#' Extract Topics Over Time
 #'
-#' @param obj
-#' @param docs
-#' @param timestamps
-#' @param nr_bins
-#' @param datetime_format
-#' @param evolution_tuning
-#' @param global_tuning
-#' @param return_tibble
+#' Analyze how topics change over time using timestamps.
 #'
-#' @return
+#' @param obj BERTopic model object.
+#' @param docs Character vector of documents.
+#' @param timestamps Vector of timestamps corresponding to documents.
+#' @param nr_bins Integer. Number of time bins. Default NULL.
+#' @param datetime_format Character. Format string for datetime. Default NULL.
+#' @param evolution_tuning Logical. Enable evolution tuning. Default TRUE.
+#' @param global_tuning Logical. Enable global tuning. Default TRUE.
+#' @param return_tibble Logical. Return as tibble. Default TRUE.
+#'
+#' @return Topics over time data, as tibble if return_tibble is TRUE.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' topics_time <- bert_topics_over_time(tm, docs, timestamps)
+#' }
 bert_topics_over_time <-
   function(obj,
            docs = NULL,
@@ -2455,21 +2479,27 @@ bert_topics_over_time <-
   }
 
 #' Extract BERT Topics Over Time from a Tibble
+#' Get Topics Over Time from Tibble
 #'
-#' @param data
-#' @param topic_model
-#' @param document_name
-#' @param time_feature
-#' @param nr_bins
-#' @param datetime_format
-#' @param evolution_tuning
-#' @param global_tuning
-#' @param return_tibble
+#' Analyze how topics evolve over time from a data frame input.
 #'
-#' @return
+#' @param data A data frame containing documents and timestamps.
+#' @param topic_model A BERTopic model object.
+#' @param document_name Character. Name of the column containing documents.
+#' @param time_feature Character. Name of the column containing timestamps.
+#' @param nr_bins Integer. Number of time bins. Default NULL.
+#' @param datetime_format Character. Format string for datetime parsing. Default NULL.
+#' @param evolution_tuning Logical. Enable evolution tuning. Default TRUE.
+#' @param global_tuning Logical. Enable global tuning. Default TRUE.
+#' @param return_tibble Logical. Return as tibble. Default TRUE.
+#'
+#' @return A tibble with topics over time analysis.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' topics_time <- tbl_bert_topics_over_time(data, tm, "text", "date")
+#' }
 tbl_bert_topics_over_time <-
   function(data,
            topic_model,
@@ -2496,13 +2526,18 @@ tbl_bert_topics_over_time <-
 
 #' Munge Topic Over Time
 #'
-#' @param data
-#' @param topic_model
+#' Transform topics over time output into a tidy tibble format.
 #'
-#' @return
+#' @param data Output from bert_topics_over_time function.
+#' @param topic_model Optional BERTopic model to add topic labels.
+#'
+#' @return A tibble with cleaned topics over time data.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' tidy_time <- munge_bert_topics_over_time(topics_time_data, tm)
+#' }
 munge_bert_topics_over_time <-
   function(data, topic_model = NULL) {
     data <-
@@ -2525,14 +2560,19 @@ munge_bert_topics_over_time <-
 
 #' Munge Topics Per Class Output
 #'
-#' @param data
-#' @param class_name
-#' @param topic_model
+#' Transform topics per class output into a tidy tibble format.
 #'
-#' @return
+#' @param data Output from bert_topic_per_class function.
+#' @param class_name Optional character. Custom name for the class column.
+#' @param topic_model Optional BERTopic model to add topic labels.
+#'
+#' @return A tibble with cleaned topics per class data.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' tidy_class <- munge_bert_topics_per_class(class_data, "category", tm)
+#' }
 munge_bert_topics_per_class <-
   function(data,
            class_name = NULL,
@@ -2574,10 +2614,13 @@ munge_bert_topics_per_class <-
 #' @param calculate_tokens Calculate the similarity of tokens with all topics. NOTE: This is computation-wise more expensive and can require more memory. Using this over batches of documents might be preferred.  Default `FALSE`
 #' @param separator  The separator used to merge tokens into tokensets.
 #'
-#' @return
+#' @return A list containing approximate topic distributions for documents.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' distributions <- bert_approximate_distribution(obj = tm, docs = documents)
+#' }
 bert_approximate_distribution <-
   function(obj,
            docs,
@@ -2607,16 +2650,22 @@ bert_approximate_distribution <-
   }
 
 
-#' Munge Document Topic Proability Distributions
+#' Munge Document Topic Probability Distributions
 #'
-#' @param out Approximate Distribution Output
-#' @param obj Bertopic Object
-#' @param return_wide
+#' Transforms approximate distribution output into a tidy tibble format.
 #'
-#' @return
+#' @param out Approximate Distribution Output from bert_approximate_distribution.
+#' @param obj Bertopic Object. If provided, adds topic labels to output.
+#' @param return_wide Logical. If TRUE, returns wide format. Default FALSE.
+#'
+#' @return A tibble with document topic probability distributions in long or wide format.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' distributions <- bert_approximate_distribution(obj = tm, docs = docs)
+#' tidy_dist <- munge_bert_document_approximate_distributions(distributions, obj = tm)
+#' }
 munge_bert_document_approximate_distributions <-
   function(out,
            obj = NULL,
@@ -2675,14 +2724,20 @@ munge_bert_document_approximate_distributions <-
 
 #' Transform New Documents
 #'
-#' @param obj bertopic objects
-#' @param documents vector of documents
-#' @param embeddings if not `NULL` matrix or dataframe of embeddings
+#' Transform new documents using an existing BERTopic model to predict topics.
 #'
-#' @return
+#' @param obj BERTopic model object.
+#' @param documents Character vector of documents to transform.
+#' @param embeddings If not NULL, matrix or dataframe of pre-computed embeddings.
+#'
+#' @return A tibble with topic assignments and info for each document.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' new_docs <- c("New document about machine learning")
+#' results <- bert_transform_documents(obj = tm, documents = new_docs)
+#' }
 bert_transform_documents <-
   function(obj,
            documents = NULL,
