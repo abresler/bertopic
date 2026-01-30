@@ -10,7 +10,7 @@ bert_reduce_outliers(
   document_name = NULL,
   topics = NULL,
   images = NULL,
-  strategy = "embeddings",
+  strategy = "distributions",
   probabilities = NULL,
   threshold = 0L,
   embeddings = NULL,

@@ -1576,7 +1576,7 @@ bert_reduce_outliers <-
            document_name = NULL,
            topics = NULL,
            images = NULL,
-           strategy = "embeddings",
+           strategy = "distributions",
            probabilities = NULL,
            threshold = 0L,
            embeddings = NULL,
@@ -1604,15 +1604,9 @@ bert_reduce_outliers <-
         distributions_params = distributions_params
       )
 
-
-
     new_topics <- out |> as.numeric()
 
-    if (update_topics) {
-      message("Updating topics inside topic model")
-      obj <- obj$update_topics(docs = docs, topics = new_topics)
-      return(invisible())
-    }
+
 
     dat <- tibble(topic_bert_reduced = new_topics) |>
       mutate(
@@ -1641,8 +1635,13 @@ bert_reduce_outliers <-
       )
 
     if (length(document_name) > 0) {
-      dat |>
+      dat <- dat |>
         rename(UQ(document_name) := document)
+    }
+
+    if (update_topics) {
+      message("Updating topics inside topic model")
+      obj$update_topics(docs = docs, topics = new_topics)
     }
 
     dat
