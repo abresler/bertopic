@@ -7,14 +7,17 @@
 bert_transform(obj, documents, embeddings = NULL, images = NULL)
 }
 \arguments{
-\item{obj}{BERTopic Object}
+\item{obj}{A BERTopic model object created by `bert_topic()`.}
 
-\item{documents}{A single document or a list of documents to fit on}
+\item{documents}{Character vector. A single document or list of documents to transform.}
 
-\item{embeddings}{If not `NULL` Pre-trained document embeddings. These can be used instead of the sentence-transformer model.}
+\item{embeddings}{Numeric matrix or `NULL`. Pre-trained document embeddings. These can be used instead of the sentence-transformer model. Default `NULL`.}
 
-\item{images}{A list of paths to the images to predict on or the images themselves}
+\item{images}{List or `NULL`. A list of paths to the images to predict on or the images themselves. Default `NULL`.}
+}
+\value{
+The transformed BERTopic model object with predicted topics for new documents.
 }
 \description{
-After having fit a model, use transform to predict new instances
+After having fit a model, use transform to predict new instances.
 }

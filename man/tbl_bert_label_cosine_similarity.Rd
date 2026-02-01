@@ -2,7 +2,7 @@
 % Please edit documentation in R/bert-analysis.R
 \name{tbl_bert_label_cosine_similarity}
 \alias{tbl_bert_label_cosine_similarity}
-\title{BERT Cosine Simiarity}
+\title{BERT Cosine Similarity}
 \usage{
 tbl_bert_label_cosine_similarity(
   obj,
@@ -14,14 +14,17 @@ tbl_bert_label_cosine_similarity(
 )
 }
 \arguments{
-\item{obj}{topic model object}
+\item{obj}{BERTopic model object.}
 
-\item{exclude_outlier}{if `TRUE` excludes outlier topic}
+\item{exclude_outlier}{Logical. If `TRUE`, excludes outlier topic. Default `FALSE`.}
 
-\item{include_topic_number}{if `TRUE` includes topic number}
+\item{include_topic_number}{Logical. If `TRUE`, includes topic number in feature names. Default `TRUE`.}
 
-\item{return_tibble}{if `TRUE` returns tibble}
+\item{return_tibble}{Logical. If `TRUE`, returns tibble; otherwise returns matrix. Default `FALSE`.}
+}
+\value{
+A tibble (if `return_tibble = TRUE`) or matrix with cosine similarity scores between topics, with columns: `feature_01`, `feature_02` (or separated into topic and label columns), and `cosine_similarity`.
 }
 \description{
-BERT Cosine Simiarity
+BERT Cosine Similarity
 }

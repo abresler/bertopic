@@ -15,10 +15,10 @@
 
 #' Import Keybert Module
 #'
-#' @param assign_to_environment  if `TRUE` assigns to environment
-#' @param path python path
+#' @param assign_to_environment Logical. If `TRUE` assigns to environment.
+#' @param path Character. Python path to use for imports.
 #'
-#' @return
+#' @returns A Python KeyBERT module object.
 #' @export
 #'
 #' @examples
@@ -84,14 +84,12 @@ import_keybert <-
 
 #' Initiate Keybert model
 #'
-#' Runs a keybert model
+#' Runs a keybert model.
 #'
-#' @param keybert
-#' @param model default is `all-MiniLM-L6-v2` you can pick any model from \itemize{
-#' \item \href{https://www.sbert.net/docs/pretrained_models.html}{sbert}
-#' }
+#' @param keybert Python KeyBERT module. If `NULL`, imports KeyBERT automatically.
+#' @param model Character. Sentence transformer model to use. Default is `all-MiniLM-L6-v2`. See \href{https://www.sbert.net/docs/pretrained_models.html}{sbert documentation} for available models.
 #'
-#' @return
+#' @returns A Python KeyBERT model object.
 #' @export
 #'
 #' @examples
@@ -138,16 +136,16 @@ keybert_model <-
 #' @param stopword_package_sources if not `NULL` c("snowball","stopword -iso", "smart", "nltk"))
 #' @param assign_to_environment if `TRUE` assigns objec to environment
 #' @param language Language to use.  Default `english`
-#' @param iterate_individually
-#' @param return_message
-#' @param use_future
-#' @param decay
-#' @param delete_min_df
-#' @param workers
-#' @param spacy_pipeline
-#' @param custom_pos_tagger
+#' @param iterate_individually Logical. If `TRUE`, processes documents individually. Default `FALSE`.
+#' @param return_message Logical. If `TRUE`, prints processing messages. Default `TRUE`.
+#' @param use_future Logical. If `TRUE`, uses parallel processing. Default `TRUE`.
+#' @param decay Numeric. Decay parameter for keyphrase vectorizer. Default `NULL`.
+#' @param delete_min_df Logical. If `TRUE`, deletes words below minimum document frequency. Default `NULL`.
+#' @param workers Integer. Number of parallel workers. Default `1L`.
+#' @param spacy_pipeline Character. Spacy pipeline to use for POS tagging. Default `"en_core_web_sm"`.
+#' @param custom_pos_tagger Custom POS tagger function. Default `NULL`.
 #'
-#' @return `tibble` of keywords
+#' @returns A tibble containing extracted keywords with columns: `number_document`, `number_keyword`, `keyword_keybert_*` (varies by vectorizer), and `score_keybert_*`.
 #' @export
 #'
 #' @examples
@@ -367,28 +365,28 @@ keybert_keywords <-
 
 #' Extract Embeddings from Documents
 #'
-#' @param docs
-#' @param obj
-#' @param model
-#' @param stopword_package_sources
-#' @param extra_stop_words
-#' @param exclude_stop_words
-#' @param assign_to_environment
-#' @param keyphrase_ngram_range
-#' @param use_key_phrase_vectorizer
-#' @param candidates
-#' @param language
-#' @param is_lower_case
-#' @param pos_pattern
-#' @param vocabulary
-#' @param use_yake_candidates
-#' @param min_df
-#' @param max_df
+#' @param docs Character vector of documents to process.
+#' @param obj Python KeyBERT model object. If `NULL`, creates a new model.
+#' @param model Character. Sentence transformer model to use. Default `"all-MiniLM-L6-v2"`.
+#' @param stopword_package_sources Character vector. Sources for stopwords package. Default `NULL`.
+#' @param extra_stop_words Character vector. Additional stop words to exclude. Default `NULL`.
+#' @param exclude_stop_words Logical. If `TRUE`, excludes stop words. Default `TRUE`.
+#' @param assign_to_environment Logical. If `TRUE`, assigns model to environment. Default `TRUE`.
+#' @param keyphrase_ngram_range List of two integers. N-gram range for keyphrases. Default `list(1L, 1L)`.
+#' @param use_key_phrase_vectorizer Logical. If `TRUE`, uses keyphrase vectorizer. Default `TRUE`.
+#' @param candidates Character vector. Candidate keywords to use. Default `NULL`.
+#' @param language Character. Language for processing. Default `"english"`.
+#' @param is_lower_case Logical. If `TRUE`, converts to lowercase. Default `TRUE`.
+#' @param pos_pattern Character. Regex pattern for POS tags. Default `"<J.*>*<N.*>+"`.
+#' @param vocabulary Character vector. Custom vocabulary for vectorizer. Default `NULL`.
+#' @param use_yake_candidates Logical. If `TRUE`, uses YAKE keyword extractor. Default `FALSE`.
+#' @param min_df Integer. Minimum document frequency. Default `1L`.
+#' @param max_df Integer. Maximum document frequency. Default `1L`.
 #'
-#' @return
+#' @returns A list containing two elements: document embeddings and word embeddings matrices.
 #' @export
 #'
-#' @examples
+
 keybert_embeddings <-
   function(docs = NULL,
            obj = NULL,
@@ -664,19 +662,17 @@ keybert_embeddings <-
 #' @param include_both_vectorizers if `TRUE` returns keybert and sklearn methods
 #' @param use_future if `TRUE` uses parallel processing
 #' @param return_message if `TRUE` returns a message
-#' @param iterate_individually
-#' @param decay
-#' @param delete_min_df
-#' @param workers
-#' @param spacy_pipeline
-#' @param custom_pos_tagger
+#' @param iterate_individually Logical. If `TRUE`, processes each document individually. Default `FALSE`.
+#' @param decay Numeric. Decay factor for keyword scoring. Default `NULL`.
+#' @param delete_min_df Logical. If `TRUE`, removes minimum document frequency filter. Default `NULL`.
+#' @param workers Integer. Number of parallel workers for processing. Default `6L`.
+#' @param spacy_pipeline Character. Spacy pipeline for POS tagging. Default `"en_core_web_sm"`.
+#' @param custom_pos_tagger Custom POS tagger function. Default `NULL`.
 #'
-#' @return `tibble` of keywords
-#'
-#' @return
+#' @returns A tibble containing keywords extracted from the documents, with columns: `number_document`, `number_keyword`, keyword and score columns (names vary by vectorizer), and optionally joined to original data if `join_to_original_data = TRUE`.
 #' @export
 #'
-#' @examples
+
 tbl_keybert_keywords <- function(data,
                                  document_column = NULL,
                                  obj = NULL,
@@ -862,14 +858,14 @@ tbl_keybert_keywords <- function(data,
 
 #' Extract Keybert Keywords from Output
 #'
-#' @param out
-#' @param use_future
-#' @param return_message
+#' @param out Python KeyBERT output object containing extracted keywords.
+#' @param use_future Logical. If `TRUE`, uses parallel processing. Default `FALSE`.
+#' @param return_message Logical. If `TRUE`, prints processing messages. Default `FALSE`.
 #'
-#' @return
+#' @returns A tibble with columns: `number_document`, `keyword_keybert`, and `score_keybert`.
 #' @export
 #'
-#' @examples
+
 tbl_keybert_data <-
   function(out,
            use_future = FALSE,
@@ -923,15 +919,15 @@ tbl_keybert_data <-
 
 #' Gather Keybert Generated Keywords
 #'
-#' @param data A `tbl`
-#' @param id_column Name of ID coliumn
-#' @param only_distinct if `TRUE` only distinct keywords
-#' @param other_join_columns If `TRUE` other column features to include
+#' @param data A tibble containing KeyBERT-generated keyword columns.
+#' @param id_column Character. Name of ID column. If `NULL`, creates a default ID column.
+#' @param only_distinct Logical. If `TRUE`, returns only distinct keywords. Default `FALSE`.
+#' @param other_join_columns Character vector. Additional column names to include in output. Default `NULL`.
 #'
-#' @return
+#' @returns A tibble in long format with columns: ID column, `type_keyword` (vectorizer type), `keyword`, `is_sklearn`, and `is_keyphrase`. If `only_distinct = TRUE`, returns only the distinct keywords.
 #' @export
 #'
-#' @examples
+
 gather_keybert_keywords <-
   function(data,
            id_column = NULL,

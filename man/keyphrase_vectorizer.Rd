@@ -24,35 +24,40 @@ keyphrase_vectorizer(
 )
 }
 \arguments{
-\item{obj}{keyphrase modeule object}
+\item{obj}{Keyphrase module object. If `NULL`, imports automatically.}
 
-\item{language}{stop words language; default is `English`}
+\item{language}{Character. Stopwords language. Default `"english"`.}
 
-\item{stopword_package_sources}{list of stopwords sources from `stopwords` packages}
+\item{stopword_package_sources}{Character vector. External stopword sources. Default `NULL`.}
 
-\item{exclude_stop_words}{if `TRUE` excludes stopwords}
+\item{exclude_stop_words}{Logical. If `TRUE`, excludes stopwords. Default `TRUE`.}
 
-\item{extra_stop_words}{if `TRUE` other stopwords to exclude}
+\item{extra_stop_words}{Character vector. Additional stopwords to exclude. Default `NULL`.}
 
-\item{is_lower_case}{Whether the returned keyphrases should be converted to lowercase.}
+\item{is_lower_case}{Logical. If `TRUE`, converts keyphrases to lowercase. Default `TRUE`.}
 
-\item{max_df}{During fitting ignore keyphrases that have a document frequency strictly higher than the given threshold. Default `NULL`}
+\item{spacy_exclude}{List. spaCy pipeline components to exclude. Default `list('parser', 'attribute_ruler', 'lemmatizer', 'ner')`.}
 
-\item{min_df}{During fitting ignore keyphrases that have a document frequency strictly lower than the given threshold. This value is also called cut-off in the literature.  Default `NULL`}
+\item{max_df}{Integer or `NULL`. Maximum document frequency threshold. Default `NULL`.}
 
-\item{workers}{How many workers to use for spaCy part-of-speech tagging. If set to -1, use all available worker threads of the machine. SpaCy uses the specified number of cores to tag documents with part-of-speech. Depending on the platform, starting many processes with multiprocessing can add a lot of overhead. In particular, the default start method spawn used in macOS/OS X (as of Python 3.8) and in Windows can be slow. Therefore, carefully consider whether this option is really necessary.}
+\item{min_df}{Integer or `NULL`. Minimum document frequency threshold. Default `NULL`.}
 
-\item{pos_pattern}{Position Pattern defaults to `pos_pattern = "<J.*>*<N.*>+"`}
+\item{workers}{Integer. Number of spaCy workers. Default `1`.}
 
-\item{spacy_pipeline}{A list of spaCy \itemize{
-\item \href{https://spacy.io/usage/processing-pipelines#built-in}{Spacy Pipeline options}
-} components that should be excluded during the POS-tagging. Removing not needed pipeline components can sometimes make a big difference and improve loading and inference speed.}
+\item{pos_pattern}{Character. POS pattern for keyphrase extraction. Default `"<J.*>*<N.*>+"`.}
 
-\item{custom_pos_tagger}{A callable function which expects a list of strings in a ‘raw_documents’ parameter and returns a list of (word token, POS-tag) tuples. If this parameter is not None, the custom tagger function is used to tag words with parts-of-speech, while the spaCy pipeline is ignored.}
+\item{spacy_pipeline}{Character. spaCy model. Default `"en_core_web_sm"`.}
 
-\item{binary}{If True, all non zero counts are set to 1. This is useful for discrete probabilistic models that model binary events rather than integer counts.}
+\item{custom_pos_tagger}{Callable or `NULL`. Custom POS tagger function. Default `NULL`.}
 
-\item{delete_min_df}{}
+\item{binary}{Logical. If `TRUE`, all non-zero counts are set to 1. Default `FALSE`.}
+
+\item{decay}{Numeric or `NULL`. Decay parameter. Default `NULL`.}
+
+\item{delete_min_df}{Logical or `NULL`. Delete min_df parameter. Default `NULL`.}
+}
+\value{
+A Python KeyphraseCountVectorizer object configured with specified parameters.
 }
 \description{
 Build a Keyphrase Vectorizer

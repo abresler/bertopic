@@ -12,13 +12,16 @@ print_bert_topic_tree(
 )
 }
 \arguments{
-\item{obj}{Bertopic Model}
+\item{obj}{A BERTopic model object.}
 
-\item{hierarchy}{Output from `bert_topic_hierarchy`}
+\item{hierarchy}{Output from `bert_topic_hierarchy`. A hierarchical topics object.}
 
-\item{tight_layout}{Whether to use a tight layout (narrow width) for easier readability if you have hundreds of topics.  Default `FALSE`}
+\item{tight_layout}{Logical. If `TRUE` uses tight layout for readability with many topics. Default is `FALSE`.}
 
-\item{max_distance}{The maximum distance between two topics. This value is based on the Distance column in hier_topics.  Default `NULL`}
+\item{max_distance}{Numeric. Maximum distance between topics, or `NULL` for no limit. Default is `NULL`.}
+}
+\value{
+Called for side effects; prints the topic tree to console.
 }
 \description{
 Print Bertopic Tree

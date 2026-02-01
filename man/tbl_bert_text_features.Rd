@@ -2,13 +2,20 @@
 % Please edit documentation in R/bert-documents.R
 \name{tbl_bert_text_features}
 \alias{tbl_bert_text_features}
-\title{Pull Text and Name It for bertopic}
+\title{Pull Text and Name It for BERTopic}
 \usage{
 tbl_bert_text_features(data, id_columns = NULL, text_column = NULL)
 }
 \arguments{
-\item{text_column}{}
+\item{data}{A tibble or data frame containing text and ID columns.}
+
+\item{id_columns}{Character vector. Column names to use for creating unique IDs.}
+
+\item{text_column}{Character. Name of the column containing text.}
+}
+\value{
+A named character vector where names are IDs and values are text documents.
 }
 \description{
-Pull Text and Name It for bertopic
+Pull Text and Name It for BERTopic
 }

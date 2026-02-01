@@ -2,7 +2,7 @@
 % Please edit documentation in R/bert-topic-modify.R
 \name{bert_update_topics}
 \alias{bert_update_topics}
-\title{Updates the topic representation by recalculating c-TF-IDF with the new parameters as defined in this function.}
+\title{Update BERTopic Topic Representations}
 \usage{
 bert_update_topics(
   obj,
@@ -34,46 +34,61 @@ bert_update_topics(
 )
 }
 \arguments{
-\item{obj}{BERTopic Object}
+\item{obj}{BERTopic model object.}
 
-\item{docs}{The documents you used when calling either fit or fit_transform}
+\item{docs}{Character vector of documents used in model fitting.}
 
-\item{topics}{A list of topics where each topic is related to a document in docs. Use this variable to change or map the topics. NOTE: Using a custom list of topic assignments may lead to errors if topic reduction techniques are used afterwards. Make sure that manually assigning topics is the last step in the pipeline.  Default `NULL`}
+\item{topics}{Integer vector. Topics mapping for documents. Default `NULL`.}
 
-\item{top_n_words}{The number of words per topic to extract. Setting this too high can negatively impact topic embeddings as topics are typically best represented by at most 10 words.  Default `10`}
+\item{top_n_words}{Integer. Number of words per topic to extract. Default `10`.}
 
-\item{n_gram_range}{The n-gram range for the CountVectorizer. Default `NULL`}
+\item{images}{List. Optional images. Default `NULL`.}
 
-\item{vectorizer_model}{Pass in your own CountVectorizer from scikit-learn.  Default `NULL`}
+\item{n_gram_range}{List. N-gram range for CountVectorizer as `list(min, max)`. Default `list(1L, 1L)`.}
 
-\item{ctfidf_model}{Pass in your own c-TF-IDF model to update the representations.  Default `NULL`}
+\item{use_empty_vectorizer}{Logical. If `TRUE`, uses empty vectorizer. Default `FALSE`.}
 
-\item{representation_model}{Pass in a model that fine-tunes the topic representations calculated through c-TF-IDF. Models from bertopic.representation are supported. Default `NULL`}
+\item{vectorizer_model}{Callable. Custom CountVectorizer from scikit-learn. Default `NULL`.}
 
-\item{language}{The main language used in your documents. The default sentence-transformers model for "english" is all-MiniLM-L6-v2. For a full overview of supported languages see bertopic.backend.languages. Select "multilingual" to load in the paraphrase-multilingual-MiniLM-L12-v2 sentence-tranformers model that supports 50+ languages. Default `english`}
+\item{ctfidf_model}{Callable. Custom c-TF-IDF model. Default `NULL`.}
 
-\item{use_key_phrase_vectorizer}{if `TRUE` uses a keyphrase vectorizer}
+\item{representation_model}{Callable. Model to fine-tune c-TF-IDF representations. Default `NULL`.}
 
-\item{use_sklearn_vectorizer}{If `TRUE` uses SKLearn vectorizer}
+\item{language}{Character. Language code. Default `"english"`.}
 
-\item{is_lower_case}{if `TRUE` lower case}
+\item{use_key_phrase_vectorizer}{Logical. If `TRUE`, uses keyphrase vectorizer. Default `FALSE`.}
 
-\item{keyphrase_ngram_range}{If not `NULL` range for keyphrase}
+\item{use_sklearn_vectorizer}{Logical. If `TRUE`, uses sklearn vectorizer. Default `FALSE`.}
 
-\item{exclude_stop_words}{if `TRUE` excludes basic stopwords}
+\item{is_lower_case}{Logical. If `TRUE`, converts to lowercase. Default `TRUE`.}
 
-\item{stopword_package_sources}{options if not `NULL` `c("snowball", "stopwords-iso", "smart", "nltk")`}
+\item{keyphrase_ngram_range}{List. N-gram range for keyphrase vectorizer. Default `list(1L, 1L)`.}
 
-\item{extra_stop_words}{vector of other stopwords}
+\item{exclude_stop_words}{Logical. If `TRUE`, excludes stopwords. Default `TRUE`.}
 
-\item{min_df}{During fitting ignore keyphrases that have a document frequency strictly lower than the given threshold. This value is also called cut-off in the literature.  Default `1L`}
+\item{stopword_package_sources}{Character vector. Stopword sources: `"snowball"`, `"stopwords-iso"`, `"smart"`, `"nltk"`. Default `NULL`.}
 
-\item{pos_pattern}{Position patter for keyphrase.  Defaults to `pos_pattern = "<J.*>*<N.*>+",`}
+\item{extra_stop_words}{Character vector. Additional stopwords. Default `NULL`.}
 
-\item{seed_topic_list}{A list of seed words per topic to converge around.  Default is `NULL`}
+\item{min_df}{Integer. Minimum document frequency for keyphrases. Default `1L`.}
 
-\item{workers}{}
+\item{max_df}{Integer. Maximum document frequency. Default `1L`.}
+
+\item{pos_pattern}{Character. POS pattern for keyphrase vectorizer. Default `"<J.*>*<N.*>+"`.}
+
+\item{seed_topic_list}{List. Seed words per topic. Default `NULL`.}
+
+\item{decay}{Numeric or `NULL`. Decay parameter. Default `NULL`.}
+
+\item{delete_min_df}{Logical or `NULL`. Delete min_df parameter. Default `NULL`.}
+
+\item{workers}{Integer. Number of workers for processing. Default `6L`.}
+
+\item{vocabulary}{List. Custom vocabulary. Default `NULL`.}
+}
+\value{
+The updated BERTopic model object.
 }
 \description{
-Updates the topic representation by recalculating c-TF-IDF with the new parameters as defined in this function.
+Update BERTopic Topic Representations
 }

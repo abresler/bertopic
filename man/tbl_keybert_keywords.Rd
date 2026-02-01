@@ -54,6 +54,8 @@ tbl_keybert_keywords(
 
 \item{obj}{Keybert Object}
 
+\item{iterate_individually}{Logical. If `TRUE`, processes each document individually. Default `FALSE`.}
+
 \item{include_both_vectorizers}{if `TRUE` returns keybert and sklearn methods}
 
 \item{model}{Use a custom embedding model. The following backends are currently supported: * SentenceTransformers * 🤗 Transformers * Flair * Spacy * Gensim * USE (TF-Hub) You can also pass in a string that points to one of the following sentence-transformers models: * https://www.sbert.net/docs/pretrained_models.html}
@@ -112,12 +114,20 @@ tbl_keybert_keywords(
 
 \item{join_to_original_data}{if `TRUE` joins to original data}
 
-\item{custom_pos_tagger}{}
+\item{decay}{Numeric. Decay factor for keyword scoring. Default `NULL`.}
+
+\item{delete_min_df}{Logical. If `TRUE`, removes minimum document frequency filter. Default `NULL`.}
+
+\item{workers}{Integer. Number of parallel workers for processing. Default `6L`.}
+
+\item{spacy_pipeline}{Character. Spacy pipeline for POS tagging. Default `"en_core_web_sm"`.}
+
+\item{custom_pos_tagger}{Custom POS tagger function. Default `NULL`.}
 
 \item{nest_data}{if `TRUE` nests data}
 }
 \value{
-`tibble` of keywords
+A tibble containing keywords extracted from the documents, with columns: `number_document`, `number_keyword`, keyword and score columns (names vary by vectorizer), and optionally joined to original data if `join_to_original_data = TRUE`.
 }
 \description{
 Join Keybert Keywords to data

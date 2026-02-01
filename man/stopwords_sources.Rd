@@ -7,7 +7,10 @@
 stopwords_sources(sources = c("snowball", "stopwords-iso", "smart", "nltk"))
 }
 \arguments{
-\item{sources}{}
+\item{sources}{Character vector. Stopword sources to include. Options: `"snowball"`, `"stopwords-iso"`, `"smart"`, `"nltk"`.}
+}
+\value{
+A character vector of unique stopwords combined from specified sources.
 }
 \description{
 Stopword Package Sources

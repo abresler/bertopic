@@ -43,65 +43,78 @@ bert_topic(
 )
 }
 \arguments{
-\item{umap_model}{Pass in a UMAP model to be used instead of the default. NOTE: You can also pass in any dimensionality reduction algorithm as long as it has .fit and .transform functions.}
+\item{obj}{Python BERTopic module object or `NULL` to import.}
 
-\item{hdbscan_model}{Pass in a hdbscan.HDBSCAN model to be used instead of the default NOTE: You can also pass in any clustering algorithm as long as it has .fit and .predict functions along with the .labels_ variable. Default `NULL`}
+\item{umap_model}{Python UMAP model or `NULL`. Pass in a UMAP model to be used instead of the default. NOTE: You can also pass in any dimensionality reduction algorithm as long as it has `.fit` and `.transform` functions. Default `NULL`.}
 
-\item{vectorizer_model}{Pass in a custom CountVectorizer instead of the default model. Default `NULL`}
+\item{hdbscan_model}{Python HDBSCAN model or `NULL`. Pass in an `hdbscan.HDBSCAN` model to be used instead of the default. NOTE: You can also pass in any clustering algorithm as long as it has `.fit` and `.predict` functions along with the `.labels_` variable. Default `NULL`.}
 
-\item{embedding_model}{type of embedding model - either an object or `NULL` options include \itemize{
-\item \href{https://www.sbert.net/docs/pretrained_models.html}{sbert}
-} and it defaults to `all-MiniLM-L6-v2`}
+\item{vectorizer_model}{Python vectorizer model or `NULL`. Pass in a custom CountVectorizer instead of the default model. Default `NULL`.}
 
-\item{ctfidf_model}{Pass in a custom ClassTfidfTransformer instead of the default model. Default `NULL`}
+\item{embedding_model}{Python embedding model or `NULL`. Type of embedding model - either a model object or `NULL`. Options include \href{https://www.sbert.net/docs/pretrained_models.html}{sbert} and defaults to `"all-MiniLM-L6-v2"`. Default `NULL`.}
 
-\item{nr_topics}{Specifying the number of topics will reduce the initial number of topics to the value specified. This reduction can take a while as each reduction in topics (-1) activates a c-TF-IDF calculation. If this is set to None, no reduction is applied. Use `auto` to automatically reduce topics using HDBSCAN.}
+\item{ctfidf_model}{Python C-TF-IDF model or `NULL`. Pass in a custom ClassTfidfTransformer instead of the default model. Default `NULL`.}
 
-\item{language}{The main language used in your documents. The default sentence-transformers model for "english" is all-MiniLM-L6-v2. For a full overview of supported languages see bertopic.backend.languages. Select "multilingual" to load in the paraphrase-multilingual-MiniLM-L12-v2 sentence-tranformers model that supports 50+ languages. Default `english`}
+\item{nr_topics}{Integer or `NULL`. Specifying the number of topics will reduce the initial number of topics to the value specified. This reduction can take a while as each reduction in topics (-1) activates a c-TF-IDF calculation. If `NULL`, no reduction is applied. Use `"auto"` to automatically reduce topics using HDBSCAN. Default `NULL`.}
 
-\item{representation_model}{The base representation model for fine-tuning topic representations}
+\item{language}{Character. The main language used in your documents. The default sentence-transformers model for "english" is all-MiniLM-L6-v2. For a full overview of supported languages see `bertopic.backend.languages`. Select "multilingual" to load the paraphrase-multilingual-MiniLM-L12-v2 sentence-transformers model that supports 50+ languages. Default `"english"`.}
 
-\item{top_n_words}{The number of words per topic to extract. Setting this too high can negatively impact topic embeddings as topics are typically best represented by at most 10 words.  Default to `10L`}
+\item{representation_model}{Python representation model or `NULL`. The base representation model for fine-tuning topic representations. Default `NULL`.}
 
-\item{use_key_phrase_vectorizer}{if `TRUE` uses a keyphrase vectorizer}
+\item{top_n_words}{Integer. The number of words per topic to extract. Setting this too high can negatively impact topic embeddings as topics are typically best represented by at most 10 words. Default `10L`.}
 
-\item{use_sklearn_vectorizer}{if `TRUE` uses SKLearn vetorizer}
+\item{use_key_phrase_vectorizer}{Logical. If `TRUE` uses a keyphrase vectorizer. Default `FALSE`.}
 
-\item{is_lower_case}{if `TRUE` is lowercase}
+\item{use_sklearn_vectorizer}{Logical. If `TRUE` uses scikit-learn vectorizer. Default `FALSE`.}
 
-\item{n_gram_range}{The n-gram range for the CountVectorizer. Advised to keep high values between 1 and 3. More would likely lead to memory issues. NOTE: This param will not be used if you pass in your own CountVectorizer. Default to `list(1L, 1L)`}
+\item{is_lower_case}{Logical. If `TRUE` converts text to lowercase. Default `TRUE`.}
 
-\item{keyphrase_ngram_range}{If not `NULL` range for keyphrase}
+\item{n_gram_range}{List of integers. The n-gram range for the CountVectorizer. Advised to keep high values between 1 and 3. More would likely lead to memory issues. NOTE: This param will not be used if you pass in your own CountVectorizer. Default `list(1L, 1L)`.}
 
-\item{min_topic_size}{The minimum size of the topic. Increasing this value will lead to a lower number of clusters/topics. NOTE: This param will not be used if you are not using HDBSCAN. Default 10}
+\item{zeroshot_topic_list}{List or `NULL`. List of candidate topic labels for zero-shot classification. Default `NULL`.}
 
-\item{low_memory}{Sets UMAP low memory to True to make sure less memory is used. NOTE: This is only used in UMAP. For example, if you use PCA instead of UMAP this parameter will not be used. Default `FALSE`}
+\item{zeroshot_min_similarity}{Numeric. Minimum similarity score for zero-shot topic matching. Default `0.7`.}
 
-\item{exclude_stop_words}{if `TRUE` excludes base stop words}
+\item{keyphrase_ngram_range}{List or `NULL`. Range for keyphrase n-grams. Default `list(1L, 1L)`.}
 
-\item{stopword_package_sources}{options if not `NULL` `c("snowball", "stopwords-iso", "smart", "nltk")`}
+\item{min_topic_size}{Integer. The minimum size of the topic. Increasing this value will lead to a lower number of clusters/topics. NOTE: This param will not be used if you are not using HDBSCAN. Default `10L`.}
 
-\item{extra_stop_words}{vector of other stopwords}
+\item{low_memory}{Logical. Sets UMAP low memory to `TRUE` to make sure less memory is used. NOTE: This is only used in UMAP. For example, if you use PCA instead of UMAP this parameter will not be used. Default `FALSE`.}
 
-\item{calculate_probabilities}{Whether to calculate the probabilities of all topics per document instead of the probability of the assigned topic per document. This could slow down the extraction of topics if you have many documents (> 100_000). Set this only to True if you have a low amount of documents or if you do not mind more computation time. NOTE: If false you cannot use the corresponding visualization method visualize_probabilities.  Default to `FALSE`}
+\item{exclude_stop_words}{Logical. If `TRUE` excludes base stop words. Default `TRUE`.}
 
-\item{min_df}{During fitting ignore keyphrases that have a document frequency strictly lower than the given threshold. This value is also called cut-off in the literature.  Default `1L`}
+\item{stopword_package_sources}{Character vector or `NULL`. Options if not `NULL`: `c("snowball", "stopwords-iso", "smart", "nltk")`. Default `NULL`.}
 
-\item{max_df}{During fitting ignore keyphrases that have a document frequency strictly higher than the given threshold. Default `1L`}
+\item{extra_stop_words}{Character vector or `NULL`. Additional stopwords to exclude. Default `NULL`.}
 
-\item{pos_pattern}{Position patter for keyphrase.  Defaults to `pos_pattern = "<J.*>*<N.*>+",`
-\href{https://maartengr.github.io/KeyBERT/guides/countvectorizer.html#languages}{Position Pattern via KeyBERT}
-\href{https://keyphrase-vectorizers.readthedocs.io/en/latest/api.html}{KeyPhrase POS API}
-\href{https://github.com/TimSchopf/KeyphraseVectorizers#custom-pos-tagger}{Custom Tagger via KeyPhrase}}
+\item{calculate_probabilities}{Logical. If `TRUE` calculates the probabilities of all topics per document instead of the probability of the assigned topic per document. This could slow down the extraction of topics if you have many documents (> 100,000). Set this only to `TRUE` if you have a low amount of documents or if you do not mind more computation time. NOTE: If `FALSE` you cannot use the corresponding visualization method `visualize_probabilities`. Default `TRUE`.}
 
-\item{seed_topic_list}{A list of seed words per topic to converge around.  Default is `NULL`}
+\item{min_df}{Integer. During fitting ignore keyphrases that have a document frequency strictly lower than the given threshold. This value is also called cut-off in the literature. Default `1L`.}
 
-\item{verbose}{if `TRUE` verbose output}
+\item{max_df}{Integer. During fitting ignore keyphrases that have a document frequency strictly higher than the given threshold. Default `1L`.}
 
-\item{use_token_parallel}{}
+\item{pos_pattern}{Character. Position pattern for keyphrase extraction. Defaults to `"<J.*>*<N.*>+"`. See \href{https://maartengr.github.io/KeyBERT/guides/countvectorizer.html#languages}{Position Pattern via KeyBERT}, \href{https://keyphrase-vectorizers.readthedocs.io/en/latest/api.html}{KeyPhrase POS API}, and \href{https://github.com/TimSchopf/KeyphraseVectorizers#custom-pos-tagger}{Custom Tagger via KeyPhrase} for details.}
+
+\item{seed_topic_list}{List or `NULL`. A list of seed words per topic to converge around. Default `NULL`.}
+
+\item{verbose}{Logical. If `TRUE` verbose output is printed. Default `TRUE`.}
+
+\item{vocabulary}{List or `NULL`. Custom vocabulary for the vectorizer. Default `NULL`.}
+
+\item{workers}{Integer. Number of parallel workers for processing. Default `6L`.}
+
+\item{decay}{Numeric or `NULL`. Decay parameter for online learning. Default `NULL`.}
+
+\item{delete_min_df}{Logical or `NULL`. If `TRUE` deletes documents with frequency below `min_df`. Default `NULL`.}
+
+\item{numba_threads}{Integer. Number of threads for Numba operations. Default `1L`.}
+
+\item{use_token_parallel}{Logical. If `TRUE` enables parallel tokenization. Default `TRUE`.}
+
+\item{set_attributes}{Logical. If `TRUE` sets attributes on the model object. Default `TRUE`.}
 }
 \value{
-python object
+A Python BERTopic model object configured with the specified parameters.
 }
 \description{
 Functions for unsupervised clustering algorithms.

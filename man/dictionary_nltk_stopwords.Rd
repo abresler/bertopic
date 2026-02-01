@@ -7,7 +7,10 @@
 dictionary_nltk_stopwords(language = "english")
 }
 \arguments{
-\item{language}{language defaults to `english`}
+\item{language}{Character. Language code. Default `"english"`.}
+}
+\value{
+A character vector of stopwords in the specified language.
 }
 \description{
 NLTK Stopwords

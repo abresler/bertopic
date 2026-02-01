@@ -7,7 +7,10 @@
 list_to_tuple(obj)
 }
 \arguments{
-\item{obj}{}
+\item{obj}{List object to convert to a Python tuple.}
+}
+\value{
+A Python tuple object.
 }
 \description{
 List to Tuple

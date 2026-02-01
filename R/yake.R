@@ -5,7 +5,7 @@
 #' @param assign_to_environment Logical. If TRUE, assigns the yake module to the global environment. Default TRUE.
 #' @param path Optional path to Python executable. If NULL, uses default Python.
 #'
-#' @return A Python yake module object.
+#' @returns A Python yake module object.
 #' @export
 #'
 #' @examples
@@ -43,23 +43,23 @@ import_yake <-
     data
   }
 
-#' Yake Keyword Extractor
+#' YAKE Keyword Extractor
 #'
 #' Extract keywords from documents using YAKE (Yet Another Keyword Extractor).
 #'
-#' @param docs Character vector of documents to extract keywords from. If NULL, returns the KeywordExtractor object.
-#' @param obj Optional yake module object. If NULL, imports yake automatically.
-#' @param text_column Optional name to rename the text column in output.
-#' @param top_features Integer. Number of top keywords to extract per document. Default 10.
-#' @param language Character. Language of the documents. Default "english".
-#' @param assign_to_environment Logical. If TRUE, assigns the KeywordExtractor to global environment. Default TRUE.
-#' @param max_ngram_size Integer. Maximum n-gram size for keywords. Default 2.
-#' @param deduplication_thresold Numeric. Threshold for deduplication (0-1). Default 0.9.
-#' @param deduplication_algo Character. Deduplication algorithm. Default "seqm".
-#' @param return_summary Logical. If TRUE, returns summarized keywords per document. Default TRUE.
-#' @param window_size Integer. Window size for keyword extraction. Default 1.
+#' @param docs Character vector of documents to extract keywords from. If `NULL`, returns the KeywordExtractor object.
+#' @param obj Yake module object. If `NULL`, imports yake automatically.
+#' @param text_column Character. Optional name to rename the text column in output. Default `NULL`.
+#' @param top_features Integer. Number of top keywords to extract per document. Default `10`.
+#' @param language Character. Language code. Default `"english"`.
+#' @param assign_to_environment Logical. If `TRUE`, assigns the KeywordExtractor to global environment. Default `TRUE`.
+#' @param max_ngram_size Integer. Maximum n-gram size for keywords. Default `2`.
+#' @param deduplication_thresold Numeric. Threshold for deduplication (0-1). Default `0.9`.
+#' @param deduplication_algo Character. Deduplication algorithm. Default `"seqm"`.
+#' @param return_summary Logical. If `TRUE`, returns summarized keywords per document. Default `TRUE`.
+#' @param window_size Integer. Window size for keyword extraction. Default `1`.
 #'
-#' @return A tibble with extracted keywords per document, or a KeywordExtractor object if docs is NULL.
+#' @returns A tibble with columns: `number_document`, `text`, `keyword_yake`, and optionally `score_yake`; or a KeywordExtractor object if `docs` is `NULL`.
 #' @export
 #'
 #' @examples

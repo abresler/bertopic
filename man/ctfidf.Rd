@@ -15,13 +15,18 @@ ctfidf(
 )
 }
 \arguments{
-\item{bm25_weighting}{Uses BM25-inspired idf-weighting procedure instead of the procedure as defined in the c-TF-IDF formula. It uses the following weighting scheme: log(1+((avg_nr_samples - df + 0.5) / (df+0.5))). Default is `FALSE`}
+\item{bm25_weighting}{Logical. Uses BM25-inspired idf-weighting procedure instead of the procedure as defined in the c-TF-IDF formula. It uses the following weighting scheme: `log(1+((avg_nr_samples - df + 0.5) / (df+0.5)))`. Default `FALSE`.}
 
-\item{reduce_frequent_words}{Takes the square root of the bag-of-words after normalizing the matrix. Helps to reduce the impact of words that appear too frequently. Default is `FALSE`}
+\item{reduce_frequent_words}{Logical. Takes the square root of the bag-of-words after normalizing the matrix. Helps to reduce the impact of words that appear too frequently. Default `FALSE`.}
 
-\item{seed_multiplier}{}
+\item{seed_words}{Character vector or `NULL`. Specific words that will have their idf value increased. Default `NULL`.}
 
-\item{obj}{bertopic object}
+\item{seed_multiplier}{Numeric. The value with which the idf values of the words in `seed_words` are multiplied. Default `2`.}
+
+\item{obj}{Python BERTopic module object or `NULL` to import. Default `NULL`.}
+}
+\value{
+A Python ClassTfidfTransformer model object.
 }
 \description{
 A Class-based TF-IDF procedure using scikit-learns TfidfTransformer as a base.

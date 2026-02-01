@@ -5,13 +5,16 @@
 #'
 #' Flair module \url{https://flair.readthedocs.io/en/latest/modules.html}
 #'
-#' @param assign_to_environment
-#' @param path
+#' @param assign_to_environment Logical. If `TRUE`, assigns module to global environment.
+#' @param path Character. Path to Python installation directory.
 #'
-#' @return
+#' @returns The Python Flair module object, invisibly.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' flair <- import_flair(assign_to_environment = FALSE)
+#' }
 import_flair <-
   function(assign_to_environment = T,
            path = NULL) {
@@ -24,12 +27,15 @@ import_flair <-
     obj
   }
 
-#' Title
+#' Access Flair Embeddings
 #'
-#' @return
+#' @returns The Flair embeddings module object.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' embeddings <- flair_embeddings()
+#' }
 flair_embeddings <-
   function() {
     obj <- import_flair(assign_to_environment = F)
@@ -38,12 +44,16 @@ flair_embeddings <-
 
 #' Roberta Embeddings
 #'
-#' @param obj
+#' @param obj Flair module object or `NULL`. If `NULL`, imports the module.
+#' @param is_token_embedding Logical. If `TRUE`, uses token-level embeddings. Default `TRUE`.
 #'
-#' @return
+#' @returns A Python TransformerDocumentEmbeddings object for RoBERTa embeddings.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' roberta <- roberta_embeddings()
+#' }
 roberta_embeddings <-
   function(obj = NULL, is_token_embedding = T) {
   if (length(obj) == 0) {
@@ -60,13 +70,16 @@ roberta_embeddings <-
 
 #' Sentence Transformer Module
 #'
-#' @param assign_to_environment
-#' @param path
+#' @param assign_to_environment Logical. If `TRUE`, assigns module to global environment.
+#' @param path Character. Path to Python installation directory.
 #'
-#' @return
+#' @returns The Python sentence-transformers module object, invisibly.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' st <- import_sentence_transformers(assign_to_environment = FALSE)
+#' }
 import_sentence_transformers <-
   function(assign_to_environment = T,
            path = NULL) {
@@ -81,15 +94,17 @@ import_sentence_transformers <-
 
 #' Sentence Transformer
 #'
-#' @param obj
-#' @param model_name transformer model name default `all-MiniLM-L6-v2` other options
-#' \item \href{https://www.sbert.net/docs/pretrained_models.html}{sbert}
-#' } and it defaults to `all-MiniLM-L6-v2`
+#' @param obj Sentence-transformers module object or `NULL`. If `NULL`, imports the module.
+#' @param model_name Character. Transformer model name. Default `"all-MiniLM-L6-v2"`. See \href{https://www.sbert.net/docs/pretrained_models.html}{sbert documentation} for other options.
+#' @param ... Additional arguments passed to `SentenceTransformer()`.
 #'
-#' @return
+#' @returns A Python SentenceTransformer model object for generating embeddings.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' model <- sentence_transformer(model_name = "all-MiniLM-L6-v2")
+#' }
 sentence_transformer <-
   function(obj = NULL, model_name = "all-MiniLM-L6-v2",...) {
     if (length(obj) == 0) {
@@ -103,13 +118,16 @@ sentence_transformer <-
 
 #' Import Hugging Face Transformers
 #'
-#' @param assign_to_environment
-#' @param path
+#' @param assign_to_environment Logical. If `TRUE`, assigns module to global environment.
+#' @param path Character. Path to Python installation directory.
 #'
-#' @return
+#' @returns The Python transformers module object, invisibly.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' transformers <- import_transformers(assign_to_environment = FALSE)
+#' }
 import_transformers <-
   function(assign_to_environment = T,
            path = NULL) {
@@ -124,13 +142,16 @@ import_transformers <-
 
 #' Distilbert Transformer
 #'
-#' @param obj
-#' @param ...
+#' @param obj Transformers module object or `NULL`. If `NULL`, imports the module.
+#' @param ... Additional arguments passed to `pipeline()`.
 #'
-#' @return
+#' @returns A Python feature-extraction pipeline using DistilBERT model.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' pipeline <- distilbert_embedding_transformer()
+#' }
 distilbert_embedding_transformer <-
   function(obj = NULL,...) {
     if (length(obj) == 0) {
@@ -142,18 +163,18 @@ distilbert_embedding_transformer <-
 
 #' Hugging Face Transformers
 #'
-#' @param obj
-#' @param task
-#' @param model model name options
-#' \itemize{
-#' \item \href{https://huggingface.co/models}{hugging face models}
-#' }
-#' @param ...
+#' @param obj Transformers module object or `NULL`. If `NULL`, imports the module.
+#' @param task Character. The task for the pipeline. Default `"feature-extraction"`.
+#' @param model Character. Model name from Hugging Face. Default `"distilbert-base-cased"`. See \href{https://huggingface.co/models}{Hugging Face models} for other options.
+#' @param ... Additional arguments passed to `pipeline()`.
 #'
-#' @return
+#' @returns A Python transformers pipeline object for the specified task and model.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' pipeline <- hugging_face_transformers(task = "feature-extraction", model = "distilbert-base-cased")
+#' }
 hugging_face_transformers <-
   function(obj = NULL, task = "feature-extraction", model = "distilbert-base-cased" ,...) {
     if (length(obj) == 0) {
@@ -168,14 +189,18 @@ hugging_face_transformers <-
 
 #' Embed Vector of Words
 #'
-#' @param obj Topic Model Object
-#' @param words Vector of Words
-#' @param verbose if `TRUE` verbose
+#' @param obj BERTopic topic model object.
+#' @param words Character vector. Words to embed.
+#' @param return_tibble Logical. If `TRUE`, returns a tibble; if `FALSE`, returns a matrix. Default `TRUE`.
+#' @param verbose Logical. If `TRUE`, displays verbose output. Default `TRUE`.
 #'
-#' @return
+#' @returns A tibble (if `return_tibble = TRUE`) or matrix with embeddings for each word. Columns include embedding dimensions and a `word` column.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' embeddings <- bert_embed_words(obj = topic_model, words = c("hello", "world"))
+#' }
 bert_embed_words <-
   function(obj, words, return_tibble = T,
            verbose = TRUE) {
@@ -194,14 +219,18 @@ bert_embed_words <-
 
 #' Embed Documents
 #'
-#' @param obj
-#' @param docs
-#' @param verbose
+#' @param obj BERTopic topic model object.
+#' @param docs Character vector. Documents to embed.
+#' @param return_tibble Logical. If `TRUE`, returns a tibble; if `FALSE`, returns a matrix. Default `TRUE`.
+#' @param verbose Logical. If `TRUE`, displays verbose output. Default `TRUE`.
 #'
-#' @return
+#' @returns A tibble (if `return_tibble = TRUE`) or matrix with embeddings for each document. Columns include embedding dimensions and a `document` column.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' embeddings <- bert_embed_documents(obj = topic_model, docs = c("First document.", "Second document."))
+#' }
 bert_embed_documents <-
   function(obj, docs, return_tibble = TRUE, verbose = TRUE) {
     dat <- topic_model$embedding_model$embed_documents(document = docs, verbose = verbose)

@@ -2,7 +2,7 @@
 % Please edit documentation in R/bert-documents.R
 \name{extract_bert_topics}
 \alias{extract_bert_topics}
-\title{Extract Berttopics from output}
+\title{Extract BERTopic Assignments from Output}
 \usage{
 extract_bert_topics(
   obj,
@@ -15,8 +15,23 @@ extract_bert_topics(
 )
 }
 \arguments{
-\item{label_words}{}
+\item{obj}{BERTopic model object.}
+
+\item{docs}{Character vector of documents. If `NULL`, returns only topic probabilities.}
+
+\item{id_columns}{Character vector. Column names to parse from document names/IDs.}
+
+\item{text_column}{Character. Name for the text column in output. If `NULL`, defaults to `text`.}
+
+\item{include_labels}{Logical. If `TRUE`, includes topic labels in output. Default `TRUE`.}
+
+\item{number_words}{Integer. Number of words per topic label. Default `4L`.}
+
+\item{arrange_topics}{Logical. If `TRUE`, arranges output by topic and probability. Default `FALSE`.}
+}
+\value{
+A tibble with columns: `topic_bert`, `pct_probability_topic_bert`, and optional `label_bertopic` and text columns.
 }
 \description{
-Extract Berttopics from output
+Extract BERTopic Assignments from Output
 }

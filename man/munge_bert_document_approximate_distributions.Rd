@@ -7,14 +7,14 @@
 munge_bert_document_approximate_distributions(out, obj = NULL, return_wide = F)
 }
 \arguments{
-\item{out}{Approximate Distribution Output from bert_approximate_distribution.}
+\item{out}{Approximate distribution output from bert_approximate_distribution.}
 
-\item{obj}{Bertopic Object. If provided, adds topic labels to output.}
+\item{obj}{BERTopic model object. If provided, adds topic labels to output. Default `NULL`.}
 
-\item{return_wide}{Logical. If TRUE, returns wide format. Default FALSE.}
+\item{return_wide}{Logical. If `TRUE`, returns wide format; otherwise returns long format. Default `FALSE`.}
 }
 \value{
-A tibble with document topic probability distributions in long or wide format.
+A tibble with document topic probability distributions in long or wide format. Long format has columns: `number_document`, `label_topic_bert`, `pct_probability_topic_bert`. Wide format has columns for each topic.
 }
 \description{
 Transforms approximate distribution output into a tidy tibble format.

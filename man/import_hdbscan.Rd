@@ -7,8 +7,18 @@
 import_hdbscan(assign_to_environment = T, path = NULL)
 }
 \arguments{
-\item{path}{}
+\item{assign_to_environment}{Logical. If `TRUE`, assigns module to global environment.}
+
+\item{path}{Character. Path to Python installation directory.}
+}
+\value{
+The Python hdbscan module object, invisibly.
 }
 \description{
 Import hdbscan
+}
+\examples{
+\dontrun{
+hdbscan <- import_hdbscan(assign_to_environment = FALSE)
+}
 }

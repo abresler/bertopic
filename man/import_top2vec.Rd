@@ -7,7 +7,12 @@
 import_top2vec(assign_to_environment = T, path = NULL)
 }
 \arguments{
-\item{path}{}
+\item{assign_to_environment}{Logical. If `TRUE`, assigns the imported Top2Vec module to the global environment. Default `TRUE`.}
+
+\item{path}{Character. Optional path to Python executable. If `NULL`, uses default Python.}
+}
+\value{
+A Python Top2Vec module object.
 }
 \description{
 Import Top2Vec

@@ -9,12 +9,12 @@ munge_bert_topics_per_class(data, class_name = NULL, topic_model = NULL)
 \arguments{
 \item{data}{Output from bert_topic_per_class function.}
 
-\item{class_name}{Optional character. Custom name for the class column.}
+\item{class_name}{Character. Custom name for the class column. Default `NULL`.}
 
-\item{topic_model}{Optional BERTopic model to add topic labels.}
+\item{topic_model}{BERTopic model object to add topic labels. Default `NULL`.}
 }
 \value{
-A tibble with cleaned topics per class data.
+A tibble with cleaned topics per class data, with columns: `topic_bert`, `words`, `count`, `class` (or custom named column), and optionally topic labels from the model.
 }
 \description{
 Transform topics per class output into a tidy tibble format.

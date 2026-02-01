@@ -11,10 +11,20 @@ bertopic_representations(
 )
 }
 \arguments{
-\item{obj}{Bertopic Module}
+\item{obj}{BERTopic module object or `NULL`. If `NULL`, imports the module.}
 
-\item{use_token_parallel}{}
+\item{numba_threads}{Integer. Number of threads for Numba. Default `1`.}
+
+\item{use_token_parallel}{Logical. If `TRUE`, uses token-level parallelization. Default `TRUE`.}
+}
+\value{
+The BERTopic representations module object.
 }
 \description{
 Import Bertopic Representations
+}
+\examples{
+\dontrun{
+rep_module <- bertopic_representations()
+}
 }

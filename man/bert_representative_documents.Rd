@@ -14,9 +14,20 @@ bert_representative_documents(
 )
 }
 \arguments{
-\item{obj}{Topic Model Object}
+\item{obj}{A BERTopic model object.}
 
-\item{topic_number}{If not `NULL` number of topic}
+\item{topic_number}{Integer. Specific topic number, or `NULL` to return all topics.}
+
+\item{include_labels}{Logical. If `TRUE` includes topic labels. Default is `TRUE`.}
+
+\item{number_words}{Integer. Number of top words to use in labels. Default is 5.}
+
+\item{top_n_documents}{Integer. Maximum number of documents to return per topic, or `NULL` for all.}
+
+\item{sep}{Character. Separator for label construction. Default is `"_"`.}
+}
+\value{
+A tibble containing representative documents with columns: `number_document_topic`, `topic_bert`, `label_bertopic`, `text`, and `is_outlier_bert_topic`.
 }
 \description{
 Topic's Representative Documents

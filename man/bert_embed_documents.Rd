@@ -7,8 +7,22 @@
 bert_embed_documents(obj, docs, return_tibble = TRUE, verbose = TRUE)
 }
 \arguments{
-\item{verbose}{}
+\item{obj}{BERTopic topic model object.}
+
+\item{docs}{Character vector. Documents to embed.}
+
+\item{return_tibble}{Logical. If `TRUE`, returns a tibble; if `FALSE`, returns a matrix. Default `TRUE`.}
+
+\item{verbose}{Logical. If `TRUE`, displays verbose output. Default `TRUE`.}
+}
+\value{
+A tibble (if `return_tibble = TRUE`) or matrix with embeddings for each document. Columns include embedding dimensions and a `document` column.
 }
 \description{
 Embed Documents
+}
+\examples{
+\dontrun{
+embeddings <- bert_embed_documents(obj = topic_model, docs = c("First document.", "Second document."))
+}
 }

@@ -16,8 +16,30 @@ langchain_representation(
 )
 }
 \arguments{
-\item{obj}{}
+\item{chain}{Python LangChain chain object or `NULL`.}
+
+\item{prompt}{Character or `NULL`. Prompt template for the chain.}
+
+\item{nr_docs}{Integer. Number of documents to pass to the chain. Default `4`.}
+
+\item{diversity}{Numeric or `NULL`. Diversity of documents to pass to the chain.}
+
+\item{doc_length}{Integer or `NULL`. Maximum length of each document.}
+
+\item{tokenizer}{Character or `NULL`. Tokenizer for document length calculation.}
+
+\item{chain_config}{List or `NULL`. Additional chain configuration parameters.}
+
+\item{obj}{BERTopic object or `NULL`.}
+}
+\value{
+A Python LangChain representation object with representation_method and input_parameters attributes.
 }
 \description{
 Lang Chain Representation
+}
+\examples{
+\dontrun{
+repr <- langchain_representation(chain = NULL, prompt = "What are these documents about?")
+}
 }

@@ -7,7 +7,10 @@
 tbl_polyfuzz_matches(obj)
 }
 \arguments{
-\item{obj}{polyfuzz objet}
+\item{obj}{A PolyFuzz model object.}
+}
+\value{
+A tibble containing matches with columns: `from`, `to`, and `similarity`.
 }
 \description{
 Polyfuzz matches in a clean tibble

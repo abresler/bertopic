@@ -6,6 +6,9 @@
 \usage{
 bert_base_stop_words()
 }
+\value{
+A character vector of base English stopwords.
+}
 \description{
 bert
 }

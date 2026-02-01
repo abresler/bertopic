@@ -15,20 +15,28 @@ keybert_inspired_representation(
 )
 }
 \arguments{
-\item{top_n_words}{The top n words to extract per topic.  Default `10`.}
+\item{top_n_words}{Integer. The top n words to extract per topic. Default `10`.}
 
-\item{nr_repr_docs}{The number of representative documents to extract per cluster.  Default `5`.}
+\item{nr_repr_docs}{Integer. The number of representative documents to extract per cluster. Default `5`.}
 
-\item{nr_samples}{The number of candidate documents to extract per cluster.  Default `500`.}
+\item{nr_samples}{Integer. The number of candidate documents to extract per cluster. Default `500`.}
 
-\item{nr_candidate_words}{The number of candidate words per cluster.  Default `100`.}
+\item{nr_candidate_words}{Integer. The number of candidate words per cluster. Default `100`.}
 
-\item{random_state}{The random state for randomly sampling candidate documents.  Default `42`.}
+\item{random_state}{Integer. The random state for randomly sampling candidate documents. Default `42`.}
 
-\item{numba_threads}{}
+\item{numba_threads}{Integer. Number of threads for Numba. Default `1`.}
 
-\item{obj}{Bertopic Module}
+\item{obj}{BERTopic module object or `NULL`.}
+}
+\value{
+A Python KeyBERTInspired representation object with representation_method and input_parameters attributes.
 }
 \description{
 Use a KeyBERT-like model to fine-tune the topic representations
+}
+\examples{
+\dontrun{
+repr <- keybert_inspired_representation(top_n_words = 10L)
+}
 }

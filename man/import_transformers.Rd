@@ -7,8 +7,18 @@
 import_transformers(assign_to_environment = T, path = NULL)
 }
 \arguments{
-\item{path}{}
+\item{assign_to_environment}{Logical. If `TRUE`, assigns module to global environment.}
+
+\item{path}{Character. Path to Python installation directory.}
+}
+\value{
+The Python transformers module object, invisibly.
 }
 \description{
 Import Hugging Face Transformers
+}
+\examples{
+\dontrun{
+transformers <- import_transformers(assign_to_environment = FALSE)
+}
 }

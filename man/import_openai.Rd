@@ -2,13 +2,23 @@
 % Please edit documentation in R/base_modules.R
 \name{import_openai}
 \alias{import_openai}
-\title{OpenAI}
+\title{Import OpenAI}
 \usage{
 import_openai(assign_to_environment = T, path = NULL)
 }
 \arguments{
-\item{path}{}
+\item{assign_to_environment}{Logical. If `TRUE`, assigns module to global environment.}
+
+\item{path}{Character. Path to Python installation directory.}
+}
+\value{
+The Python OpenAI module object, invisibly.
 }
 \description{
-OpenAI
+Import OpenAI
+}
+\examples{
+\dontrun{
+openai <- import_openai(assign_to_environment = FALSE)
+}
 }

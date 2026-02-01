@@ -2,13 +2,18 @@
 % Please edit documentation in R/keyphrase.R
 \name{import_keyphrase}
 \alias{import_keyphrase}
-\title{Import Keyphrase}
+\title{Import Keyphrase Vectorizers}
 \usage{
 import_keyphrase(assign_to_environment = T, path = NULL)
 }
 \arguments{
-\item{path}{}
+\item{assign_to_environment}{Logical. If `TRUE`, assigns the keyphrase module to the global environment. Default `TRUE`.}
+
+\item{path}{Character. Optional path to Python executable. If `NULL`, uses default Python.}
+}
+\value{
+A Python keyphrase_vectorizers module object.
 }
 \description{
-Import Keyphrase
+Import Keyphrase Vectorizers
 }

@@ -6,6 +6,9 @@
 \usage{
 bert_backend()
 }
+\value{
+A Python BERTopic backend module object.
+}
 \description{
 Bertopic Backend
 }

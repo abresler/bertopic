@@ -23,38 +23,48 @@ sklearn_vectorizer(
 )
 }
 \arguments{
-\item{obj}{sklearn library object}
+\item{obj}{Scikit-learn library object or `NULL`.}
 
-\item{ngram_range}{`list` The lower and upper boundary of the range of n-values for different word n-grams or char n-grams to be extracted. All values of n such such that min_n <= n <= max_n will be used. For example an ngram_range of (1, 1) means only unigrams, (1, 2) means unigrams and bigrams, and (2, 2) means only bigrams. Only applies if analyzer is not callable.}
+\item{language}{Character. Language for stopword filtering. Default `"english"`.}
 
-\item{analyzer}{`{‘word’, ‘char’, ‘char_wb’} or callable, default=’word’` Whether the feature should be made of word n-gram or character n-grams. Option ‘char_wb’ creates character n-grams only from text inside word boundaries; n-grams at the edges of words are padded with space. If a callable is passed it is used to extract the sequence of features out of the raw, unprocessed input.}
+\item{ngram_range}{List of two integers. The lower and upper boundary of the range of n-values for different word n-grams to be extracted. For example `list(1L, 2L)` means unigrams and bigrams.}
 
-\item{strip_accents}{`{‘ascii’, ‘unicode’} or callable, default=None`  Remove accents and perform other character normalization during the preprocessing step. ‘ascii’ is a fast method that only works on characters that have a direct ASCII mapping. ‘unicode’ is a slightly slower method that works on any characters. None (default) means no character normalization is performed.`}
+\item{analyzer}{Character. Whether the feature should be made of word n-grams or character n-grams. Options: `"word"`, `"char"`, or `"char_wb"`. Default `"word"`.}
 
-\item{exclude_stop_words}{if `TRUE` excludes stopwords.  Default is `TRUE`}
+\item{stopword_package_sources}{Character vector or `NULL`. Sources for stopword packages.}
 
-\item{extra_stop_words}{Vector of extra stop wwords}
+\item{strip_accents}{Character or `NULL`. Remove accents: `"ascii"` or `"unicode"`. Default `NULL`.}
 
-\item{token_pattern}{Regular expression denoting what constitutes a “token”, only used if analyzer == 'word'. The default regexp select tokens of 2 or more alphanumeric characters (punctuation is completely ignored and always treated as a token separator).}
+\item{exclude_stop_words}{Logical. If `TRUE`, excludes stopwords. Default `TRUE`.}
 
-\item{vocabulary}{Either a Mapping (e.g., a dict) where keys are terms and values are indices in the feature matrix, or an iterable over terms. If not given, a vocabulary is determined from the input documents. Indices in the mapping should not be repeated and should not have any gap between 0 and the largest index.}
+\item{extra_stop_words}{Character vector or `NULL`. Additional stopwords to exclude.}
 
-\item{is_lower_case}{if `TRUE` all to lower case}
+\item{token_pattern}{Character. Regular expression for tokenization. Default `"(?u)\\b\\w\\w+\\b"`.}
 
-\item{max_df}{During fitting ignore keyphrases that have a document frequency strictly higher than the given threshold. Default `NULL`}
+\item{vocabulary}{List or `NULL`. Pre-defined vocabulary mapping.}
 
-\item{min_df}{During fitting ignore keyphrases that have a document frequency strictly lower than the given threshold. This value is also called cut-off in the literature.  Default `NULL`}
+\item{is_lower_case}{Logical. If `TRUE`, converts text to lowercase. Default `TRUE`.}
 
-\item{max_features}{If not None, build a vocabulary that only consider the top max_features ordered by term frequency across the corpus.}
+\item{max_df}{Numeric. Maximum document frequency threshold. Default `1`.}
 
-\item{binary}{If True, all non zero counts are set to 1. This is useful for discrete probabilistic models that model binary events rather than integer counts.}
+\item{min_df}{Numeric. Minimum document frequency threshold. Default `1`.}
+
+\item{max_features}{Integer or `NULL`. Maximum number of features to consider.}
+
+\item{binary}{Logical. If `TRUE`, all non-zero counts are set to 1. Default `FALSE`.}
+}
+\value{
+A Python CountVectorizer object configured with the specified parameters.
 }
 \description{
 SKLearn Word Vectorizer
 }
 \examples{
+\dontrun{
 vectorizer_model <- sklearn_vectorizer(ngram_range = list(1L, 3L))
-docs <- c('This is the first document.', 'This document is the second document.', 'And this is the third one.', 'Is this the first document?')
+docs <- c('This is the first document.', 'This document is the second document.',
+          'And this is the third one.', 'Is this the first document?')
 vectorizer_model$fit_transform(raw_documents = docs)
 vectorizer_model$get_feature_names_out()
+}
 }

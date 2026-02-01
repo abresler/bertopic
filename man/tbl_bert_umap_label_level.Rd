@@ -15,7 +15,22 @@ tbl_bert_umap_label_level(
 )
 }
 \arguments{
-\item{exclude_outlier}{}
+\item{obj}{BERTopic model object.}
+
+\item{exclude_outlier}{Logical. If `TRUE`, excludes outlier topic. Default `FALSE`.}
+
+\item{n_components}{Integer. Number of UMAP dimensions. Default `2L`.}
+
+\item{metric}{Character. Distance metric for UMAP. Default `"cosine"`.}
+
+\item{random_state}{Integer. Random seed for reproducibility. Default `42L`.}
+
+\item{min_dist}{Numeric. Minimum distance parameter for UMAP. Default `0.1`.}
+
+\item{learning_rate}{Integer. Learning rate for UMAP. Default `1L`.}
+}
+\value{
+A tibble with topic frequencies and UMAP coordinates for visualization.
 }
 \description{
 Extract UMAP for Visualization

@@ -2,7 +2,7 @@
 % Please edit documentation in R/top2vec.R
 \name{top2vec_similar_words}
 \alias{top2vec_similar_words}
-\title{Textop2vecec Similar Words}
+\title{Top2Vec Similar Words}
 \usage{
 top2vec_similar_words(
   keywords = NULL,
@@ -14,8 +14,21 @@ top2vec_similar_words(
 )
 }
 \arguments{
-\item{ef}{}
+\item{keywords}{Character vector of keywords to find similar words for.}
+
+\item{obj}{Top2Vec model object.}
+
+\item{keywords_exclude}{Character vector. Keywords to exclude from results. Default `NULL`.}
+
+\item{number_words}{Integer. Number of similar words to return per keyword. Default `10L`.}
+
+\item{use_index}{Logical. Whether to use index for search. Default `FALSE`.}
+
+\item{ef}{Integer or `NULL`. HNSW search parameter.}
+}
+\value{
+A tibble with columns: `keyword_search`, `similar_words_top2vec`, and `score_top2vec`.
 }
 \description{
-Textop2vecec Similar Words
+Top2Vec Similar Words
 }

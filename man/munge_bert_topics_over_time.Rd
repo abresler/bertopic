@@ -9,10 +9,10 @@ munge_bert_topics_over_time(data, topic_model = NULL)
 \arguments{
 \item{data}{Output from bert_topics_over_time function.}
 
-\item{topic_model}{Optional BERTopic model to add topic labels.}
+\item{topic_model}{BERTopic model object to add topic labels. Default `NULL`.}
 }
 \value{
-A tibble with cleaned topics over time data.
+A tibble with cleaned topics over time data, with columns: `topic_bert`, `words`, `count`, `date_time`, `date`, and optionally topic labels from the model.
 }
 \description{
 Transform topics over time output into a tidy tibble format.

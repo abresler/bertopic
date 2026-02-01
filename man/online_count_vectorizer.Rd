@@ -15,7 +15,22 @@ online_count_vectorizer(
 )
 }
 \arguments{
-\item{...}{}
+\item{decay}{Numeric or `NULL`. Decay parameter for online learning. Default `NULL`.}
+
+\item{delete_min_df}{Logical or `NULL`. If `TRUE` deletes documents with frequency below minimum. Default `NULL`.}
+
+\item{stop_words}{Character vector or `NULL`. Stopwords to exclude. Default `NULL`.}
+
+\item{numba_threads}{Integer. Number of threads for Numba operations. Default `1`.}
+
+\item{use_token_parallel}{Logical. If `TRUE` enables parallel tokenization. Default `FALSE`.}
+
+\item{obj}{Python BERTopic module object or `NULL` to import. Default `NULL`.}
+
+\item{...}{Additional arguments passed to the Python vectorizer.}
+}
+\value{
+A Python OnlineCountVectorizer model object.
 }
 \description{
 An Online Vectorizer

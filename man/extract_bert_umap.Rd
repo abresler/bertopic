@@ -7,7 +7,12 @@
 extract_bert_umap(obj, data = NULL, number_zeros = 4)
 }
 \arguments{
-\item{data}{}
+\item{obj}{BERTopic model object with UMAP embeddings.}
+
+\item{data}{Optional tibble to bind UMAP coordinates to. Default `NULL`.}
+}
+\value{
+A tibble with UMAP coordinates (columns named `umap_00`, `umap_01`, etc.), `pct_dbscan_prob`, and optionally bound to the input data.
 }
 \description{
 Extract UMAP from Object

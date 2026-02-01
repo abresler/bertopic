@@ -7,8 +7,18 @@
 distilbert_embedding_transformer(obj = NULL, ...)
 }
 \arguments{
-\item{...}{}
+\item{obj}{Transformers module object or `NULL`. If `NULL`, imports the module.}
+
+\item{...}{Additional arguments passed to `pipeline()`.}
+}
+\value{
+A Python feature-extraction pipeline using DistilBERT model.
 }
 \description{
 Distilbert Transformer
+}
+\examples{
+\dontrun{
+pipeline <- distilbert_embedding_transformer()
+}
 }

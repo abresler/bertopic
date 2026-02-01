@@ -12,13 +12,16 @@ polyfuzz_rapidmatcher(
 )
 }
 \arguments{
-\item{n_jobs}{Nr of parallel processes, use -1 to use all cores.  Default `1L`}
+\item{n_jobs}{Integer. Number of parallel processes; use -1 for all cores. Default is 1.}
 
-\item{score_cutoff}{The minimum similarity for which to return a good match. Should be between 0 and 1.  Default .5}
+\item{score_cutoff}{Numeric. Minimum similarity for a good match, between 0 and 1. Default is 0.5.}
 
-\item{scorer}{The scorer function to be used to calculate the edit distance Options: `fuzz.ratio` `fuzz.partial_ratio`  `fuzz.token_sort_ratio` `fuzz.partial_token_sort_ratio` `fuzz.token_set_ratio ` `fuzz.partial_token_set_ratio` `fuzz.token_ratio` `fuzz.partial_token_ratio` `fuzz.WRation` `fuzz.QRatio` See https://maxbachmann.github.io/rapidfuzz/usage/fuzz/ for an extensive description of the scoring methods.  If NULL uses WRatio}
+\item{scorer}{A Python scorer function. Options: `fuzz.ratio`, `fuzz.partial_ratio`, `fuzz.token_sort_ratio`, `fuzz.partial_token_sort_ratio`, `fuzz.token_set_ratio`, `fuzz.partial_token_set_ratio`, `fuzz.token_ratio`, `fuzz.partial_token_ratio`, `fuzz.WRatio`, `fuzz.QRatio`. If `NULL` uses WRatio.}
 
-\item{model_id}{The name of the particular instance, used when comparing models}
+\item{model_id}{Character. Name of the particular instance, used when comparing models.}
+}
+\value{
+A Python PolyFuzz RapidFuzz model object.
 }
 \description{
 We are using RapidFuzz instead of FuzzyWuzzy since it is much faster and does not require the more restrictive GPL license

@@ -6,6 +6,21 @@
 \usage{
 sentence_transformer(obj = NULL, model_name = "all-MiniLM-L6-v2", ...)
 }
+\arguments{
+\item{obj}{Sentence-transformers module object or `NULL`. If `NULL`, imports the module.}
+
+\item{model_name}{Character. Transformer model name. Default `"all-MiniLM-L6-v2"`. See \href{https://www.sbert.net/docs/pretrained_models.html}{sbert documentation} for other options.}
+
+\item{...}{Additional arguments passed to `SentenceTransformer()`.}
+}
+\value{
+A Python SentenceTransformer model object for generating embeddings.
+}
 \description{
 Sentence Transformer
+}
+\examples{
+\dontrun{
+model <- sentence_transformer(model_name = "all-MiniLM-L6-v2")
+}
 }

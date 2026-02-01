@@ -8,7 +8,12 @@ Polyfuzz module \url{https://maartengr.github.io/PolyFuzz/}}
 import_polyfuzz(assign_to_environment = T, path = NULL)
 }
 \arguments{
-\item{path}{}
+\item{assign_to_environment}{Logical. If `TRUE` assigns the PolyFuzz module to the global environment.}
+
+\item{path}{Character. Path to Python environment or `NULL` for default.}
+}
+\value{
+A Python PolyFuzz module object.
 }
 \description{
 Import Polyfuzz

@@ -14,15 +14,18 @@ bert_similar_terms_topics(
 )
 }
 \arguments{
-\item{obj}{BERTopic Ojbect}
+\item{obj}{BERTopic model object.}
 
-\item{terms}{Vector of Terms to search}
+\item{terms}{Character vector of search terms to find similar topics for.}
 
-\item{top_n_terms}{the number of topics to return.  Default is 10}
+\item{top_n_terms}{Integer. Number of most similar topics to return per term. Default `10L`.}
 
-\item{nest_data}{if `TRUE` Nests data}
+\item{nest_data}{Logical. If `TRUE`, nests data by term. Default `FALSE`.}
 
-\item{return_message}{}
+\item{return_message}{Logical. If `TRUE`, prints processing messages. Default `TRUE`.}
+}
+\value{
+A tibble with columns: `term`, `topic_bert`, `similarity`, `is_outlier_bert_topic`, and topic information joined from `bert_topic_info()`.
 }
 \description{
 Find topics most similar to Search Terms

@@ -4,16 +4,16 @@
 
 #' Load BERTopic Model
 #'
-#' @param model_path
-#' @param obj
-#' @param embedding_model
-#' @param numba_threads
-#' @param use_token_parallel
+#' @param model_path Character. File path where the BERTopic model is stored.
+#' @param obj BERTopic module object. If `NULL`, imports BERTopic automatically.
+#' @param embedding_model Character or callable. Embedding model to use. If `NULL`, uses model's default.
+#' @param numba_threads Integer. Number of Numba threads to use. Default `1`.
+#' @param use_token_parallel Logical. Whether to use token-level parallelization. Default `TRUE`.
 #'
-#' @return
+#' @returns The loaded BERTopic model object.
 #' @export
 #'
-#' @examples
+
 bert_load <-
   function(model_path = NULL,
            obj = NULL,
@@ -46,17 +46,17 @@ bert_load <-
 
 #' Save BERTopic Model
 #'
-#' @param obj BERTopic Object
-#' @param model_path Path where object is saved
-#' @param file_name name of the BERTOPIC Model
-#' @param save_embedding_model if `TRUE` If serialization pickle, then you can choose to skip saving the embedding model. If serialization safetensors or pytorch, this variable can be used as a string pointing towards a huggingface model.
-#' @param serialization  If pickle, the entire model will be pickled. If safetensors or pytorch the model will be saved without the embedding, dimensionality reduction, and clustering algorithms. This is a very efficient format and typically advised.  Default `safetensors`
-#' @param save_ctfidf
+#' @param obj BERTopic model object.
+#' @param model_path Character. Directory path where the model will be saved.
+#' @param file_name Character. Name for the BERTopic model file. Default `"bert_model"`.
+#' @param save_embedding_model Logical or character. If `TRUE`, saves the embedding model. If character, points to HuggingFace model. Default `TRUE`.
+#' @param serialization Character. Serialization format: `"pickle"`, `"safetensors"`, or `"pytorch"`. Default `"safetensors"`.
+#' @param save_ctfidf Logical. Whether to save c-TF-IDF model. Default `TRUE`.
 #'
-#' @return
+#' @returns Called for side effects; returns invisibly.
 #' @export
 #'
-#' @examples
+
 bert_save <-
   function(obj,
            model_path = NULL,
@@ -98,9 +98,9 @@ bert_save <-
 
 #' NLTK Stopwords
 #'
-#' @param language language defaults to `english`
+#' @param language Character. Language code. Default `"english"`.
 #'
-#' @return
+#' @returns A character vector of stopwords in the specified language.
 #' @export
 #'
 #' @examples
@@ -115,12 +115,12 @@ dictionary_nltk_stopwords <-
 
 #' Stopword Package Sources
 #'
-#' @param sources
+#' @param sources Character vector. Stopword sources to include. Options: `"snowball"`, `"stopwords-iso"`, `"smart"`, `"nltk"`.
 #'
-#' @return
+#' @returns A character vector of unique stopwords combined from specified sources.
 #' @export
 #'
-#' @examples
+
 stopwords_sources <-
   function(sources = c(
              "snowball",
@@ -139,15 +139,15 @@ stopwords_sources <-
 
 #' Stopword List Generator
 #'
-#' @param language
-#' @param is_lower_case
-#' @param extra_stop_words
-#' @param stopword_package_sources
+#' @param language Character. Language code. Default `"english"`.
+#' @param is_lower_case Logical. If `TRUE`, converts stopwords to lowercase. Default `TRUE`.
+#' @param extra_stop_words Character vector. Additional stopwords to include. Default `NULL`.
+#' @param stopword_package_sources Character vector. External stopword sources to combine. Default `NULL`.
 #'
-#' @return
+#' @returns A character vector of unique stopwords.
 #' @export
 #'
-#' @examples
+
 bert_stopwords <-
   function(language = "english",
            is_lower_case = T,
@@ -178,12 +178,12 @@ bert_stopwords <-
 
 #' Select Correct Python
 #'
-#' @param path
+#' @param path Character. Path to Python executable. If `NULL`, uses default Python.
 #'
-#' @return
+#' @returns Called for side effects; returns invisibly.
 #' @export
 #'
-#' @examples
+
 select_correct_python <-
   function(path = "/opt/miniconda3/bin/python3.12") {
     if (length(path) == 0) {

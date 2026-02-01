@@ -12,7 +12,16 @@ tbl_bert_transform_documents(
 )
 }
 \arguments{
-\item{embeddings}{}
+\item{data}{A tibble or data frame containing documents to transform.}
+
+\item{topic_model}{BERTopic model object.}
+
+\item{document_name}{Character. Name of the column containing documents.}
+
+\item{embeddings}{Logical or matrix. Pre-computed embeddings. If `TRUE`, computes embeddings. Default `TRUE`.}
+}
+\value{
+A tibble containing original data with added topic assignments and related information.
 }
 \description{
 Transform Documents from Tibble

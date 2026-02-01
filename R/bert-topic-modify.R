@@ -2,14 +2,14 @@
 
 #' Merge Topics
 #'
-#' @param obj bertopic model object
-#' @param docs The documents you used when calling either fit or fit_transform
-#' @param topics_to_merge Either a list of topics or a list of list of topics to merge. For example: `list(1,2,3)` will merge topics 1, 2 and 3 `list(list(1,2), list(3,4))` will merge topics 1 and 2, and separately merge topics 3 and 4.
+#' @param obj BERTopic model object.
+#' @param docs Character vector of documents used in model fitting.
+#' @param topics_to_merge List. Either a list of topic IDs or a list of lists of topic IDs to merge. For example: `list(1,2,3)` merges topics 1, 2, and 3; `list(list(1,2), list(3,4))` merges 1 and 2 separately from 3 and 4.
 #'
-#' @return
+#' @returns The updated BERTopic model object with merged topics.
 #' @export
 #'
-#' @examples
+
 bert_merge_topics <-
   function(obj, docs,
            topics_to_merge = NULL) {
@@ -27,37 +27,24 @@ bert_merge_topics <-
     obj
   }
 
-#' Reduce Bertopic Outliers
+#' Reduce BERTopic Outliers
 #'
-#' @param obj
-#' @param docs
-#' @param topics The topics that correspond to the documents.  IF `NULL` pulls from bertopic object
-#' @param images
-#' @param strategy  When using HDBSCAN, DBSCAN, or OPTICS, a number of outlier documents might be createdthat do not fall within any of the created topics. These are labeled as -1. This function allows the user to match outlier documents with their nearest topic using one of the following strategies using the `strategy`. parameter: #' \itemize{
-#' \item{
-#' `probabilities` This uses the soft-clustering as performed by HDBSCAN to find the best matching topic for each outlier document. To use this, make sure to calculate the `probabilities` beforehand by instantiating BERTopic with `calculate_probabilities=True`.
-#' }
-#' \item{
-#' `distributions`  Use the topic distributions, as calculated with `.approximate_distribution` to find the most frequent topic in each outlier document. You can use the `distributions_params` variable to tweak the parameters of`.approximate_distribution`.
-#' }
-#' \item{
-#' `c-tf-idf` Calculate the c-TF-IDF representation for each outlier document and find the best matching c-TF-IDF topic representation using cosine similarity.
-#' }
-#' \item{
-#' `embeddings` Using the embeddings of each outlier documents, find the best matching topic embedding using cosine similarity.
-#' }
-#' }
-#' @param probabilities
-#' @param threshold The threshold for assigning topics to outlier documents. This value represents the minimum probability when `strategy="probabilities"`. For all other strategies, it represents the minimum similarity.
-#' @param embeddings The pre-computed embeddings to be used when `strategy="embeddings"`. If this is None, then it will compute the embeddings for the outlier documents.
-#' @param distributions_params The parameters used in `.approximate_distribution` when using the strategy `"distributions"`.
-#' @param document_name if not `NULL` new name for document column
-#' @param update_topics If `TRUE` updates topics
+#' @param obj BERTopic model object.
+#' @param docs Character vector of documents used in model fitting.
+#' @param topics Integer vector. Topics corresponding to documents. If `NULL`, pulls from model object.
+#' @param images List. Optional images associated with documents. Default `NULL`.
+#' @param strategy Character. Strategy for assigning outliers. Options: `"probabilities"` (uses HDBSCAN soft-clustering), `"distributions"` (uses topic distributions), `"c-tf-idf"` (uses c-TF-IDF cosine similarity), `"embeddings"` (uses embedding cosine similarity). Default `"distributions"`.
+#' @param probabilities Matrix. Pre-computed probabilities for strategy `"probabilities"`. Default `NULL`.
+#' @param threshold Numeric. Minimum probability or similarity threshold for topic assignment. Default `0L`.
+#' @param embeddings Matrix. Pre-computed embeddings for strategy `"embeddings"`. If `NULL`, computes them.
+#' @param distributions_params List. Parameters for `.approximate_distribution` when using strategy `"distributions"`. Default `NULL`.
+#' @param document_name Character. If not `NULL`, new name for document column.
+#' @param update_topics Logical. If `TRUE`, updates topics in model. Default `TRUE`.
 #'
-#' @return
+#' @returns A tibble with columns: `number_document`, `strategy`, `is_reduced_topic`, and topic information before/after reduction.
 #' @export
 #'
-#' @examples
+
 bert_reduce_outliers <-
   function(obj,
            docs,
@@ -135,24 +122,24 @@ bert_reduce_outliers <-
     dat
   }
 
-#' Reduce BERTopics
+#' Reduce BERTopic Topics
 #'
-#' @param obj BERTopic Topic Model
-#' @param docs Vector of Documents
-#' @param number_topics Number of topics to reduce to
-#' @param number_words Top n words per topic to use.  Default is 4
-#' @param separator The string with which the words and topic prefix will be separated. Underscores are the default but a nice alternative is ", ".  Default `_`
-#' @param word_length The maximum length of each word in the topic label. Some words might be relatively long and setting this value helps to make sure that all labels have relatively similar lengths.
-#' @param topic_prefix  Whether to use the topic ID as a prefix. If set to True, the topic ID will be separated using the separator
-#' @param append_number_words Append the number of words
-#' @param update_bert_labels If `TRUE` updates actual topic labels
-#' @param update_topic_model_labels if `TRUE` updates new label into a custom field
-#' @param images
+#' @param obj BERTopic model object.
+#' @param docs Character vector of documents used in model fitting.
+#' @param number_topics Integer. Target number of topics to reduce to.
+#' @param update_bert_labels Logical. If `TRUE`, updates actual topic labels. Default `TRUE`.
+#' @param number_words Integer. Number of top words per topic for labeling. Default `1L`.
+#' @param separator Character. Separator between words and topic prefix. Default `"_"`.
+#' @param word_length Integer or `NULL`. Maximum length of each word in topic label. Default `NULL`.
+#' @param update_topic_model_labels Logical. If `TRUE`, updates custom label field. Default `TRUE`.
+#' @param append_number_words Logical. If `TRUE`, appends number of words to label. Default `FALSE`.
+#' @param images List. Optional images associated with documents. Default `NULL`.
+#' @param topic_prefix Logical. If `TRUE`, uses topic ID as prefix. Default `FALSE`.
 #'
-#' @return
+#' @returns The updated BERTopic model object with reduced topics.
 #' @export
 #'
-#' @examples
+
 bert_reduce_topics <-
   function(obj,
            docs = NULL,
@@ -192,39 +179,39 @@ bert_reduce_topics <-
     obj
   }
 
-#' Updates the topic representation by recalculating c-TF-IDF with the new parameters as defined in this function.
+#' Update BERTopic Topic Representations
 #'
-#' @param obj BERTopic Object
-#' @param docs The documents you used when calling either fit or fit_transform
-#' @param topics  A list of topics where each topic is related to a document in docs. Use this variable to change or map the topics. NOTE: Using a custom list of topic assignments may lead to errors if topic reduction techniques are used afterwards. Make sure that manually assigning topics is the last step in the pipeline.  Default `NULL`
-#' @param top_n_words The number of words per topic to extract. Setting this too high can negatively impact topic embeddings as topics are typically best represented by at most 10 words.  Default `10`
-#' @param n_gram_range The n-gram range for the CountVectorizer. Default `NULL`
-#' @param vectorizer_model Pass in your own CountVectorizer from scikit-learn.  Default `NULL`
-#' @param ctfidf_model Pass in your own c-TF-IDF model to update the representations.  Default `NULL`
-#' @param representation_model  Pass in a model that fine-tunes the topic representations calculated through c-TF-IDF. Models from bertopic.representation are supported. Default `NULL`
-#' @param language The main language used in your documents. The default sentence-transformers model for "english" is all-MiniLM-L6-v2. For a full overview of supported languages see bertopic.backend.languages. Select "multilingual" to load in the paraphrase-multilingual-MiniLM-L12-v2 sentence-tranformers model that supports 50+ languages. Default `english`
-#' @param use_key_phrase_vectorizer if `TRUE` uses a keyphrase vectorizer
-#' @param use_sklearn_vectorizer If `TRUE` uses SKLearn vectorizer
-#' @param is_lower_case if `TRUE` lower case
-#' @param keyphrase_ngram_range If not `NULL` range for keyphrase
-#' @param exclude_stop_words if `TRUE` excludes basic stopwords
-#' @param stopword_package_sources options if not `NULL` `c("snowball", "stopwords-iso", "smart", "nltk")`
-#' @param extra_stop_words vector of other stopwords
-#' @param min_df During fitting ignore keyphrases that have a document frequency strictly lower than the given threshold. This value is also called cut-off in the literature.  Default `1L`
-#' @param pos_pattern Position patter for keyphrase.  Defaults to `pos_pattern = "<J.*>*<N.*>+",`
-#' @param seed_topic_list A list of seed words per topic to converge around.  Default is `NULL`
-#' @param max_df
-#' @param vocabulary
-#' @param images
-#' @param use_empty_vectorizer
-#' @param decay
-#' @param delete_min_df
-#' @param workers
+#' @param obj BERTopic model object.
+#' @param docs Character vector of documents used in model fitting.
+#' @param topics Integer vector. Topics mapping for documents. Default `NULL`.
+#' @param top_n_words Integer. Number of words per topic to extract. Default `10`.
+#' @param n_gram_range List. N-gram range for CountVectorizer as `list(min, max)`. Default `list(1L, 1L)`.
+#' @param vectorizer_model Callable. Custom CountVectorizer from scikit-learn. Default `NULL`.
+#' @param ctfidf_model Callable. Custom c-TF-IDF model. Default `NULL`.
+#' @param representation_model Callable. Model to fine-tune c-TF-IDF representations. Default `NULL`.
+#' @param language Character. Language code. Default `"english"`.
+#' @param use_key_phrase_vectorizer Logical. If `TRUE`, uses keyphrase vectorizer. Default `FALSE`.
+#' @param use_sklearn_vectorizer Logical. If `TRUE`, uses sklearn vectorizer. Default `FALSE`.
+#' @param is_lower_case Logical. If `TRUE`, converts to lowercase. Default `TRUE`.
+#' @param keyphrase_ngram_range List. N-gram range for keyphrase vectorizer. Default `list(1L, 1L)`.
+#' @param exclude_stop_words Logical. If `TRUE`, excludes stopwords. Default `TRUE`.
+#' @param stopword_package_sources Character vector. Stopword sources: `"snowball"`, `"stopwords-iso"`, `"smart"`, `"nltk"`. Default `NULL`.
+#' @param extra_stop_words Character vector. Additional stopwords. Default `NULL`.
+#' @param min_df Integer. Minimum document frequency for keyphrases. Default `1L`.
+#' @param pos_pattern Character. POS pattern for keyphrase vectorizer. Default `"<J.*>*<N.*>+"`.
+#' @param seed_topic_list List. Seed words per topic. Default `NULL`.
+#' @param max_df Integer. Maximum document frequency. Default `1L`.
+#' @param vocabulary List. Custom vocabulary. Default `NULL`.
+#' @param images List. Optional images. Default `NULL`.
+#' @param use_empty_vectorizer Logical. If `TRUE`, uses empty vectorizer. Default `FALSE`.
+#' @param decay Numeric or `NULL`. Decay parameter. Default `NULL`.
+#' @param delete_min_df Logical or `NULL`. Delete min_df parameter. Default `NULL`.
+#' @param workers Integer. Number of workers for processing. Default `6L`.
 #'
-#' @return
+#' @returns The updated BERTopic model object.
 #' @export
 #'
-#' @examples
+
 bert_update_topics <-
   function(obj,
            docs = NULL,
@@ -358,15 +345,15 @@ bert_update_topics <-
     obj
   }
 
-#' Set Topic Labals
+#' Set Topic Labels
 #'
-#' @param obj
-#' @param topic_labels
+#' @param obj BERTopic model object.
+#' @param topic_labels Character vector or list. Custom labels for topics.
 #'
-#' @return
+#' @returns The updated BERTopic model object with custom labels set.
 #' @export
 #'
-#' @examples
+
 bert_set_topic_labels <-
   function(obj, topic_labels) {
     obj$set_topic_labels(topic_labels = topic_labels)

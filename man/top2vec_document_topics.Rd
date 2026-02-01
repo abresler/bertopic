@@ -2,13 +2,16 @@
 % Please edit documentation in R/top2vec.R
 \name{top2vec_document_topics}
 \alias{top2vec_document_topics}
-\title{Top Textop2vecec Documents}
+\title{Top2Vec Documents}
 \usage{
 top2vec_document_topics(obj)
 }
 \arguments{
-\item{obj}{}
+\item{obj}{Top2Vec model object.}
+}
+\value{
+A tibble with columns: `number_document`, `id_document`, `topic_top2vec`, and `distance`.
 }
 \description{
-Top Textop2vecec Documents
+Top2Vec Documents
 }

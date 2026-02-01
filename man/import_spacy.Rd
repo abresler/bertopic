@@ -7,8 +7,18 @@
 import_spacy(assign_to_environment = T, path = NULL)
 }
 \arguments{
-\item{path}{}
+\item{assign_to_environment}{Logical. If `TRUE`, assigns module to global environment.}
+
+\item{path}{Character. Path to Python installation directory.}
+}
+\value{
+The Python Spacy module object, invisibly.
 }
 \description{
 Import Spacy
+}
+\examples{
+\dontrun{
+spacy <- import_spacy(assign_to_environment = FALSE)
+}
 }

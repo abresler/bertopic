@@ -8,11 +8,11 @@
 
 #' Import Python Modules
 #'
-#' @param modules
-#' @param assign_to_environment
-#' @param python_path
+#' @param modules Character vector of Python module names to import.
+#' @param assign_to_environment Logical. If `TRUE`, assigns modules to global environment.
+#' @param python_path Character. Path to Python installation directory.
 #'
-#' @return
+#' @returns The Python module objects, invisibly.
 #' @export
 #'
 #' @examples
@@ -41,15 +41,18 @@ import_python_modules <-
 
 # nltk --------------------------------------------------------------------
 
-#' import NLTK
+#' Import NLTK
 #'
-#' @param assign_to_environment
-#' @param path
+#' @param assign_to_environment Logical. If `TRUE`, assigns module to global environment.
+#' @param path Character. Path to Python installation directory.
 #'
-#' @return
+#' @returns The Python NLTK module object, invisibly.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' nltk <- import_nltk(assign_to_environment = FALSE)
+#' }
 import_nltk <-
   function(assign_to_environment = T,
            path = NULL) {
@@ -65,13 +68,16 @@ import_nltk <-
 
 #' Import NLTK Corpus
 #'
-#' @param assign_to_environment
-#' @param path
+#' @param assign_to_environment Logical. If `TRUE`, assigns module to global environment.
+#' @param path Character. Path to Python installation directory.
 #'
-#' @return
+#' @returns The Python NLTK corpus module object, invisibly.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' nltk_corpus <- import_nltk_corpus(assign_to_environment = FALSE)
+#' }
 import_nltk_corpus <-
   function(assign_to_environment = T,
            path = NULL) {
@@ -91,13 +97,16 @@ import_nltk_corpus <-
 
 #' Import Scikit Learn
 #'
-#' @param assign_to_environment
-#' @param path
+#' @param assign_to_environment Logical. If `TRUE`, assigns module to global environment.
+#' @param path Character. Path to Python installation directory.
 #'
-#' @return
+#' @returns The Python scikit-learn module object, invisibly.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' sklearn <- import_sklearn(assign_to_environment = FALSE)
+#' }
 import_sklearn <-
   function(assign_to_environment = T,
            path = NULL) {
@@ -111,37 +120,34 @@ import_sklearn <-
   }
 
 #' SKLearn Word Vectorizer
-#
-#' @param obj sklearn library object
-#' @param language
-#' @param ngram_range `list` The lower and upper boundary of the range of n-values for different word n-grams or char n-grams to be extracted. All values of n such such that min_n <= n <= max_n will be used. For example an ngram_range of (1, 1) means only unigrams, (1, 2) means unigrams and bigrams, and (2, 2) means only bigrams. Only applies if analyzer is not callable.
-#' @param analyzer Remove accents and perform other character normalization during the preprocessing step. ‘ascii’ is a fast method that only works on characters that have a direct ASCII mapping. ‘unicode’ is a slightly slower method that works on any characters. None (default) does nothing.
-#' @param strip_accents
-#' @param exclude_stop_words if `TRUE` excludes stopwords
-#' @param extra_stop_words if `TRUE` other stopwords to exclude
-
-#' @param token_pattern  Regular expression denoting what constitutes a “token”, only used if analyzer == 'word'. The default regexp select tokens of 2 or more alphanumeric characters (punctuation is completely ignored and always treated as a token separator).
 #'
-#' @param is_lower_case if `TRUE` all to lower case
-#' @param max_df During fitting ignore keyphrases that have a document frequency strictly higher than the given threshold. Default `NULL`
-#' @param min_df During fitting ignore keyphrases that have a document frequency strictly lower than the given threshold. This value is also called cut-off in the literature.  Default `NULL`
-#' @param max_features  If not None, build a vocabulary that only consider the top max_features ordered by term frequency across the corpus.
-#' @param binary If True, all non zero counts are set to 1. This is useful for discrete probabilistic models that model binary events rather than integer counts.
-#' @param analyzer `{‘word’, ‘char’, ‘char_wb’} or callable, default=’word’` Whether the feature should be made of word n-gram or character n-grams. Option ‘char_wb’ creates character n-grams only from text inside word boundaries; n-grams at the edges of words are padded with space. If a callable is passed it is used to extract the sequence of features out of the raw, unprocessed input.
-#' @param stopword_package_sources
-#' @param strip_accents `{‘ascii’, ‘unicode’} or callable, default=None`  Remove accents and perform other character normalization during the preprocessing step. ‘ascii’ is a fast method that only works on characters that have a direct ASCII mapping. ‘unicode’ is a slightly slower method that works on any characters. None (default) means no character normalization is performed.`
-#' @param exclude_stop_words if `TRUE` excludes stopwords.  Default is `TRUE`
-#' @param extra_stop_words Vector of extra stop wwords
-#' @param vocabulary Either a Mapping (e.g., a dict) where keys are terms and values are indices in the feature matrix, or an iterable over terms. If not given, a vocabulary is determined from the input documents. Indices in the mapping should not be repeated and should not have any gap between 0 and the largest index.
+#' @param obj Scikit-learn library object or `NULL`.
+#' @param language Character. Language for stopword filtering. Default `"english"`.
+#' @param ngram_range List of two integers. The lower and upper boundary of the range of n-values for different word n-grams to be extracted. For example `list(1L, 2L)` means unigrams and bigrams.
+#' @param analyzer Character. Whether the feature should be made of word n-grams or character n-grams. Options: `"word"`, `"char"`, or `"char_wb"`. Default `"word"`.
+#' @param stopword_package_sources Character vector or `NULL`. Sources for stopword packages.
+#' @param strip_accents Character or `NULL`. Remove accents: `"ascii"` or `"unicode"`. Default `NULL`.
+#' @param exclude_stop_words Logical. If `TRUE`, excludes stopwords. Default `TRUE`.
+#' @param extra_stop_words Character vector or `NULL`. Additional stopwords to exclude.
+#' @param token_pattern Character. Regular expression for tokenization. Default `"(?u)\\b\\w\\w+\\b"`.
+#' @param vocabulary List or `NULL`. Pre-defined vocabulary mapping.
+#' @param is_lower_case Logical. If `TRUE`, converts text to lowercase. Default `TRUE`.
+#' @param max_df Numeric. Maximum document frequency threshold. Default `1`.
+#' @param min_df Numeric. Minimum document frequency threshold. Default `1`.
+#' @param max_features Integer or `NULL`. Maximum number of features to consider.
+#' @param binary Logical. If `TRUE`, all non-zero counts are set to 1. Default `FALSE`.
 #'
-#' @return
+#' @returns A Python CountVectorizer object configured with the specified parameters.
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' vectorizer_model <- sklearn_vectorizer(ngram_range = list(1L, 3L))
-#' docs <- c('This is the first document.', 'This document is the second document.', 'And this is the third one.', 'Is this the first document?')
+#' docs <- c('This is the first document.', 'This document is the second document.',
+#'           'And this is the third one.', 'Is this the first document?')
 #' vectorizer_model$fit_transform(raw_documents = docs)
-#'vectorizer_model$get_feature_names_out()
+#' vectorizer_model$get_feature_names_out()
+#' }
 sklearn_vectorizer <-
   function(obj = NULL,
            language = "english",
@@ -203,13 +209,16 @@ sklearn_vectorizer <-
 
 #' Import UMAP
 #'
-#' @param assign_to_environment
-#' @param path
+#' @param assign_to_environment Logical. If `TRUE`, assigns module to global environment.
+#' @param path Character. Path to Python installation directory.
 #'
-#' @return
+#' @returns The Python UMAP module object, invisibly.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' umap <- import_umap(assign_to_environment = FALSE)
+#' }
 import_umap <-
   function(assign_to_environment = T,
            path = NULL) {
@@ -229,13 +238,16 @@ import_umap <-
 
 #' Import hdbscan
 #'
-#' @param assign_to_environment
-#' @param path
+#' @param assign_to_environment Logical. If `TRUE`, assigns module to global environment.
+#' @param path Character. Path to Python installation directory.
 #'
-#' @return
+#' @returns The Python hdbscan module object, invisibly.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' hdbscan <- import_hdbscan(assign_to_environment = FALSE)
+#' }
 import_hdbscan <-
   function(assign_to_environment = T,
            path = NULL) {
@@ -260,13 +272,16 @@ import_hdbscan <-
 #' \item \href{https://radimrehurek.com/gensim/}{GENSIM}
 #' }
 #'
-#' @param assign_to_environment
-#' @param path
+#' @param assign_to_environment Logical. If `TRUE`, assigns module to global environment.
+#' @param path Character. Path to Python installation directory.
 #'
-#' @return
+#' @returns The Python Gensim module object, invisibly.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' gensim <- import_gensim(assign_to_environment = FALSE)
+#' }
 import_gensim <-
   function(assign_to_environment = T,
            path = NULL) {
@@ -284,13 +299,16 @@ import_gensim <-
 
 #' Import Spacy
 #'
-#' @param assign_to_environment
-#' @param path
+#' @param assign_to_environment Logical. If `TRUE`, assigns module to global environment.
+#' @param path Character. Path to Python installation directory.
 #'
-#' @return
+#' @returns The Python Spacy module object, invisibly.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' spacy <- import_spacy(assign_to_environment = FALSE)
+#' }
 import_spacy <-
   function(assign_to_environment = T,
            path = NULL) {
@@ -309,13 +327,16 @@ import_spacy <-
 
 #' Import use
 #'
-#' @param assign_to_environment
-#' @param path
+#' @param assign_to_environment Logical. If `TRUE`, assigns module to global environment.
+#' @param path Character. Path to Python installation directory.
 #'
-#' @return
+#' @returns The Python use module object, invisibly.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' use <- import_use(assign_to_environment = FALSE)
+#' }
 import_use <-
   function(assign_to_environment = T,
            path = NULL) {
@@ -329,15 +350,18 @@ import_use <-
   }
 
 
-#' OpenAI
+#' Import OpenAI
 #'
-#' @param assign_to_environment
-#' @param path
+#' @param assign_to_environment Logical. If `TRUE`, assigns module to global environment.
+#' @param path Character. Path to Python installation directory.
 #'
-#' @return
+#' @returns The Python OpenAI module object, invisibly.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' openai <- import_openai(assign_to_environment = FALSE)
+#' }
 import_openai <-
   function(assign_to_environment = T,
            path = NULL) {
@@ -352,13 +376,16 @@ import_openai <-
 
 #' Import Llama CPP
 #'
-#' @param assign_to_environment
-#' @param path
+#' @param assign_to_environment Logical. If `TRUE`, assigns module to global environment.
+#' @param path Character. Path to Python installation directory.
 #'
-#' @return
+#' @returns The Python llama-cpp module object, invisibly.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' llama_cpp <- import_llama_cpp(assign_to_environment = FALSE)
+#' }
 import_llama_cpp <-
   function(assign_to_environment = T,
            path = NULL) {

@@ -7,8 +7,18 @@
 import_umap(assign_to_environment = T, path = NULL)
 }
 \arguments{
-\item{path}{}
+\item{assign_to_environment}{Logical. If `TRUE`, assigns module to global environment.}
+
+\item{path}{Character. Path to Python installation directory.}
+}
+\value{
+The Python UMAP module object, invisibly.
 }
 \description{
 Import UMAP
+}
+\examples{
+\dontrun{
+umap <- import_umap(assign_to_environment = FALSE)
+}
 }

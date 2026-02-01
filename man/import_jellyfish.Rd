@@ -7,7 +7,12 @@
 import_jellyfish(assign_to_environment = T, path = NULL)
 }
 \arguments{
-\item{path}{}
+\item{assign_to_environment}{Logical. If `TRUE` assigns the Jellyfish module to the global environment.}
+
+\item{path}{Character. Path to Python environment or `NULL` for default.}
+}
+\value{
+A Python Jellyfish module object for string comparison.
 }
 \description{
 Jelly fish module \url{https://jamesturk.github.io/jellyfish/}

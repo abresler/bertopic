@@ -2,7 +2,7 @@
 % Please edit documentation in R/bert-topic-modify.R
 \name{bert_reduce_topics}
 \alias{bert_reduce_topics}
-\title{Reduce BERTopics}
+\title{Reduce BERTopic Topics}
 \usage{
 bert_reduce_topics(
   obj,
@@ -19,28 +19,31 @@ bert_reduce_topics(
 )
 }
 \arguments{
-\item{obj}{BERTopic Topic Model}
+\item{obj}{BERTopic model object.}
 
-\item{docs}{Vector of Documents}
+\item{docs}{Character vector of documents used in model fitting.}
 
-\item{number_topics}{Number of topics to reduce to}
+\item{number_topics}{Integer. Target number of topics to reduce to.}
 
-\item{update_bert_labels}{If `TRUE` updates actual topic labels}
+\item{update_bert_labels}{Logical. If `TRUE`, updates actual topic labels. Default `TRUE`.}
 
-\item{number_words}{Top n words per topic to use.  Default is 4}
+\item{number_words}{Integer. Number of top words per topic for labeling. Default `1L`.}
 
-\item{separator}{The string with which the words and topic prefix will be separated. Underscores are the default but a nice alternative is ", ".  Default `_`}
+\item{separator}{Character. Separator between words and topic prefix. Default `"_"`.}
 
-\item{word_length}{The maximum length of each word in the topic label. Some words might be relatively long and setting this value helps to make sure that all labels have relatively similar lengths.}
+\item{word_length}{Integer or `NULL`. Maximum length of each word in topic label. Default `NULL`.}
 
-\item{update_topic_model_labels}{if `TRUE` updates new label into a custom field}
+\item{update_topic_model_labels}{Logical. If `TRUE`, updates custom label field. Default `TRUE`.}
 
-\item{append_number_words}{Append the number of words}
+\item{append_number_words}{Logical. If `TRUE`, appends number of words to label. Default `FALSE`.}
 
-\item{images}{}
+\item{images}{List. Optional images associated with documents. Default `NULL`.}
 
-\item{topic_prefix}{Whether to use the topic ID as a prefix. If set to True, the topic ID will be separated using the separator}
+\item{topic_prefix}{Logical. If `TRUE`, uses topic ID as prefix. Default `FALSE`.}
+}
+\value{
+The updated BERTopic model object with reduced topics.
 }
 \description{
-Reduce BERTopics
+Reduce BERTopic Topics
 }

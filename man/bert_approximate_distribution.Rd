@@ -2,9 +2,7 @@
 % Please edit documentation in R/bert-analysis.R
 \name{bert_approximate_distribution}
 \alias{bert_approximate_distribution}
-\title{Get a string representation of the current object.
-¶
-A post-hoc approximation of topic distributions across documents.}
+\title{Approximate Topic Distribution}
 \usage{
 bert_approximate_distribution(
   obj,
@@ -20,31 +18,34 @@ bert_approximate_distribution(
 )
 }
 \arguments{
-\item{obj}{Topic Model Object}
+\item{obj}{BERTopic model object.}
 
-\item{docs}{Vector of Documents}
+\item{docs}{Character vector of documents.}
 
-\item{window}{Size of the moving window which indicates the number of tokens being considered.  Default `4`}
+\item{window}{Integer. Size of the moving window which indicates the number of tokens being considered. Default `4`.}
 
-\item{stride}{How far the window should move at each step.  Default `1`.}
+\item{stride}{Integer. How far the window should move at each step. Default `1`.}
 
-\item{min_similarity}{The minimum similarity of a document's tokenset with respect to the topics.  Default `.1`}
+\item{min_similarity}{Numeric. The minimum similarity of a document's tokenset with respect to the topics. Default `0.1`.}
 
-\item{batch_size}{The number of documents to process at a time. If None, then all documents are processed at once. NOTE: With a large number of documents, it is not advised to process all documents at once.    Default `1000`}
+\item{batch_size}{Integer. The number of documents to process at a time. If `NULL`, all documents are processed at once. NOTE: With a large number of documents, it is not advised to process all documents at once. Default `1000`.}
 
-\item{padding}{Whether to pad the beginning and ending of a document with empty tokens.  Default `FALSE`}
+\item{padding}{Logical. Whether to pad the beginning and ending of a document with empty tokens. Default `FALSE`.}
 
-\item{use_embedding_model}{Whether to use the topic model's embedding model to calculate the similarity between tokensets and topics instead of using c-TF-IDF.  Default `FALSE`}
+\item{use_embedding_model}{Logical. Whether to use the topic model's embedding model to calculate the similarity between tokensets and topics instead of using c-TF-IDF. Default `FALSE`.}
 
-\item{calculate_tokens}{Calculate the similarity of tokens with all topics. NOTE: This is computation-wise more expensive and can require more memory. Using this over batches of documents might be preferred.  Default `FALSE`}
+\item{calculate_tokens}{Logical. If `TRUE`, calculates the similarity of tokens with all topics. NOTE: This is computation-wise more expensive and can require more memory. Default `FALSE`.}
 
-\item{separator}{The separator used to merge tokens into tokensets.}
+\item{separator}{Character. The separator used to merge tokens into tokensets. Default `" "`.}
 }
 \value{
 A list containing approximate topic distributions for documents.
 }
 \description{
-In order to perform this approximation, each document is split into tokens according to the provided tokenizer in the CountVectorizer. Then, a sliding window is applied on each document creating subsets of the document. For example, with a window size of 3 and stride of 1, the sentence:
+A post-hoc approximation of topic distributions across documents.
+}
+\details{
+In order to perform this approximation, each document is split into tokens according to the provided tokenizer in the CountVectorizer. Then, a sliding window is applied on each document creating subsets of the document. For example, with a window size of 3 and stride of 1, the sentence: "I love pizza" becomes ["I love", "love pizza"].
 }
 \examples{
 \dontrun{

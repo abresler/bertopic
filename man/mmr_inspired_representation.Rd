@@ -2,19 +2,25 @@
 % Please edit documentation in R/representation_models.R
 \name{mmr_inspired_representation}
 \alias{mmr_inspired_representation}
-\title{Calculate Maximal Marginal Relevance (MMR) between candidate keywords and the document.
-MMR considers the similarity of keywords/keyphrases with the document, along with the similarity of already selected keywords and keyphrases. This results in a selection of keywords that maximize their within diversity with respect to the document.}
+\title{Calculate Maximal Marginal Relevance (MMR) between candidate keywords and the document}
 \usage{
 mmr_inspired_representation(obj = NULL, diversity = 0.1, top_n_words = 10)
 }
 \arguments{
-\item{obj}{Bertopic Module}
+\item{obj}{BERTopic module object or `NULL`.}
 
-\item{diversity}{How diverse the select keywords/keyphrases are. Values range between 0 and 1 with 0 being not diverse at all and 1 being most diverse.  Default `0.1`}
+\item{diversity}{Numeric. Diversity level for selected keywords. Values range between 0 and 1 with 0 being not diverse and 1 being most diverse. Default `0.1`.}
 
-\item{top_n_words}{The number of keywords/keyhprases to return default `10`}
+\item{top_n_words}{Integer. The number of keywords/keyphrases to return. Default `10`.}
+}
+\value{
+A Python MaximalMarginalRelevance representation object with representation_method and input_parameters attributes.
 }
 \description{
-Calculate Maximal Marginal Relevance (MMR) between candidate keywords and the document.
 MMR considers the similarity of keywords/keyphrases with the document, along with the similarity of already selected keywords and keyphrases. This results in a selection of keywords that maximize their within diversity with respect to the document.
+}
+\examples{
+\dontrun{
+repr <- mmr_inspired_representation(diversity = 0.1, top_n_words = 10L)
+}
 }

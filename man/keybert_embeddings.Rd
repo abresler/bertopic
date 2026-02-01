@@ -25,7 +25,42 @@ keybert_embeddings(
 )
 }
 \arguments{
-\item{max_df}{}
+\item{docs}{Character vector of documents to process.}
+
+\item{obj}{Python KeyBERT model object. If `NULL`, creates a new model.}
+
+\item{model}{Character. Sentence transformer model to use. Default `"all-MiniLM-L6-v2"`.}
+
+\item{stopword_package_sources}{Character vector. Sources for stopwords package. Default `NULL`.}
+
+\item{extra_stop_words}{Character vector. Additional stop words to exclude. Default `NULL`.}
+
+\item{exclude_stop_words}{Logical. If `TRUE`, excludes stop words. Default `TRUE`.}
+
+\item{assign_to_environment}{Logical. If `TRUE`, assigns model to environment. Default `TRUE`.}
+
+\item{keyphrase_ngram_range}{List of two integers. N-gram range for keyphrases. Default `list(1L, 1L)`.}
+
+\item{use_key_phrase_vectorizer}{Logical. If `TRUE`, uses keyphrase vectorizer. Default `TRUE`.}
+
+\item{candidates}{Character vector. Candidate keywords to use. Default `NULL`.}
+
+\item{language}{Character. Language for processing. Default `"english"`.}
+
+\item{is_lower_case}{Logical. If `TRUE`, converts to lowercase. Default `TRUE`.}
+
+\item{pos_pattern}{Character. Regex pattern for POS tags. Default `"<J.*>*<N.*>+"`.}
+
+\item{vocabulary}{Character vector. Custom vocabulary for vectorizer. Default `NULL`.}
+
+\item{use_yake_candidates}{Logical. If `TRUE`, uses YAKE keyword extractor. Default `FALSE`.}
+
+\item{min_df}{Integer. Minimum document frequency. Default `1L`.}
+
+\item{max_df}{Integer. Maximum document frequency. Default `1L`.}
+}
+\value{
+A list containing two elements: document embeddings and word embeddings matrices.
 }
 \description{
 Extract Embeddings from Documents

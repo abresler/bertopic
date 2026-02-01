@@ -11,9 +11,12 @@ import_keybert(
 )
 }
 \arguments{
-\item{assign_to_environment}{if `TRUE` assigns to environment}
+\item{assign_to_environment}{Logical. If `TRUE` assigns to environment.}
 
-\item{path}{python path}
+\item{path}{Character. Python path to use for imports.}
+}
+\value{
+A Python KeyBERT module object.
 }
 \description{
 Import Keybert Module

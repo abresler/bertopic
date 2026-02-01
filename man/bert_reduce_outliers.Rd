@@ -2,7 +2,7 @@
 % Please edit documentation in R/bert-topic-modify.R
 \name{bert_reduce_outliers}
 \alias{bert_reduce_outliers}
-\title{Reduce Bertopic Outliers}
+\title{Reduce BERTopic Outliers}
 \usage{
 bert_reduce_outliers(
   obj,
@@ -19,33 +19,31 @@ bert_reduce_outliers(
 )
 }
 \arguments{
-\item{document_name}{if not `NULL` new name for document column}
+\item{obj}{BERTopic model object.}
 
-\item{topics}{The topics that correspond to the documents.  IF `NULL` pulls from bertopic object}
+\item{docs}{Character vector of documents used in model fitting.}
 
-\item{strategy}{When using HDBSCAN, DBSCAN, or OPTICS, a number of outlier documents might be createdthat do not fall within any of the created topics. These are labeled as -1. This function allows the user to match outlier documents with their nearest topic using one of the following strategies using the `strategy`. parameter: #' \itemize{
-\item{
-`probabilities` This uses the soft-clustering as performed by HDBSCAN to find the best matching topic for each outlier document. To use this, make sure to calculate the `probabilities` beforehand by instantiating BERTopic with `calculate_probabilities=True`.
+\item{document_name}{Character. If not `NULL`, new name for document column.}
+
+\item{topics}{Integer vector. Topics corresponding to documents. If `NULL`, pulls from model object.}
+
+\item{images}{List. Optional images associated with documents. Default `NULL`.}
+
+\item{strategy}{Character. Strategy for assigning outliers. Options: `"probabilities"` (uses HDBSCAN soft-clustering), `"distributions"` (uses topic distributions), `"c-tf-idf"` (uses c-TF-IDF cosine similarity), `"embeddings"` (uses embedding cosine similarity). Default `"distributions"`.}
+
+\item{probabilities}{Matrix. Pre-computed probabilities for strategy `"probabilities"`. Default `NULL`.}
+
+\item{threshold}{Numeric. Minimum probability or similarity threshold for topic assignment. Default `0L`.}
+
+\item{embeddings}{Matrix. Pre-computed embeddings for strategy `"embeddings"`. If `NULL`, computes them.}
+
+\item{update_topics}{Logical. If `TRUE`, updates topics in model. Default `TRUE`.}
+
+\item{distributions_params}{List. Parameters for `.approximate_distribution` when using strategy `"distributions"`. Default `NULL`.}
 }
-\item{
-`distributions`  Use the topic distributions, as calculated with `.approximate_distribution` to find the most frequent topic in each outlier document. You can use the `distributions_params` variable to tweak the parameters of`.approximate_distribution`.
-}
-\item{
-`c-tf-idf` Calculate the c-TF-IDF representation for each outlier document and find the best matching c-TF-IDF topic representation using cosine similarity.
-}
-\item{
-`embeddings` Using the embeddings of each outlier documents, find the best matching topic embedding using cosine similarity.
-}
-}}
-
-\item{threshold}{The threshold for assigning topics to outlier documents. This value represents the minimum probability when `strategy="probabilities"`. For all other strategies, it represents the minimum similarity.}
-
-\item{embeddings}{The pre-computed embeddings to be used when `strategy="embeddings"`. If this is None, then it will compute the embeddings for the outlier documents.}
-
-\item{update_topics}{If `TRUE` updates topics}
-
-\item{distributions_params}{The parameters used in `.approximate_distribution` when using the strategy `"distributions"`.}
+\value{
+A tibble with columns: `number_document`, `strategy`, `is_reduced_topic`, and topic information before/after reduction.
 }
 \description{
-Reduce Bertopic Outliers
+Reduce BERTopic Outliers
 }

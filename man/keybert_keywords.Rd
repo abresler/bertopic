@@ -48,6 +48,10 @@ keybert_keywords(
 
 \item{obj}{Keybert Object}
 
+\item{iterate_individually}{Logical. If `TRUE`, processes documents individually. Default `FALSE`.}
+
+\item{return_message}{Logical. If `TRUE`, prints processing messages. Default `TRUE`.}
+
 \item{model}{Use a custom embedding model. The following backends are currently supported: * SentenceTransformers * 🤗 Transformers * Flair * Spacy * Gensim * USE (TF-Hub) You can also pass in a string that points to one of the following sentence-transformers models: * https://www.sbert.net/docs/pretrained_models.html}
 
 \item{stopword_package_sources}{if not `NULL` c("snowball","stopword -iso", "smart", "nltk"))}
@@ -59,6 +63,8 @@ keybert_keywords(
 \item{assign_to_environment}{if `TRUE` assigns objec to environment}
 
 \item{keyphrase_ngram_range}{Length, in words, of the extracted keywords/keyphrases. NOTE: This is not used if you passed a vectorizer.  This tells KeyBERT how long the keywords should be in terms of the number of words.}
+
+\item{use_future}{Logical. If `TRUE`, uses parallel processing. Default `TRUE`.}
 
 \item{use_embeddings}{if `TRUE` uses embeddings}
 
@@ -98,10 +104,18 @@ keybert_keywords(
 
 \item{highlight}{Whether to print the document and highlight its keywords/keyphrases. NOTE: This does not work if multiple documents are passed.}
 
-\item{custom_pos_tagger}{}
+\item{decay}{Numeric. Decay parameter for keyphrase vectorizer. Default `NULL`.}
+
+\item{delete_min_df}{Logical. If `TRUE`, deletes words below minimum document frequency. Default `NULL`.}
+
+\item{workers}{Integer. Number of parallel workers. Default `1L`.}
+
+\item{spacy_pipeline}{Character. Spacy pipeline to use for POS tagging. Default `"en_core_web_sm"`.}
+
+\item{custom_pos_tagger}{Custom POS tagger function. Default `NULL`.}
 }
 \value{
-`tibble` of keywords
+A tibble containing extracted keywords with columns: `number_document`, `number_keyword`, `keyword_keybert_*` (varies by vectorizer), and `score_keybert_*`.
 }
 \description{
 Keybert Keywords

@@ -7,7 +7,10 @@
 bert_stop_words(extra_stop_words = NULL)
 }
 \arguments{
-\item{extra_stop_words}{}
+\item{extra_stop_words}{Character vector of additional stopwords to append.}
+}
+\value{
+A character vector of stopwords including base words and any extra stopwords provided.
 }
 \description{
 Bertopic Stopwords

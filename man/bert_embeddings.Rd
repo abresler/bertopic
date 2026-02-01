@@ -7,7 +7,16 @@
 bert_embeddings(embeddings, docs = NULL, id_columns = NULL, text_column = NULL)
 }
 \arguments{
-\item{text_column}{}
+\item{embeddings}{Numeric matrix or array of embeddings.}
+
+\item{docs}{Character vector of documents corresponding to embeddings. Default `NULL`.}
+
+\item{id_columns}{Character vector. Names to create from document IDs. Default `NULL`.}
+
+\item{text_column}{Character. Name for the text/document column. Default `NULL`.}
+}
+\value{
+A tibble with embeddings converted to numeric columns, optionally with ID and text columns.
 }
 \description{
 Bert Embeddings

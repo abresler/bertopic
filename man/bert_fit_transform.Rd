@@ -7,13 +7,16 @@
 bert_fit_transform(obj, documents, embeddings = NULL, y = NULL)
 }
 \arguments{
-\item{obj}{BERTopic Object}
+\item{obj}{A BERTopic model object created by `bert_topic()`.}
 
-\item{documents}{A single document or a list of documents to fit on}
+\item{documents}{Character vector. A single document or list of documents to fit on.}
 
-\item{embeddings}{If not `NULL` Pre-trained document embeddings. These can be used instead of the sentence-transformer model.}
+\item{embeddings}{Numeric matrix or `NULL`. Pre-trained document embeddings. These can be used instead of the sentence-transformer model. Default `NULL`.}
 
-\item{y}{If Not `NULL` The target class for (semi)-supervised modeling. Use -1 if no class for a specific instance is specified.#'}
+\item{y}{Integer vector or `NULL`. The target class for (semi)-supervised modeling. Use `-1` if no class for a specific instance is specified. Default `NULL`.}
+}
+\value{
+An integer vector of assigned topic IDs for each document.
 }
 \description{
 Fit the models on a collection of documents, generate topics, and return the docs with topics.

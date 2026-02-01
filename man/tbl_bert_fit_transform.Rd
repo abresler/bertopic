@@ -14,17 +14,20 @@ tbl_bert_fit_transform(
 )
 }
 \arguments{
-\item{obj}{BERTopic Object}
+\item{obj}{A BERTopic model object created by `bert_topic()`.}
 
-\item{data}{a tibble}
+\item{data}{A tibble containing text and optional class columns.}
 
-\item{text_field}{name of text field}
+\item{text_field}{Character. Name of the column containing text documents.}
 
-\item{class_fields}{if not `NULL` `y` or `class` fields.}
+\item{class_fields}{Character vector or `NULL`. Names of columns to use as class labels for semi-supervised learning. Default `NULL`.}
 
-\item{embeddings}{If not `NULL` Pre-trained document embeddings. These can be used instead of the sentence-transformer model.}
+\item{embeddings}{Numeric matrix or `NULL`. Pre-trained document embeddings. These can be used instead of the sentence-transformer model. Default `NULL`.}
 
-\item{images}{}
+\item{images}{List or `NULL`. A list of paths to images or the images themselves. Default `NULL`.}
+}
+\value{
+An integer vector of assigned topic IDs for each document.
 }
 \description{
 Fit the models on a collection of documents, generate topics, and return the docs with topics.

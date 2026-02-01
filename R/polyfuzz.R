@@ -10,13 +10,13 @@
 #' Import Polyfuzz
 #' Polyfuzz module \url{https://maartengr.github.io/PolyFuzz/}
 #'
-#' @param assign_to_environment
-#' @param path
+#' @param assign_to_environment Logical. If `TRUE` assigns the PolyFuzz module to the global environment.
+#' @param path Character. Path to Python environment or `NULL` for default.
 #'
-#' @return
+#' @returns A Python PolyFuzz module object.
 #' @export
 #'
-#' @examples
+
 import_polyfuzz <-
   function(assign_to_environment = T,
            path = NULL) {
@@ -33,13 +33,13 @@ import_polyfuzz <-
 #'
 #' RapidFuzz module \url{https://maxbachmann.github.io/RapidFuzz/}
 #'
-#' @param assign_to_environment
-#' @param path
+#' @param assign_to_environment Logical. If `TRUE` assigns the RapidFuzz module to the global environment.
+#' @param path Character. Path to Python environment or `NULL` for default.
 #'
-#' @return
+#' @returns A Python RapidFuzz module object.
 #' @export
 #'
-#' @examples
+
 import_rapidfuzz <-
   function(assign_to_environment = T,
            path = NULL) {
@@ -54,10 +54,10 @@ import_rapidfuzz <-
 
 #' Import RapidFuzz Fuzz Options
 #'
-#' @return
+#' @returns A Python RapidFuzz fuzz module object for string matching algorithms.
 #' @export
 #'
-#' @examples
+
 import_fuzz <-
   function() {
     obj <- import_rapidfuzz(assign_to_environment = F)
@@ -68,13 +68,13 @@ import_fuzz <-
 #'
 #' Jelly fish module \url{https://jamesturk.github.io/jellyfish/}
 #'
-#' @param assign_to_environment
-#' @param path
+#' @param assign_to_environment Logical. If `TRUE` assigns the Jellyfish module to the global environment.
+#' @param path Character. Path to Python environment or `NULL` for default.
 #'
-#' @return
+#' @returns A Python Jellyfish module object for string comparison.
 #' @export
 #'
-#' @examples
+
 import_jellyfish <-
   function(assign_to_environment = T,
            path = NULL) {
@@ -89,14 +89,14 @@ import_jellyfish <-
 
 #' Save Polyfuzz Model
 #'
-#' @param obj Polyfuzz Object
-#' @param model_path Path to save
-#' @param file_name Name of the file.  Defaults to polyfuzz
+#' @param obj A PolyFuzz model object.
+#' @param model_path Character. Path to directory where model will be saved.
+#' @param file_name Character. Name of the file. Defaults to polyfuzz.
 #'
-#' @return
+#' @returns Called for side effects; returns invisibly. Saves model to specified path.
 #' @export
 #'
-#' @examples
+
 polyfuzz_save <-
   function(obj,
            model_path = NULL,
@@ -132,17 +132,17 @@ polyfuzz_save <-
 
 #' Polyfuzz Model
 #'
-#' @param obj Polyfuzz Object
-#' @param method  the method(s) used for matching. For quick selection of models select one of the following: `EditDistance`, `TF-IDF` or `Embeddings`. If you want more control over the models above, pass in a model from polyfuzz.models. For examples, see usage below.  Default `TF-iDF`
-#' @param verbose If `TRUE` prints results
-#' @param model_object A pretrained model object
-#' @param from_list If not `NULL` vector of from list
-#' @param to_list If not `NULL` vector of to list
+#' @param obj A PolyFuzz module object or `NULL` for default import.
+#' @param method Character. The method used for matching. Options: `EditDistance`, `TF-IDF`, or `Embeddings`. Default is `TF-IDF`.
+#' @param verbose Logical. If `TRUE` prints results during fitting.
+#' @param model_object A pretrained model object from polyfuzz or `NULL` for default.
+#' @param from_list Character vector. Words to match from, or `NULL`.
+#' @param to_list Character vector. Words to match to, or `NULL`.
 #'
-#' @return
+#' @returns A Python PolyFuzz model object.
 #' @export
 #'
-#' @examples
+
 polyfuzz_model <-
   function(method = "TF-IDF",
            model_object = NULL,
@@ -170,20 +170,20 @@ polyfuzz_model <-
 
 #' Match Lists of Words
 #'
-#' @param obj Polyfuzz Object
-#' @param from_list The list from which you want mappings. If you want to map items within a list, and not map the items to themselves, you can supply only the from_list and ignore the to_list.
-#' @param to_list The list where you want to map to
-#' @param top_n_matches The number of matches you want returned. This is currently only implemented for polyfuzz.models.TFIDF and polyfuzz.models.Embeddings as they can computationally handle more comparisons.
-#' @param model_id the model id of the model if you have specified multiple models
-#' @param exclude_unmatched If `TRUE` excludes unmatched
-#' @param group_model you can choose one of the models in polyfuzz.models to be used as a grouper default `NONE`
-#' @param link_min_similarity If not `NULL` the minimum similarity between strings before they are grouped in a single linkage fashion.  Default `.75`
-#' @param group_all_strings  if you want to compare a list of strings with itself and then cluster those strings, set this to True. Otherwise, only the strings that were mapped To are clustered.
+#' @param obj A PolyFuzz model object.
+#' @param from_list Character vector. The list from which you want mappings. If mapping items within a list, supply only `from_list` and ignore `to_list`.
+#' @param to_list Character vector. The list where you want to map to, or `NULL`.
+#' @param top_n_matches Integer. The number of matches to return. Currently implemented for TFIDF and Embeddings methods. Default is 1.
+#' @param model_id Character. The model ID if multiple models are specified, or `NULL`.
+#' @param exclude_unmatched Logical. If `TRUE` excludes unmatched strings.
+#' @param group_model A PolyFuzz grouper model or `NULL` for no grouping.
+#' @param link_min_similarity Numeric. Minimum similarity for linkage-based grouping. Default is 0.75.
+#' @param group_all_strings Logical. If `TRUE` compares a list with itself and clusters strings; otherwise only clusters strings that were mapped to.
 #'
-#' @return
+#' @returns A tibble containing fuzzy matches with columns: `from`, `to`, `similarity`, and `has_match`.
 #' @export
 #'
-#' @examples
+
 polyfuzz_match <-
   function(obj,
            from_list = NULL,
@@ -232,17 +232,17 @@ polyfuzz_match <-
 #' A character based n-gram TF-IDF to approximate edit distance
 #' We turn a string into, typically of length 3, n-grams. For example, using 3-grams of the "hotel" we get ['hot', 'ote', 'tel']. These are then used as input for a TfidfVectorizer in order to create a vector for each word. Then, we simply apply cosine similarity through k-NN
 #'
-#' @param n_gram_range The n_gram_range on a character-level default `list(3L, 3L)`
-#' @param clean_string  Whether to clean the string such that only alphanumerical characters are kept.  Default `TRUE`
-#' @param min_similarity  The minimum similarity between strings, otherwise return 0 similarity.  Default `.75`
-#' @param top_n  The number of matches you want returned
-#' @param cosine_method The method/package for calculating the cosine similarity. Options: `sparse` `sklearn` and `knn`.  Default is `sparse`
-#' @param model_id The name of the particular instance, used when comparing models
+#' @param n_gram_range List of integers. The n-gram range on a character-level. Default is `list(3L, 3L)`.
+#' @param clean_string Logical. If `TRUE` cleans the string to keep only alphanumeric characters. Default is `TRUE`.
+#' @param min_similarity Numeric. Minimum similarity between strings, otherwise return 0. Default is 0.75.
+#' @param top_n Integer. The number of matches you want returned.
+#' @param cosine_method Character. Method for calculating cosine similarity. Options: `sparse`, `sklearn`, `knn`. Default is `sparse`.
+#' @param model_id Character. Name of the particular instance, used when comparing models.
 #'
-#' @return
+#' @returns A Python PolyFuzz TFIDF model object.
 #' @export
 #'
-#' @examples
+
 polyfuzz_tfidf <-
   function(n_gram_range = list(3L, 3L),
            clean_string = TRUE,
@@ -263,14 +263,15 @@ polyfuzz_tfidf <-
 
 #' Calculate the Edit Distance between lists of strings using any distance/similarity based scorer
 #'
-#' @param n_jobs
-#' @param scorer The scorer function to be used to calculate the edit distance. This function should give back a float between 0 and 1, and work as follows: scorer("string_one", "string_two").  If `NULL` uses jellyfish `jaro_winkler_similarity`
-#' @param model_id The name of the particular instance, used when comparing models
+#' @param n_jobs Integer. Number of parallel jobs. Default is 1.
+#' @param scorer A Python function for calculating edit distance. Should return a float between 0 and 1. If `NULL` uses jellyfish `jaro_winkler_similarity`.
+#' @param model_id Character. Name of the particular instance, used when comparing models.
+#' @param normalize Logical. Whether to normalize scores. Default is `TRUE`.
 #'
-#' @return
+#' @returns A Python PolyFuzz EditDistance model object.
 #' @export
 #'
-#' @examples
+
 polyfuzz_edit_distance <- function(n_jobs = 1,
                                    scorer = NULL,
                                    model_id = NULL,
@@ -294,15 +295,15 @@ polyfuzz_edit_distance <- function(n_jobs = 1,
 #'
 #' We are using RapidFuzz instead of FuzzyWuzzy since it is much faster and does not require the more restrictive GPL license
 #'
-#' @param n_jobs Nr of parallel processes, use -1 to use all cores.  Default `1L`
-#' @param score_cutoff  The minimum similarity for which to return a good match. Should be between 0 and 1.  Default .5
-#' @param scorer The scorer function to be used to calculate the edit distance Options: `fuzz.ratio` `fuzz.partial_ratio`  `fuzz.token_sort_ratio` `fuzz.partial_token_sort_ratio` `fuzz.token_set_ratio ` `fuzz.partial_token_set_ratio` `fuzz.token_ratio` `fuzz.partial_token_ratio` `fuzz.WRation` `fuzz.QRatio` See https://maxbachmann.github.io/rapidfuzz/usage/fuzz/ for an extensive description of the scoring methods.  If NULL uses WRatio
-#' @param model_id The name of the particular instance, used when comparing models
+#' @param n_jobs Integer. Number of parallel processes; use -1 for all cores. Default is 1.
+#' @param score_cutoff Numeric. Minimum similarity for a good match, between 0 and 1. Default is 0.5.
+#' @param scorer A Python scorer function. Options: `fuzz.ratio`, `fuzz.partial_ratio`, `fuzz.token_sort_ratio`, `fuzz.partial_token_sort_ratio`, `fuzz.token_set_ratio`, `fuzz.partial_token_set_ratio`, `fuzz.token_ratio`, `fuzz.partial_token_ratio`, `fuzz.WRatio`, `fuzz.QRatio`. If `NULL` uses WRatio.
+#' @param model_id Character. Name of the particular instance, used when comparing models.
 #'
-#' @return
+#' @returns A Python PolyFuzz RapidFuzz model object.
 #' @export
 #'
-#' @examples
+
 polyfuzz_rapidmatcher <-
   function(n_jobs = 1,
            score_cutoff = 0.5,
@@ -325,16 +326,16 @@ polyfuzz_rapidmatcher <-
 
 #' Embedding Method
 #'
-#' @param embedding_method list of Flair embeddings to use Default is NULL
-#' @param min_similarity The minimum similarity between strings, otherwise return 0 similarity
-#' @param top_n The number of best matches you want returned
-#' @param cosine_method The method/package for calculating the cosine similarity. Options: `sparse` `sklearn` and `knn`.  Default is `sparse`
-#' @param model_id  model id
+#' @param embedding_method A Flair embeddings object or `NULL` for default.
+#' @param min_similarity Numeric. Minimum similarity between strings, otherwise return 0. Default is 0.75.
+#' @param top_n Integer. The number of best matches to return.
+#' @param cosine_method Character. Method for calculating cosine similarity. Options: `sparse`, `sklearn`, `knn`. Default is `sparse`.
+#' @param model_id Character. Name of the model instance.
 #'
-#' @return
+#' @returns A Python PolyFuzz Embeddings model object.
 #' @export
 #'
-#' @examples
+
 polyfuzz_embeddings <-
   function(embedding_method = NULL,
            min_similarity = .75,
@@ -356,16 +357,16 @@ polyfuzz_embeddings <-
 #' Embed words into vectors and use cosine similarity to find
 #' the best matches between two lists of strings
 #'
-#' @param embedding_model  The Gensim model to use, this can be either a string or the model directly model to use, this can be either a string or the model directly
-#' @param min_similarity The minimum similarity between strings, otherwise return 0 similarity
-#' @param top_n The number of best matches you want returned
-#' @param cosine_method The method/package for calculating the cosine similarity. Options: `sparse` `sklearn` and `knn`.  Default is `sparse`
-#' @param model_id  model id
+#' @param embedding_model A Sentence Transformer model. Can be either a string or model object.
+#' @param min_similarity Numeric. Minimum similarity between strings, otherwise return 0. Default is 0.5.
+#' @param top_n Integer. The number of best matches to return.
+#' @param cosine_method Character. Method for calculating cosine similarity. Options: `sparse`, `sklearn`, `knn`. Default is `sparse`.
+#' @param model_id Character. Name of the model instance.
 #'
-#' @return
+#' @returns A Python PolyFuzz SentenceEmbeddings model object.
 #' @export
 #'
-#' @examples
+
 polyfuzz_sentence_embeddings <-
   function(embedding_model = NULL,
            min_similarity = .5,
@@ -386,16 +387,16 @@ polyfuzz_sentence_embeddings <-
 
 #' Gensim Embeddings
 #'
-#' @param embedding_model
-#' @param min_similarity The minimum similarity between strings, otherwise return 0 similarity
-#' @param top_n The number of best matches you want returned
-#' @param cosine_method The method/package for calculating the cosine similarity. Options: `sparse` `sklearn` and `knn`.  Default is `sparse`
-#' @param model_id  model id
+#' @param embedding_model A Gensim model. Can be either a string or model object.
+#' @param min_similarity Numeric. Minimum similarity between strings, otherwise return 0. Default is 0.5.
+#' @param top_n Integer. The number of best matches to return.
+#' @param cosine_method Character. Method for calculating cosine similarity. Options: `sparse`, `sklearn`, `knn`. Default is `sparse`.
+#' @param model_id Character. Name of the model instance.
 #'
-#' @return
+#' @returns A Python PolyFuzz GensimEmbeddings model object.
 #' @export
 #'
-#' @examples
+
 polyfuzz_gensim_embeddings <-
   function(embedding_model = NULL,
            min_similarity = .5,
@@ -416,16 +417,16 @@ polyfuzz_gensim_embeddings <-
 
 #' Spacy Embedder
 #'
-#' @param embedding_model
-#' @param min_similarity The minimum similarity between strings, otherwise return 0 similarity
-#' @param top_n The number of best matches you want returned
-#' @param cosine_method The method/package for calculating the cosine similarity. Options: `sparse` `sklearn` and `knn`.  Default is `sparse`
-#' @param model_id  model id
+#' @param embedding_model A Spacy model. Can be either a string or model object.
+#' @param min_similarity Numeric. Minimum similarity between strings, otherwise return 0. Default is 0.5.
+#' @param top_n Integer. The number of best matches to return.
+#' @param cosine_method Character. Method for calculating cosine similarity. Options: `sparse`, `sklearn`, `knn`. Default is `sparse`.
+#' @param model_id Character. Name of the model instance.
 #'
-#' @return
+#' @returns A Python PolyFuzz SpacyEmbeddings model object.
 #' @export
 #'
-#' @examples
+
 polyfuzz_spacy_embeddings <-
   function(embedding_model = NULL,
            min_similarity = .5,
@@ -446,16 +447,16 @@ polyfuzz_spacy_embeddings <-
 
 #' USE model
 #'
-#' @param embedding_model Defaut `"https://tfhub.dev/google/universal-sentence-encoder/4"`
-#' @param min_similarity The minimum similarity between strings, otherwise return 0 similarity
-#' @param top_n The number of best matches you want returned
-#' @param cosine_method The method/package for calculating the cosine similarity. Options: `sparse` `sklearn` and `knn`.  Default is `sparse`
-#' @param model_id  model id
+#' @param embedding_model Character. URL to the Universal Sentence Encoder model. Default is `"https://tfhub.dev/google/universal-sentence-encoder/4"`.
+#' @param min_similarity Numeric. Minimum similarity between strings, otherwise return 0. Default is 0.5.
+#' @param top_n Integer. The number of best matches to return.
+#' @param cosine_method Character. Method for calculating cosine similarity. Options: `sparse`, `sklearn`, `knn`. Default is `sparse`.
+#' @param model_id Character. Name of the model instance.
 #'
-#' @return
+#' @returns A Python PolyFuzz USEEmbeddings model object.
 #' @export
 #'
-#' @examples
+
 polyfuzz_use_embeddings <-
   function(embedding_model = "https://tfhub.dev/google/universal-sentence-encoder/4",
            min_similarity = .5,
@@ -479,13 +480,13 @@ polyfuzz_use_embeddings <-
 
 #' Transform Unseen List
 #'
-#' @param obj Polyfuzz Model Object
-#' @param from_list Vector of Unseen Words
+#' @param obj A PolyFuzz model object.
+#' @param from_list Character vector of unseen words to transform.
 #'
-#' @return
+#' @returns A tibble with transformed matches including `from`, `to`, and `similarity` columns, plus `type_model` column.
 #' @export
 #'
-#' @examples
+
 polyfuzz_transform <-
   function(obj, from_list) {
     out <- obj$transform(from_list = from_list)
@@ -495,16 +496,16 @@ polyfuzz_transform <-
       select(type_model, everything())
   }
 
-#' Title
+#' Fit PolyFuzz Model
 #'
-#' @param obj
-#' @param from_list
-#' @param to_list
+#' @param obj A PolyFuzz model object.
+#' @param from_list Character vector. Words to match from.
+#' @param to_list Character vector. Words to match to, or `NULL`.
 #'
-#' @return
+#' @returns The PolyFuzz model object (invisibly) after fitting to the provided lists.
 #' @export
 #'
-#' @examples
+
 polyfuzz_fit <-
   function(obj,
            from_list = NULL,
@@ -519,12 +520,12 @@ polyfuzz_fit <-
 
 #' Polyfuzz matches in a clean tibble
 #'
-#' @param obj polyfuzz objet
+#' @param obj A PolyFuzz model object.
 #'
-#' @return
+#' @returns A tibble containing matches with columns: `from`, `to`, and `similarity`.
 #' @export
 #'
-#' @examples
+
 tbl_polyfuzz_matches <-
   function(obj) {
     obj$get_matches() |> janitor::clean_names() |> as_tibble() |> unnest()

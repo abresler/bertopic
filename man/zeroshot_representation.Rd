@@ -13,16 +13,24 @@ zeroshot_representation(
 )
 }
 \arguments{
-\item{candidate_topics}{A list of labels to assign to the topics if they exceed min_prob}
+\item{candidate_topics}{List or `NULL`. List of labels to assign to topics if they exceed min_prob.}
 
-\item{model}{A transformers pipeline that should be initialized as "zero-shot-classification". For example, pipeline("zero-shot-classification", model="facebook/bart-large-mnli")}
+\item{model}{Character. Transformers model name for zero-shot classification (e.g., `"facebook/bart-large-mnli"`). Default `"facebook/bart-large-mnli"`.}
 
-\item{pipeline_kwargs}{Kwargs that you can pass to the transformers.pipeline when it is called. NOTE: Use {"multi_label": True} to extract multiple labels for each topic.}
+\item{pipeline_kwargs}{List. Keyword arguments to pass to `transformers.pipeline`. Use `list(multi_label = TRUE)` for multiple labels per topic. Default `list()`.}
 
-\item{min_prob}{The minimum probability to assign a candidate label to a topic}
+\item{min_prob}{Numeric. Minimum probability to assign a candidate label to a topic. Default `0.8`.}
 
-\item{obj}{Bertopic Object}
+\item{obj}{BERTopic object or `NULL`.}
+}
+\value{
+A Python ZeroShotClassification representation object with representation_method and input_parameters attributes.
 }
 \description{
 Zero-shot Classification on topic keywords with candidate labels
+}
+\examples{
+\dontrun{
+repr <- zeroshot_representation(candidate_topics = c("topic1", "topic2"))
+}
 }

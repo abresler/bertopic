@@ -15,9 +15,22 @@ bert_topic_count(
 )
 }
 \arguments{
-\item{obj}{bertopic object}
+\item{obj}{A BERTopic model object.}
 
-\item{topic_number}{if not `NULL` the number of the topic.  If `NULL` returns all topics.}
+\item{topic_number}{Integer. Specific topic number, or `NULL` to return all topics.}
+
+\item{include_representative_documents}{Logical. If `TRUE` includes representative documents. Default is `FALSE`.}
+
+\item{join_labels}{Logical. If `TRUE` joins topic labels. Default is `TRUE`.}
+
+\item{only_label}{Logical. If `TRUE` includes only label column. Default is `TRUE`.}
+
+\item{include_parameters}{Logical. If `TRUE` includes model parameters. Default is `FALSE`.}
+
+\item{parameter_filters}{List of parameter filters to apply, or `NULL`.}
+}
+\value{
+A tibble containing topic frequency counts with columns: `topic_bert`, `frequency`, `label_bertopic`, and `is_outlier_bert_topic`.
 }
 \description{
 Topic Counts

@@ -15,17 +15,20 @@ polyfuzz_tfidf(
 )
 }
 \arguments{
-\item{n_gram_range}{The n_gram_range on a character-level default `list(3L, 3L)`}
+\item{n_gram_range}{List of integers. The n-gram range on a character-level. Default is `list(3L, 3L)`.}
 
-\item{clean_string}{Whether to clean the string such that only alphanumerical characters are kept.  Default `TRUE`}
+\item{clean_string}{Logical. If `TRUE` cleans the string to keep only alphanumeric characters. Default is `TRUE`.}
 
-\item{min_similarity}{The minimum similarity between strings, otherwise return 0 similarity.  Default `.75`}
+\item{min_similarity}{Numeric. Minimum similarity between strings, otherwise return 0. Default is 0.75.}
 
-\item{top_n}{The number of matches you want returned}
+\item{top_n}{Integer. The number of matches you want returned.}
 
-\item{cosine_method}{The method/package for calculating the cosine similarity. Options: `sparse` `sklearn` and `knn`.  Default is `sparse`}
+\item{cosine_method}{Character. Method for calculating cosine similarity. Options: `sparse`, `sklearn`, `knn`. Default is `sparse`.}
 
-\item{model_id}{The name of the particular instance, used when comparing models}
+\item{model_id}{Character. Name of the particular instance, used when comparing models.}
+}
+\value{
+A Python PolyFuzz TFIDF model object.
 }
 \description{
 A character based n-gram TF-IDF to approximate edit distance

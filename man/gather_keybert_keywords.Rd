@@ -12,13 +12,16 @@ gather_keybert_keywords(
 )
 }
 \arguments{
-\item{data}{A `tbl`}
+\item{data}{A tibble containing KeyBERT-generated keyword columns.}
 
-\item{id_column}{Name of ID coliumn}
+\item{id_column}{Character. Name of ID column. If `NULL`, creates a default ID column.}
 
-\item{other_join_columns}{If `TRUE` other column features to include}
+\item{other_join_columns}{Character vector. Additional column names to include in output. Default `NULL`.}
 
-\item{only_distinct}{if `TRUE` only distinct keywords}
+\item{only_distinct}{Logical. If `TRUE`, returns only distinct keywords. Default `FALSE`.}
+}
+\value{
+A tibble in long format with columns: ID column, `type_keyword` (vectorizer type), `keyword`, `is_sklearn`, and `is_keyphrase`. If `only_distinct = TRUE`, returns only the distinct keywords.
 }
 \description{
 Gather Keybert Generated Keywords

@@ -11,9 +11,14 @@ tbl_bert_parameter_features_to_attribute(
 )
 }
 \arguments{
-\item{feature_separator}{How to concatenate features.  Defaults to `@`}
+\item{data}{A tibble or data frame with feature columns to convert.}
 
-\item{text_separator}{How to concatenate text.  Defaults to `|`}
+\item{feature_separator}{Character. Separator for concatenating features. Default `"@"`.}
+
+\item{text_separator}{Character. Separator for concatenating text values. Default `"|"`.}
+}
+\value{
+A character vector with concatenated parameter features.
 }
 \description{
 Convert BERT Parameter Table to Attributes

@@ -12,9 +12,16 @@ polyfuzz_edit_distance(
 )
 }
 \arguments{
-\item{scorer}{The scorer function to be used to calculate the edit distance. This function should give back a float between 0 and 1, and work as follows: scorer("string_one", "string_two").  If `NULL` uses jellyfish `jaro_winkler_similarity`}
+\item{n_jobs}{Integer. Number of parallel jobs. Default is 1.}
 
-\item{model_id}{The name of the particular instance, used when comparing models}
+\item{scorer}{A Python function for calculating edit distance. Should return a float between 0 and 1. If `NULL` uses jellyfish `jaro_winkler_similarity`.}
+
+\item{model_id}{Character. Name of the particular instance, used when comparing models.}
+
+\item{normalize}{Logical. Whether to normalize scores. Default is `TRUE`.}
+}
+\value{
+A Python PolyFuzz EditDistance model object.
 }
 \description{
 Calculate the Edit Distance between lists of strings using any distance/similarity based scorer

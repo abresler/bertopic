@@ -7,13 +7,16 @@
 bert_topic_per_class(obj, docs = NULL, classes = NULL, global_tuning = TRUE)
 }
 \arguments{
-\item{obj}{BERTopic Object}
+\item{obj}{BERTopic model object.}
 
-\item{docs}{Vector of texts}
+\item{docs}{Character vector of documents.}
 
-\item{classes}{vector of classes}
+\item{classes}{Character vector of class assignments, one per document.}
 
-\item{global_tuning}{Fine-tune each topic representation for class c t by averaging its c-TF-IDF matrix with the global c-TF-IDF matrix. Turn this off if you want to prevent words in topic representations that could not be found in the documents for class c. Default `TRUE`}
+\item{global_tuning}{Logical. Fine-tune each topic representation for class by averaging its c-TF-IDF matrix with the global c-TF-IDF matrix. Default `TRUE`.}
+}
+\value{
+A tibble with topic assignments per class, including `topic_bert`, `label_bertopic`, `class`, and word representations.
 }
 \description{
 Topics Per Structured Class

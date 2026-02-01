@@ -90,21 +90,24 @@ Setting use_corpus_file to True can sometimes provide speedup for large datasets
 
 \item{keep_documents}{If set to False documents will only be used for training and not saved as part of the model. This will reduce model size. When using search functions only document ids will be returned, not the actual documents. Default is `TRUE`}
 
-\item{workers}{The amount of worker threads to be used in training the model. Larger amount will lead to faster training.}
+\item{workers}{Integer. The amount of worker threads to be used in training the model. Larger amount will lead to faster training.}
 
-\item{tokenizer}{Override the default tokenization method. If None then gensim.utils.simple_preprocess will be used. Tokenizer must take a document and return a list of tokens.}
+\item{tokenizer}{Optional callable. Override the default tokenization method. If `NULL`, gensim.utils.simple_preprocess will be used. Tokenizer must take a document and return a list of tokens.}
 
-\item{use_embedding_model_tokenizer}{If using an embedding model other than doc2vec, use the model’s tokenizer for document embedding. If set to True the tokenizer, either default or passed callable will be used to tokenize the text to extract the vocabulary for word embedding.  Default `FALSE`}
+\item{use_embedding_model_tokenizer}{Logical. If using an embedding model other than doc2vec, use the model's tokenizer for document embedding. If set to `TRUE`, the tokenizer, either default or passed callable will be used to tokenize the text to extract the vocabulary for word embedding. Default `FALSE`.}
 
-\item{umap_args}{Pass custom arguments to UMAP.  Default `NULL`}
+\item{umap_args}{List. Pass custom arguments to UMAP. Default `NULL`.}
 
-\item{hdbscan_args}{Pass custom arguments to HDBSCAN.  Default `TRUE`}
+\item{hdbscan_args}{List. Pass custom arguments to HDBSCAN. Default `NULL`.}
 
-\item{verbose}{Whether to print status data during training.}
+\item{verbose}{Logical. Whether to print status data during training.}
 
-\item{obj}{top2vec object.  If `NULL` initiates a new top2vec model}
+\item{obj}{Top2Vec object. If `NULL`, initiates a new Top2Vec model.}
 
-\item{assign_to_environment}{If `TRUE` assigns output to environment}
+\item{assign_to_environment}{Logical. If `TRUE`, assigns output to global environment. Default `TRUE`.}
+}
+\value{
+A Python Top2Vec model object.
 }
 \description{
 Top2Vec model \url{https://github.com/ddangelov/Top2Vec}

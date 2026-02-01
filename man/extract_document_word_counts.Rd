@@ -2,24 +2,21 @@
 % Please edit documentation in R/bert-analysis.R
 \name{extract_document_word_counts}
 \alias{extract_document_word_counts}
-\title{Extract Document Word Coutns}
+\title{Extract Document Word Counts}
 \usage{
 extract_document_word_counts(obj, docs = NULL, filter_zero = T)
 }
 \arguments{
 \item{obj}{BERTopic model object with vectorizer_model.}
 
-\item{docs}{Character vector of documents.}
+\item{docs}{Character vector of documents to analyze.}
 
-\item{filter_zero}{Logical. If TRUE, filters out zero counts. Default TRUE.}
+\item{filter_zero}{Logical. If `TRUE`, filters out zero counts. Default `TRUE`.}
 }
 \value{
-A tibble with document number, word, and count columns.
+A tibble with columns: `number_document`, `word`, and `count`.
 }
 \description{
-Extract Document Word Counts
-}
-\details{
 Extract word counts from documents using the vectorizer model.
 }
 \examples{

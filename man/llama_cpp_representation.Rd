@@ -2,7 +2,7 @@
 % Please edit documentation in R/representation_models.R
 \name{llama_cpp_representation}
 \alias{llama_cpp_representation}
-\title{A llama.cpp implementation to use as a representation model.}
+\title{A llama.cpp implementation to use as a representation model}
 \usage{
 llama_cpp_representation(
   model = "zephyr-7b-alpha.Q4_K_M.gguf",
@@ -17,10 +17,32 @@ llama_cpp_representation(
 )
 }
 \arguments{
-\item{model}{Either a string pointing towards a local LLM or a  `llama_cpp.Llama` object.}
+\item{model}{Character or Python object. Either a string pointing to a local LLM file or a `llama_cpp.Llama` object.}
 
-\item{obj}{}
+\item{prompt}{Character or `NULL`. The prompt template for the model.}
+
+\item{pipeline_kwargs}{List or `NULL`. Keyword arguments to pass to the pipeline.}
+
+\item{nr_docs}{Integer. Number of documents to pass to the model. Default `4`.}
+
+\item{diversity}{Numeric or `NULL`. Diversity of documents to pass to the model.}
+
+\item{doc_length}{Integer or `NULL`. Maximum length of each document.}
+
+\item{tokenizer}{Character or `NULL`. Tokenizer to use for document length calculation.}
+
+\item{numba_threads}{Integer. Number of threads for Numba. Default `1`.}
+
+\item{obj}{BERTopic module object or `NULL`.}
+}
+\value{
+A Python LlamaCPP representation object with representation_method and input_parameters attributes.
 }
 \description{
-A llama.cpp implementation to use as a representation model.
+A llama.cpp implementation to use as a representation model
+}
+\examples{
+\dontrun{
+repr <- llama_cpp_representation(model = "zephyr-7b-alpha.Q4_K_M.gguf")
+}
 }

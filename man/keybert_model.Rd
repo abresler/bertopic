@@ -7,12 +7,15 @@
 keybert_model(keybert = NULL, model = "all-MiniLM-L6-v2")
 }
 \arguments{
-\item{model}{default is `all-MiniLM-L6-v2` you can pick any model from \itemize{
-\item \href{https://www.sbert.net/docs/pretrained_models.html}{sbert}
-}}
+\item{keybert}{Python KeyBERT module. If `NULL`, imports KeyBERT automatically.}
+
+\item{model}{Character. Sentence transformer model to use. Default is `all-MiniLM-L6-v2`. See \href{https://www.sbert.net/docs/pretrained_models.html}{sbert documentation} for available models.}
+}
+\value{
+A Python KeyBERT model object.
 }
 \description{
-Runs a keybert model
+Runs a keybert model.
 }
 \examples{
 kb <- keybert_model()

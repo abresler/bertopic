@@ -6,6 +6,9 @@
 \usage{
 base_clusterer()
 }
+\value{
+A Python BaseCluster object.
+}
 \description{
 Initiate an Empty Clusterer
 }

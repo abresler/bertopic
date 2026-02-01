@@ -14,15 +14,18 @@ polyfuzz_sentence_embeddings(
 )
 }
 \arguments{
-\item{embedding_model}{The Gensim model to use, this can be either a string or the model directly model to use, this can be either a string or the model directly}
+\item{embedding_model}{A Sentence Transformer model. Can be either a string or model object.}
 
-\item{min_similarity}{The minimum similarity between strings, otherwise return 0 similarity}
+\item{min_similarity}{Numeric. Minimum similarity between strings, otherwise return 0. Default is 0.5.}
 
-\item{top_n}{The number of best matches you want returned}
+\item{top_n}{Integer. The number of best matches to return.}
 
-\item{cosine_method}{The method/package for calculating the cosine similarity. Options: `sparse` `sklearn` and `knn`.  Default is `sparse`}
+\item{cosine_method}{Character. Method for calculating cosine similarity. Options: `sparse`, `sklearn`, `knn`. Default is `sparse`.}
 
-\item{model_id}{model id}
+\item{model_id}{Character. Name of the model instance.}
+}
+\value{
+A Python PolyFuzz SentenceEmbeddings model object.
 }
 \description{
 Embed words into vectors and use cosine similarity to find

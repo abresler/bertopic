@@ -12,13 +12,16 @@ bert_merge_models(
 )
 }
 \arguments{
-\item{obj}{BERTopic object}
+\item{obj}{A BERTopic model object created by `bert_topic()`.}
 
-\item{models}{A list of fitted BERTopic models}
+\item{models}{List of fitted BERTopic model objects to merge.}
 
-\item{min_similarity}{The minimum similarity for when topics are merged.  Default .7}
+\item{min_similarity}{Numeric. The minimum similarity score for when topics are merged. Default `0.7`.}
 
-\item{embedding_model}{Additionally load in an embedding model if necessary.}
+\item{embedding_model}{Python embedding model or `NULL`. Additionally load in an embedding model if necessary. Default `NULL`.}
+}
+\value{
+The merged BERTopic model object with consolidated topics from all input models.
 }
 \description{
 Merge multiple pre-trained BERTopic models into a single model

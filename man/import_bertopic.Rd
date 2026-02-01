@@ -13,12 +13,18 @@ import_bertopic(
 )
 }
 \arguments{
-\item{assign_to_environment}{if \code{TRUE} assigns to environment}
+\item{assign_to_environment}{Logical. If `TRUE` assigns the BERTopic module to the global environment.}
 
-\item{use_kmp_fork}{}
+\item{path}{Character. Path to Python environment if not using the default.}
+
+\item{numba_threads}{Integer. Number of threads for Numba operations. Default `1`.}
+
+\item{use_token_parallel}{Logical. If `TRUE` enables parallel tokenization. Default `TRUE`.}
+
+\item{use_kmp_fork}{Logical. If `TRUE` uses KMP fork. Default `FALSE`.}
 }
 \value{
-python object
+A Python BERTopic module object.
 }
 \description{
 \href{https://maartengr.github.io/BERTopic}{BERTopic API from python} and other examples \href{https://github.com/MaartenGr/BERTopic}{here}

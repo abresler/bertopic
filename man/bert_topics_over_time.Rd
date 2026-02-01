@@ -22,18 +22,18 @@ bert_topics_over_time(
 
 \item{timestamps}{Vector of timestamps corresponding to documents.}
 
-\item{nr_bins}{Integer. Number of time bins. Default NULL.}
+\item{nr_bins}{Integer. Number of time bins. Default `NULL`.}
 
-\item{datetime_format}{Character. Format string for datetime. Default NULL.}
+\item{datetime_format}{Character. Format string for datetime. Default `NULL`.}
 
-\item{evolution_tuning}{Logical. Enable evolution tuning. Default TRUE.}
+\item{evolution_tuning}{Logical. Enable evolution tuning. Default `TRUE`.}
 
-\item{global_tuning}{Logical. Enable global tuning. Default TRUE.}
+\item{global_tuning}{Logical. Enable global tuning. Default `TRUE`.}
 
-\item{return_tibble}{Logical. Return as tibble. Default TRUE.}
+\item{return_tibble}{Logical. If `TRUE`, returns tibble format. Default `TRUE`.}
 }
 \value{
-Topics over time data, as tibble if return_tibble is TRUE.
+Topics over time data, as tibble if `return_tibble = TRUE`.
 }
 \description{
 Analyze how topics change over time using timestamps.

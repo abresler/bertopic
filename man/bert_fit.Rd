@@ -7,16 +7,19 @@
 bert_fit(obj, documents, embeddings = NULL, y = NULL, images = NULL)
 }
 \arguments{
-\item{obj}{BERTopic Object}
+\item{obj}{A BERTopic model object created by `bert_topic()`.}
 
-\item{documents}{A single document or a list of documents to fit on}
+\item{documents}{Character vector. A single document or list of documents to fit on.}
 
-\item{embeddings}{If not `NULL` Pre-trained document embeddings. These can be used instead of the sentence-transformer model.}
+\item{embeddings}{Numeric matrix or `NULL`. Pre-trained document embeddings. These can be used instead of the sentence-transformer model. Default `NULL`.}
 
-\item{y}{If Not `NULL` The target class for (semi)-supervised modeling. Use -1 if no class for a specific instance is specified.}
+\item{y}{Integer vector or `NULL`. The target class for (semi)-supervised modeling. Use `-1` if no class for a specific instance is specified. Default `NULL`.}
 
-\item{images}{A list of paths to the images to fit on or the images themselves}
+\item{images}{List or `NULL`. A list of paths to the images to fit on or the images themselves. Default `NULL`.}
+}
+\value{
+The fitted BERTopic model object.
 }
 \description{
-Fit the models (Bert, UMAP, and, HDBSCAN) on a collection of documents and generate topics
+Fit the models (BERT, UMAP, and HDBSCAN) on a collection of documents and generate topics.
 }

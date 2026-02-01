@@ -15,7 +15,22 @@ bert_topic_info(
 )
 }
 \arguments{
-\item{top_n_aspect_words}{}
+\item{obj}{A BERTopic model object.}
+
+\item{topic_number}{Integer. Specific topic number to retrieve, or `NULL` for all topics.}
+
+\item{return_summary}{Logical. If `TRUE` returns summary format. Default is `TRUE`.}
+
+\item{assign_to_environment}{Logical. If `TRUE` assigns results to global environment. Default is `TRUE`.}
+
+\item{concatenator}{Character. String to concatenate multiple values. Default is ". ".}
+
+\item{top_n_aspect_words}{Integer. Number of top aspect words to include, or `NULL` for all.}
+
+\item{remove_list_columns}{Logical. If `TRUE` removes list-type columns. Default is `TRUE`.}
+}
+\value{
+A tibble containing topic information with columns: `topic_bert`, `label_bertopic`, `is_outlier_bert_topic`, and additional topic metadata.
 }
 \description{
 BERT Topic Model Info

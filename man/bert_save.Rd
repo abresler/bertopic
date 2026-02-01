@@ -14,17 +14,20 @@ bert_save(
 )
 }
 \arguments{
-\item{obj}{BERTopic Object}
+\item{obj}{BERTopic model object.}
 
-\item{model_path}{Path where object is saved}
+\item{model_path}{Character. Directory path where the model will be saved.}
 
-\item{file_name}{name of the BERTOPIC Model}
+\item{file_name}{Character. Name for the BERTopic model file. Default `"bert_model"`.}
 
-\item{serialization}{If pickle, the entire model will be pickled. If safetensors or pytorch the model will be saved without the embedding, dimensionality reduction, and clustering algorithms. This is a very efficient format and typically advised.  Default `safetensors`}
+\item{serialization}{Character. Serialization format: `"pickle"`, `"safetensors"`, or `"pytorch"`. Default `"safetensors"`.}
 
-\item{save_ctfidf}{}
+\item{save_ctfidf}{Logical. Whether to save c-TF-IDF model. Default `TRUE`.}
 
-\item{save_embedding_model}{if `TRUE` If serialization pickle, then you can choose to skip saving the embedding model. If serialization safetensors or pytorch, this variable can be used as a string pointing towards a huggingface model.}
+\item{save_embedding_model}{Logical or character. If `TRUE`, saves the embedding model. If character, points to HuggingFace model. Default `TRUE`.}
+}
+\value{
+Called for side effects; returns invisibly.
 }
 \description{
 Save BERTopic Model

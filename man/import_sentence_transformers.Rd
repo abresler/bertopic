@@ -7,8 +7,18 @@
 import_sentence_transformers(assign_to_environment = T, path = NULL)
 }
 \arguments{
-\item{path}{}
+\item{assign_to_environment}{Logical. If `TRUE`, assigns module to global environment.}
+
+\item{path}{Character. Path to Python installation directory.}
+}
+\value{
+The Python sentence-transformers module object, invisibly.
 }
 \description{
 Sentence Transformer Module
+}
+\examples{
+\dontrun{
+st <- import_sentence_transformers(assign_to_environment = FALSE)
+}
 }

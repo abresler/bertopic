@@ -7,11 +7,14 @@
 bert_merge_topics(obj, docs, topics_to_merge = NULL)
 }
 \arguments{
-\item{obj}{bertopic model object}
+\item{obj}{BERTopic model object.}
 
-\item{docs}{The documents you used when calling either fit or fit_transform}
+\item{docs}{Character vector of documents used in model fitting.}
 
-\item{topics_to_merge}{Either a list of topics or a list of list of topics to merge. For example: `list(1,2,3)` will merge topics 1, 2 and 3 `list(list(1,2), list(3,4))` will merge topics 1 and 2, and separately merge topics 3 and 4.}
+\item{topics_to_merge}{List. Either a list of topic IDs or a list of lists of topic IDs to merge. For example: `list(1,2,3)` merges topics 1, 2, and 3; `list(list(1,2), list(3,4))` merges 1 and 2 separately from 3 and 4.}
+}
+\value{
+The updated BERTopic model object with merged topics.
 }
 \description{
 Merge Topics

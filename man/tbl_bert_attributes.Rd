@@ -12,13 +12,16 @@ tbl_bert_attributes(
 )
 }
 \arguments{
-\item{obj}{BERTopic Object}
+\item{obj}{A BERTopic model object.}
 
-\item{return_clean}{if `TRUE` returns clean set of parameters}
+\item{return_clean}{Logical. If `TRUE` returns a clean set of parameters. Default `FALSE`.}
 
-\item{return_wide}{if `TRUE` returns it in wide form}
+\item{return_wide}{Logical. If `TRUE` returns it in wide form. Default `FALSE`.}
 
-\item{parameter_filter}{if not `NULL` filters the attrbutes}
+\item{parameter_filter}{Character vector or `NULL`. If not `NULL` filters the attributes by pattern matching. Default `NULL`.}
+}
+\value{
+A tibble containing model attributes, either in long or wide format depending on arguments.
 }
 \description{
 Return Tibble of BERT Attributes

@@ -6,6 +6,9 @@
 \usage{
 word_doc_embedder()
 }
+\value{
+A Python WordDocEmbedder model class.
+}
 \description{
 Combine a document- and word-level embedder
 }

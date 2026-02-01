@@ -13,13 +13,18 @@ bert_parameters(
 )
 }
 \arguments{
-\item{obj}{topic model object}
+\item{obj}{A BERTopic model object or Python object with `get_params()` method.}
 
-\item{deep}{if `TRUE` returns deep information}
+\item{deep}{Logical. If `TRUE` returns deep information. Default `FALSE`.}
 
-\item{return_tibble}{If `TRUE` returns a `tibble`}
+\item{return_tibble}{Logical. If `TRUE` returns a `tibble`. Default `FALSE`.}
 
-\item{return_attributes}{If `TRUE` returns concatenated character vector of the parameters}
+\item{use_dfc_method}{Logical. If `TRUE` uses `map_dfc` method for conversion. Default `FALSE`.}
+
+\item{return_attributes}{Logical. If `TRUE` returns concatenated character vector of the parameters. Default `FALSE`.}
+}
+\value{
+A list (default), tibble (if `return_tibble = TRUE`), or character vector (if `return_attributes = TRUE`) containing model parameters.
 }
 \description{
 BERTopic Parameters

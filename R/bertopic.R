@@ -5,10 +5,10 @@
 
 #' bert
 #'
-#' @return
+#' @returns A character vector of base English stopwords.
 #' @export
 #'
-#' @examples
+
 bert_base_stop_words <-
   function() {
     c(
@@ -335,12 +335,12 @@ bert_base_stop_words <-
 
 #' Bertopic Stopwords
 #'
-#' @param extra_stop_words
+#' @param extra_stop_words Character vector of additional stopwords to append.
 #'
-#' @return
+#' @returns A character vector of stopwords including base words and any extra stopwords provided.
 #' @export
 #'
-#' @examples
+
 bert_stop_words <-
   function(extra_stop_words = NULL) {
     stopwords <- bert_base_stop_words()
@@ -362,13 +362,13 @@ bert_stop_words <-
 #'
 #' \href{https://maartengr.github.io/BERTopic}{BERTopic API from python} and other examples \href{https://github.com/MaartenGr/BERTopic}{here}
 #'
-#' @param assign_to_environment if \code{TRUE} assigns to environment
-#' @param path
-#' @param numba_threads
-#' @param use_token_parallel
-#' @param use_kmp_fork
+#' @param assign_to_environment Logical. If `TRUE` assigns the BERTopic module to the global environment.
+#' @param path Character. Path to Python environment if not using the default.
+#' @param numba_threads Integer. Number of threads for Numba operations. Default `1`.
+#' @param use_token_parallel Logical. If `TRUE` enables parallel tokenization. Default `TRUE`.
+#' @param use_kmp_fork Logical. If `TRUE` uses KMP fork. Default `FALSE`.
 #'
-#' @return python object
+#' @returns A Python BERTopic module object.
 #' @export
 #'
 #' @examples
@@ -396,13 +396,13 @@ import_bertopic <-
 
 #' Import Numba
 #'
-#' @param assign_to_environment
-#' @param path
+#' @param assign_to_environment Logical. If `TRUE` assigns the Numba module to the global environment.
+#' @param path Character. Path to Python environment if not using the default.
 #'
-#' @return
+#' @returns A Python Numba module object.
 #' @export
 #'
-#' @examples
+
 import_numba <-
   function(assign_to_environment = T,
            path = NULL) {
@@ -417,15 +417,15 @@ import_numba <-
 
 
 # stup --------------------------------------------------------------------
-#' Set BERTopic Model Attriubtes
+#' Set BERTopic Model Attributes
 #'
-#' @param obj BERTopic Object
-#' @param representation_model  If not `NULL` representation model
+#' @param obj A BERTopic model object created by `bert_topic()`.
+#' @param representation_model Python representation model object or `NULL`.
 #'
-#' @return
+#' @returns The BERTopic model object with attached attributes for base, HDBSCAN, C-TF-IDF, UMAP, and representation parameters.
 #' @export
 #'
-#' @examples
+
 set_bert_attributes <-
   function(obj, representation_model = NULL) {
     base_params <-
@@ -483,48 +483,43 @@ set_bert_attributes <-
 #' \item \href{https://maartengr.github.io/BERTopic/api/bertopic.html}{berttopic}
 #' }
 #'
-#' @param verbose if `TRUE` verbose output
-#' @param top_n_words The number of words per topic to extract. Setting this too high can negatively impact topic embeddings as topics are typically best represented by at most 10 words.  Default to `10L`
-#' @param language The main language used in your documents. The default sentence-transformers model for "english" is all-MiniLM-L6-v2. For a full overview of supported languages see bertopic.backend.languages. Select "multilingual" to load in the paraphrase-multilingual-MiniLM-L12-v2 sentence-tranformers model that supports 50+ languages. Default `english`
-#' @param n_gram_range The n-gram range for the CountVectorizer. Advised to keep high values between 1 and 3. More would likely lead to memory issues. NOTE: This param will not be used if you pass in your own CountVectorizer. Default to `list(1L, 1L)`
-#' @param min_topic_size The minimum size of the topic. Increasing this value will lead to a lower number of clusters/topics. NOTE: This param will not be used if you are not using HDBSCAN. Default 10
-#' @param nr_topics Specifying the number of topics will reduce the initial number of topics to the value specified. This reduction can take a while as each reduction in topics (-1) activates a c-TF-IDF calculation. If this is set to None, no reduction is applied. Use `auto` to automatically reduce topics using HDBSCAN.
-#' @param low_memory Sets UMAP low memory to True to make sure less memory is used. NOTE: This is only used in UMAP. For example, if you use PCA instead of UMAP this parameter will not be used. Default `FALSE`
-#' @param calculate_probabilities Whether to calculate the probabilities of all topics per document instead of the probability of the assigned topic per document. This could slow down the extraction of topics if you have many documents (> 100_000). Set this only to True if you have a low amount of documents or if you do not mind more computation time. NOTE: If false you cannot use the corresponding visualization method visualize_probabilities.  Default to `FALSE`
-#' @param seed_topic_list A list of seed words per topic to converge around.  Default is `NULL`
-#' @param umap_model Pass in a UMAP model to be used instead of the default. NOTE: You can also pass in any dimensionality reduction algorithm as long as it has .fit and .transform functions.
-#' @param hdbscan_model Pass in a hdbscan.HDBSCAN model to be used instead of the default NOTE: You can also pass in any clustering algorithm as long as it has .fit and .predict functions along with the .labels_ variable. Default `NULL`
-#' @param vectorizer_model Pass in a custom CountVectorizer instead of the default model. Default `NULL`
-#' @param ctfidf_model Pass in a custom ClassTfidfTransformer instead of the default model. Default `NULL`
-#' @param exclude_stop_words if `TRUE` excludes base stop words
-#' @param use_key_phrase_vectorizer if `TRUE` uses a keyphrase vectorizer
-#' @param is_lower_case if `TRUE` is lowercase
-#' @param embedding_model type of embedding model - either an object or `NULL` options include \itemize{
-#' \item \href{https://www.sbert.net/docs/pretrained_models.html}{sbert}
-#' } and it defaults to `all-MiniLM-L6-v2`
-#' @param extra_stop_words vector of other stopwords
-#' @param max_df During fitting ignore keyphrases that have a document frequency strictly higher than the given threshold. Default `1L`
-#' @param min_df During fitting ignore keyphrases that have a document frequency strictly lower than the given threshold. This value is also called cut-off in the literature.  Default `1L`
-#' @param pos_pattern Position patter for keyphrase.  Defaults to `pos_pattern = "<J.*>*<N.*>+",`
-#' \href{https://maartengr.github.io/KeyBERT/guides/countvectorizer.html#languages}{Position Pattern via KeyBERT}
-#' \href{https://keyphrase-vectorizers.readthedocs.io/en/latest/api.html}{KeyPhrase POS API}
-#' \href{https://github.com/TimSchopf/KeyphraseVectorizers#custom-pos-tagger}{Custom Tagger via KeyPhrase}
-#' @param keyphrase_ngram_range If not `NULL` range for keyphrase
-#' @param vocabulary
-#' @param stopword_package_sources options if not `NULL` `c("snowball", "stopwords-iso", "smart", "nltk")`
-#' @param use_sklearn_vectorizer if `TRUE` uses SKLearn vetorizer
-#' @param representation_model The base representation model for fine-tuning topic representations
-#' @param numba_threads
-#' @param set_attributes
-#' @param zeroshot_topic_list
-#' @param zeroshot_min_similarity
-#' @param workers
-#' @param decay
-#' @param delete_min_df
-#' @param obj
-#' @param use_token_parallel
+#' @param obj Python BERTopic module object or `NULL` to import.
+#' @param verbose Logical. If `TRUE` verbose output is printed. Default `TRUE`.
+#' @param top_n_words Integer. The number of words per topic to extract. Setting this too high can negatively impact topic embeddings as topics are typically best represented by at most 10 words. Default `10L`.
+#' @param language Character. The main language used in your documents. The default sentence-transformers model for "english" is all-MiniLM-L6-v2. For a full overview of supported languages see `bertopic.backend.languages`. Select "multilingual" to load the paraphrase-multilingual-MiniLM-L12-v2 sentence-transformers model that supports 50+ languages. Default `"english"`.
+#' @param n_gram_range List of integers. The n-gram range for the CountVectorizer. Advised to keep high values between 1 and 3. More would likely lead to memory issues. NOTE: This param will not be used if you pass in your own CountVectorizer. Default `list(1L, 1L)`.
+#' @param min_topic_size Integer. The minimum size of the topic. Increasing this value will lead to a lower number of clusters/topics. NOTE: This param will not be used if you are not using HDBSCAN. Default `10L`.
+#' @param nr_topics Integer or `NULL`. Specifying the number of topics will reduce the initial number of topics to the value specified. This reduction can take a while as each reduction in topics (-1) activates a c-TF-IDF calculation. If `NULL`, no reduction is applied. Use `"auto"` to automatically reduce topics using HDBSCAN. Default `NULL`.
+#' @param low_memory Logical. Sets UMAP low memory to `TRUE` to make sure less memory is used. NOTE: This is only used in UMAP. For example, if you use PCA instead of UMAP this parameter will not be used. Default `FALSE`.
+#' @param calculate_probabilities Logical. If `TRUE` calculates the probabilities of all topics per document instead of the probability of the assigned topic per document. This could slow down the extraction of topics if you have many documents (> 100,000). Set this only to `TRUE` if you have a low amount of documents or if you do not mind more computation time. NOTE: If `FALSE` you cannot use the corresponding visualization method `visualize_probabilities`. Default `TRUE`.
+#' @param seed_topic_list List or `NULL`. A list of seed words per topic to converge around. Default `NULL`.
+#' @param umap_model Python UMAP model or `NULL`. Pass in a UMAP model to be used instead of the default. NOTE: You can also pass in any dimensionality reduction algorithm as long as it has `.fit` and `.transform` functions. Default `NULL`.
+#' @param hdbscan_model Python HDBSCAN model or `NULL`. Pass in an `hdbscan.HDBSCAN` model to be used instead of the default. NOTE: You can also pass in any clustering algorithm as long as it has `.fit` and `.predict` functions along with the `.labels_` variable. Default `NULL`.
+#' @param vectorizer_model Python vectorizer model or `NULL`. Pass in a custom CountVectorizer instead of the default model. Default `NULL`.
+#' @param ctfidf_model Python C-TF-IDF model or `NULL`. Pass in a custom ClassTfidfTransformer instead of the default model. Default `NULL`.
+#' @param exclude_stop_words Logical. If `TRUE` excludes base stop words. Default `TRUE`.
+#' @param use_key_phrase_vectorizer Logical. If `TRUE` uses a keyphrase vectorizer. Default `FALSE`.
+#' @param is_lower_case Logical. If `TRUE` converts text to lowercase. Default `TRUE`.
+#' @param embedding_model Python embedding model or `NULL`. Type of embedding model - either a model object or `NULL`. Options include \href{https://www.sbert.net/docs/pretrained_models.html}{sbert} and defaults to `"all-MiniLM-L6-v2"`. Default `NULL`.
+#' @param extra_stop_words Character vector or `NULL`. Additional stopwords to exclude. Default `NULL`.
+#' @param max_df Integer. During fitting ignore keyphrases that have a document frequency strictly higher than the given threshold. Default `1L`.
+#' @param min_df Integer. During fitting ignore keyphrases that have a document frequency strictly lower than the given threshold. This value is also called cut-off in the literature. Default `1L`.
+#' @param pos_pattern Character. Position pattern for keyphrase extraction. Defaults to `"<J.*>*<N.*>+"`. See \href{https://maartengr.github.io/KeyBERT/guides/countvectorizer.html#languages}{Position Pattern via KeyBERT}, \href{https://keyphrase-vectorizers.readthedocs.io/en/latest/api.html}{KeyPhrase POS API}, and \href{https://github.com/TimSchopf/KeyphraseVectorizers#custom-pos-tagger}{Custom Tagger via KeyPhrase} for details.
+#' @param keyphrase_ngram_range List or `NULL`. Range for keyphrase n-grams. Default `list(1L, 1L)`.
+#' @param vocabulary List or `NULL`. Custom vocabulary for the vectorizer. Default `NULL`.
+#' @param stopword_package_sources Character vector or `NULL`. Options if not `NULL`: `c("snowball", "stopwords-iso", "smart", "nltk")`. Default `NULL`.
+#' @param use_sklearn_vectorizer Logical. If `TRUE` uses scikit-learn vectorizer. Default `FALSE`.
+#' @param representation_model Python representation model or `NULL`. The base representation model for fine-tuning topic representations. Default `NULL`.
+#' @param numba_threads Integer. Number of threads for Numba operations. Default `1L`.
+#' @param set_attributes Logical. If `TRUE` sets attributes on the model object. Default `TRUE`.
+#' @param zeroshot_topic_list List or `NULL`. List of candidate topic labels for zero-shot classification. Default `NULL`.
+#' @param zeroshot_min_similarity Numeric. Minimum similarity score for zero-shot topic matching. Default `0.7`.
+#' @param workers Integer. Number of parallel workers for processing. Default `6L`.
+#' @param decay Numeric or `NULL`. Decay parameter for online learning. Default `NULL`.
+#' @param delete_min_df Logical or `NULL`. If `TRUE` deletes documents with frequency below `min_df`. Default `NULL`.
+#' @param use_token_parallel Logical. If `TRUE` enables parallel tokenization. Default `TRUE`.
 #'
-#' @return python object
+#' @returns A Python BERTopic model object configured with the specified parameters.
 #' @export
 #'
 #' @examples
@@ -716,10 +711,10 @@ bert_topic <-
 
 #' Bertopic Backend
 #'
-#' @return
+#' @returns A Python BERTopic backend module object.
 #' @export
 #'
-#' @examples
+
 bert_backend <-
   function() {
     bertopic <- import_bertopic(assign_to_environment = F)
@@ -734,10 +729,10 @@ bert_backend <-
 
 #' Bertopic Plotting
 #'
-#' @return
+#' @returns A Python BERTopic plotting module object.
 #' @export
 #'
-#' @examples
+
 bert_plotting <-
   function() {
     bertopic <- import_bertopic(assign_to_environment = F)
@@ -751,14 +746,14 @@ bert_plotting <-
 
 #' Convert BERT Parameter Table to Attributes
 #'
-#' @param data
-#' @param feature_separator How to concatenate features.  Defaults to `@`
-#' @param text_separator How to concatenate text.  Defaults to `|`
+#' @param data A tibble or data frame with feature columns to convert.
+#' @param feature_separator Character. Separator for concatenating features. Default `"@"`.
+#' @param text_separator Character. Separator for concatenating text values. Default `"|"`.
 #'
-#' @return
+#' @returns A character vector with concatenated parameter features.
 #' @export
 #'
-#' @examples
+
 tbl_bert_parameter_features_to_attribute <-
   function(data,
            feature_separator = "@",
@@ -776,15 +771,16 @@ tbl_bert_parameter_features_to_attribute <-
 
 #' BERTopic Parameters
 #'
-#' @param obj topic model object
-#' @param deep if `TRUE` returns deep information
-#' @param return_tibble If `TRUE` returns a `tibble`
-#' @param return_attributes If `TRUE` returns concatenated character vector of the parameters
+#' @param obj A BERTopic model object or Python object with `get_params()` method.
+#' @param deep Logical. If `TRUE` returns deep information. Default `FALSE`.
+#' @param return_tibble Logical. If `TRUE` returns a `tibble`. Default `FALSE`.
+#' @param return_attributes Logical. If `TRUE` returns concatenated character vector of the parameters. Default `FALSE`.
+#' @param use_dfc_method Logical. If `TRUE` uses `map_dfc` method for conversion. Default `FALSE`.
 #'
-#' @return
+#' @returns A list (default), tibble (if `return_tibble = TRUE`), or character vector (if `return_attributes = TRUE`) containing model parameters.
 #' @export
 #'
-#' @examples
+
 bert_parameters <-
   function(obj,
            deep = FALSE,
@@ -854,15 +850,15 @@ bert_parameters <-
 
 #' Return Tibble of BERT Attributes
 #'
-#' @param obj BERTopic Object
-#' @param return_clean if `TRUE` returns clean set of parameters
-#' @param return_wide if `TRUE` returns it in wide form
-#' @param parameter_filter if not `NULL` filters the attrbutes
+#' @param obj A BERTopic model object.
+#' @param return_clean Logical. If `TRUE` returns a clean set of parameters. Default `FALSE`.
+#' @param return_wide Logical. If `TRUE` returns it in wide form. Default `FALSE`.
+#' @param parameter_filter Character vector or `NULL`. If not `NULL` filters the attributes by pattern matching. Default `NULL`.
 #'
-#' @return
+#' @returns A tibble containing model attributes, either in long or wide format depending on arguments.
 #' @export
 #'
-#' @examples
+
 tbl_bert_attributes <-
   function(obj,
            return_clean = F,
@@ -939,17 +935,17 @@ tbl_bert_attributes <-
 
 #' BERTopic Transform
 #'
-#' After having fit a model, use transform to predict new instances
+#' After having fit a model, use transform to predict new instances.
 #'
-#' @param obj BERTopic Object
-#' @param documents  A single document or a list of documents to fit on
-#' @param embeddings If not `NULL` Pre-trained document embeddings. These can be used instead of the sentence-transformer model.
-#' @param images A list of paths to the images to predict on or the images themselves
+#' @param obj A BERTopic model object created by `bert_topic()`.
+#' @param documents Character vector. A single document or list of documents to transform.
+#' @param embeddings Numeric matrix or `NULL`. Pre-trained document embeddings. These can be used instead of the sentence-transformer model. Default `NULL`.
+#' @param images List or `NULL`. A list of paths to the images to predict on or the images themselves. Default `NULL`.
 #'
-#' @return
+#' @returns The transformed BERTopic model object with predicted topics for new documents.
 #' @export
 #'
-#' @examples
+
 bert_transform <-
   function(obj, documents, embeddings = NULL, images = NULL) {
     obj <- obj$transform(documents = documents, embeddings = embeddings, images = images)
@@ -959,15 +955,15 @@ bert_transform <-
 
 #' Fit BERTopic on a subset of the data and perform online learning with batch-like data.
 #'
-#' @param obj Topic Model Object
-#' @param documents A list of documents to fit on
-#' @param embeddings Pre-trained document embeddings. These can be used instead of the sentence-transformer model
-#' @param y The target class for (semi)-supervised modeling. Use -1 if no class for a specific instance is specified
+#' @param obj A BERTopic model object created by `bert_topic()`.
+#' @param documents Character vector. A list of documents to fit on.
+#' @param embeddings Numeric matrix or `NULL`. Pre-trained document embeddings. These can be used instead of the sentence-transformer model. Default `NULL`.
+#' @param y Integer vector or `NULL`. The target class for (semi)-supervised modeling. Use `-1` if no class for a specific instance is specified. Default `NULL`.
 #'
-#' @return
+#' @returns The BERTopic model object updated with partial fit results.
 #' @export
 #'
-#' @examples
+
 bert_partial_fit <-
   function(obj,
            documents,
@@ -982,18 +978,18 @@ bert_partial_fit <-
 
 #' BERTopic Fit
 #'
-#' Fit the models (Bert, UMAP, and, HDBSCAN) on a collection of documents and generate topics
+#' Fit the models (BERT, UMAP, and HDBSCAN) on a collection of documents and generate topics.
 #'
-#' @param obj BERTopic Object
-#' @param documents  A single document or a list of documents to fit on
-#' @param embeddings If not `NULL` Pre-trained document embeddings. These can be used instead of the sentence-transformer model.
-#' @param y If Not `NULL` The target class for (semi)-supervised modeling. Use -1 if no class for a specific instance is specified.
-#' @param images  A list of paths to the images to fit on or the images themselves
+#' @param obj A BERTopic model object created by `bert_topic()`.
+#' @param documents Character vector. A single document or list of documents to fit on.
+#' @param embeddings Numeric matrix or `NULL`. Pre-trained document embeddings. These can be used instead of the sentence-transformer model. Default `NULL`.
+#' @param y Integer vector or `NULL`. The target class for (semi)-supervised modeling. Use `-1` if no class for a specific instance is specified. Default `NULL`.
+#' @param images List or `NULL`. A list of paths to the images to fit on or the images themselves. Default `NULL`.
 #'
-#' @return
+#' @returns The fitted BERTopic model object.
 #' @export
 #'
-#' @examples
+
 bert_fit <-
   function(obj,
            documents,
@@ -1015,14 +1011,15 @@ bert_fit <-
 #'
 #' Fit the models on a collection of documents, generate topics, and return the docs with topics.
 #'
-#' @param obj BERTopic Object
-#' @param documents  A single document or a list of documents to fit on
-#' @param embeddings If not `NULL` Pre-trained document embeddings. These can be used instead of the sentence-transformer model.
-#' @param y If Not `NULL` The target class for (semi)-supervised modeling. Use -1 if no class for a specific instance is specified.#'
-#' @return
+#' @param obj A BERTopic model object created by `bert_topic()`.
+#' @param documents Character vector. A single document or list of documents to fit on.
+#' @param embeddings Numeric matrix or `NULL`. Pre-trained document embeddings. These can be used instead of the sentence-transformer model. Default `NULL`.
+#' @param y Integer vector or `NULL`. The target class for (semi)-supervised modeling. Use `-1` if no class for a specific instance is specified. Default `NULL`.
+#'
+#' @returns An integer vector of assigned topic IDs for each document.
 #' @export
 #'
-#' @examples
+
 bert_fit_transform <-
   function(obj,
            documents,
@@ -1045,17 +1042,17 @@ bert_fit_transform <-
 #'
 #' Fit the models on a collection of documents, generate topics, and return the docs with topics.
 #'
-#' @param obj BERTopic Object
-#' @param data a tibble
-#' @param text_field name of text field
-#' @param class_fields if not `NULL` `y` or `class` fields.
-#' @param embeddings If not `NULL` Pre-trained document embeddings. These can be used instead of the sentence-transformer model.
-#' @param images
+#' @param obj A BERTopic model object created by `bert_topic()`.
+#' @param data A tibble containing text and optional class columns.
+#' @param text_field Character. Name of the column containing text documents.
+#' @param class_fields Character vector or `NULL`. Names of columns to use as class labels for semi-supervised learning. Default `NULL`.
+#' @param embeddings Numeric matrix or `NULL`. Pre-trained document embeddings. These can be used instead of the sentence-transformer model. Default `NULL`.
+#' @param images List or `NULL`. A list of paths to images or the images themselves. Default `NULL`.
 #'
-#' @return
+#' @returns An integer vector of assigned topic IDs for each document.
 #' @export
 #'
-#' @examples
+
 tbl_bert_fit_transform <-
   function(obj,
            data = NULL,
@@ -1110,12 +1107,12 @@ tbl_bert_fit_transform <-
 
 #' Class TFIDF Transformer
 #'
-#' @param bm25_weighting Uses BM25-inspired idf-weighting procedure instead of the procedure as defined in the c-TF-IDF formula. It uses the following weighting scheme: log(1+((avg_nr_samples - df + 0.5) / (df+0.5))).  Defaults to `FALSE`
-#' @param reduce_frequent_words Takes the square root of the bag-of-words after normalizing the matrix. Helps to reduce the impact of words that appear too frequently. Defaults to `FALSE`
-#' @param seed_words Specific words that will have their idf value increased by the value of seed_multiplier. NOTE: This will only increase the value of words that have an exact match
-#' @param seed_multiplier The value with which the idf values of the words in seed_words are multiplied.  Default 2
+#' @param bm25_weighting Logical. Uses BM25-inspired idf-weighting procedure instead of the procedure as defined in the c-TF-IDF formula. It uses the following weighting scheme: `log(1+((avg_nr_samples - df + 0.5) / (df+0.5)))`. Default `FALSE`.
+#' @param reduce_frequent_words Logical. Takes the square root of the bag-of-words after normalizing the matrix. Helps to reduce the impact of words that appear too frequently. Default `FALSE`.
+#' @param seed_words Character vector or `NULL`. Specific words that will have their idf value increased by the value of `seed_multiplier`. NOTE: This will only increase the value of words that have an exact match. Default `NULL`.
+#' @param seed_multiplier Numeric. The value with which the idf values of the words in `seed_words` are multiplied. Default `2`.
 #'
-#' @return
+#' @returns A Python ClassTfidfTransformer model object.
 #' @export
 #'
 #' @examples
@@ -1146,14 +1143,18 @@ class_tfidf_transformer <-
 
 #' An Online Vectorizer
 #'
-#' @param decay
-#' @param delete_min_df
-#' @param ...
+#' @param decay Numeric or `NULL`. Decay parameter for online learning. Default `NULL`.
+#' @param delete_min_df Logical or `NULL`. If `TRUE` deletes documents with frequency below minimum. Default `NULL`.
+#' @param stop_words Character vector or `NULL`. Stopwords to exclude. Default `NULL`.
+#' @param numba_threads Integer. Number of threads for Numba operations. Default `1`.
+#' @param use_token_parallel Logical. If `TRUE` enables parallel tokenization. Default `FALSE`.
+#' @param obj Python BERTopic module object or `NULL` to import. Default `NULL`.
+#' @param ... Additional arguments passed to the Python vectorizer.
 #'
-#' @return
+#' @returns A Python OnlineCountVectorizer model object.
 #' @export
 #'
-#' @examples
+
 online_count_vectorizer <- function(decay = NULL,
                                     delete_min_df = NULL,
                                     stop_words = NULL,
@@ -1181,13 +1182,13 @@ online_count_vectorizer <- function(decay = NULL,
 #' c-TF-IDF can best be explained as a TF-IDF formula adopted for multiple classes by joining all documents per class. Thus, each class is converted to a single document instead of set of documents. The frequency of each word x is extracted for each class c and is l1 normalized. This constitutes the term frequency.
 #' Then, the term frequency is multiplied with IDF which is the logarithm of 1 plus the average number of words per class A divided by the frequency of word x across all classes.
 #'
-#' @param bm25_weighting  Uses BM25-inspired idf-weighting procedure instead of the procedure as defined in the c-TF-IDF formula. It uses the following weighting scheme: log(1+((avg_nr_samples - df + 0.5) / (df+0.5))). Default is `FALSE`
-#' @param reduce_frequent_words Takes the square root of the bag-of-words after normalizing the matrix. Helps to reduce the impact of words that appear too frequently. Default is `FALSE`
-#' @param obj bertopic object
-#' @param seed_words
-#' @param seed_multiplier
+#' @param bm25_weighting Logical. Uses BM25-inspired idf-weighting procedure instead of the procedure as defined in the c-TF-IDF formula. It uses the following weighting scheme: `log(1+((avg_nr_samples - df + 0.5) / (df+0.5)))`. Default `FALSE`.
+#' @param reduce_frequent_words Logical. Takes the square root of the bag-of-words after normalizing the matrix. Helps to reduce the impact of words that appear too frequently. Default `FALSE`.
+#' @param seed_words Character vector or `NULL`. Specific words that will have their idf value increased. Default `NULL`.
+#' @param seed_multiplier Numeric. The value with which the idf values of the words in `seed_words` are multiplied. Default `2`.
+#' @param obj Python BERTopic module object or `NULL` to import. Default `NULL`.
 #'
-#' @return
+#' @returns A Python ClassTfidfTransformer model object.
 #' @export
 #'
 #' @examples
@@ -1214,10 +1215,10 @@ ctfidf <-
 
 #' Initiate an Empty Clusterer
 #'
-#' @return
+#' @returns A Python BaseCluster object.
 #' @export
 #'
-#' @examples
+
 base_clusterer <-
   function() {
     bertopic <- import_bertopic(assign_to_environment = F)
@@ -1228,13 +1229,13 @@ base_clusterer <-
 
 #' The Base Embedder used for creating embedding models
 #'
-#' @param embedding_model The main embedding model to be used for extracting document and word embedding default `NULL`
-#' @param word_embedding_model  The embedding model used for extracting word embeddings only. If this model is selected, then the embedding_model is purely used for creating document embeddings. Default `NULL`
+#' @param embedding_model Python embedding model or `NULL`. The main embedding model to be used for extracting document and word embeddings. Default `NULL`.
+#' @param word_embedding_model Python embedding model or `NULL`. The embedding model used for extracting word embeddings only. If this model is selected, then the `embedding_model` is purely used for creating document embeddings. Default `NULL`.
 #'
-#' @return
+#' @returns A Python BaseEmbedder model object.
 #' @export
 #'
-#' @examples
+
 base_embedder <-
   function(embedding_model = NULL,
            word_embedding_model = NULL) {
@@ -1249,10 +1250,10 @@ base_embedder <-
 
 #' Combine a document- and word-level embedder
 #'
-#' @return
+#' @returns A Python WordDocEmbedder model class.
 #' @export
 #'
-#' @examples
+
 word_doc_embedder <-
   function() {
     bertopic <- import_bertopic(assign_to_environment = F)
@@ -1267,15 +1268,15 @@ word_doc_embedder <-
 
 #' Merge multiple pre-trained BERTopic models into a single model
 #'
-#' @param obj BERTopic object
-#' @param models A list of fitted BERTopic models
-#' @param min_similarity The minimum similarity for when topics are merged.  Default .7
-#' @param embedding_model Additionally load in an embedding model if necessary.
+#' @param obj A BERTopic model object created by `bert_topic()`.
+#' @param models List of fitted BERTopic model objects to merge.
+#' @param min_similarity Numeric. The minimum similarity score for when topics are merged. Default `0.7`.
+#' @param embedding_model Python embedding model or `NULL`. Additionally load in an embedding model if necessary. Default `NULL`.
 #'
-#' @return
+#' @returns The merged BERTopic model object with consolidated topics from all input models.
 #' @export
 #'
-#' @examples
+
 bert_merge_models <-
   function(obj,
            models = NULL,

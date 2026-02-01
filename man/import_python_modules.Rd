@@ -11,7 +11,14 @@ import_python_modules(
 )
 }
 \arguments{
-\item{python_path}{}
+\item{modules}{Character vector of Python module names to import.}
+
+\item{python_path}{Character. Path to Python installation directory.}
+
+\item{assign_to_environment}{Logical. If `TRUE`, assigns modules to global environment.}
+}
+\value{
+The Python module objects, invisibly.
 }
 \description{
 Import Python Modules

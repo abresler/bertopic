@@ -2,7 +2,7 @@
 % Please edit documentation in R/yake.R
 \name{yake_keyword_extractor}
 \alias{yake_keyword_extractor}
-\title{Yake Keyword Extractor}
+\title{YAKE Keyword Extractor}
 \usage{
 yake_keyword_extractor(
   docs = NULL,
@@ -19,30 +19,30 @@ yake_keyword_extractor(
 )
 }
 \arguments{
-\item{docs}{Character vector of documents to extract keywords from. If NULL, returns the KeywordExtractor object.}
+\item{docs}{Character vector of documents to extract keywords from. If `NULL`, returns the KeywordExtractor object.}
 
-\item{obj}{Optional yake module object. If NULL, imports yake automatically.}
+\item{obj}{Yake module object. If `NULL`, imports yake automatically.}
 
-\item{text_column}{Optional name to rename the text column in output.}
+\item{text_column}{Character. Optional name to rename the text column in output. Default `NULL`.}
 
-\item{top_features}{Integer. Number of top keywords to extract per document. Default 10.}
+\item{top_features}{Integer. Number of top keywords to extract per document. Default `10`.}
 
-\item{language}{Character. Language of the documents. Default "english".}
+\item{language}{Character. Language code. Default `"english"`.}
 
-\item{assign_to_environment}{Logical. If TRUE, assigns the KeywordExtractor to global environment. Default TRUE.}
+\item{assign_to_environment}{Logical. If `TRUE`, assigns the KeywordExtractor to global environment. Default `TRUE`.}
 
-\item{max_ngram_size}{Integer. Maximum n-gram size for keywords. Default 2.}
+\item{max_ngram_size}{Integer. Maximum n-gram size for keywords. Default `2`.}
 
-\item{deduplication_thresold}{Numeric. Threshold for deduplication (0-1). Default 0.9.}
+\item{deduplication_thresold}{Numeric. Threshold for deduplication (0-1). Default `0.9`.}
 
-\item{deduplication_algo}{Character. Deduplication algorithm. Default "seqm".}
+\item{deduplication_algo}{Character. Deduplication algorithm. Default `"seqm"`.}
 
-\item{return_summary}{Logical. If TRUE, returns summarized keywords per document. Default TRUE.}
+\item{return_summary}{Logical. If `TRUE`, returns summarized keywords per document. Default `TRUE`.}
 
-\item{window_size}{Integer. Window size for keyword extraction. Default 1.}
+\item{window_size}{Integer. Window size for keyword extraction. Default `1`.}
 }
 \value{
-A tibble with extracted keywords per document, or a KeywordExtractor object if docs is NULL.
+A tibble with columns: `number_document`, `text`, `keyword_yake`, and optionally `score_yake`; or a KeywordExtractor object if `docs` is `NULL`.
 }
 \description{
 Extract keywords from documents using YAKE (Yet Another Keyword Extractor).

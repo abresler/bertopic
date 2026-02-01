@@ -7,7 +7,10 @@
 top2vec_topic_embeddings(obj)
 }
 \arguments{
-\item{obj}{}
+\item{obj}{Top2Vec model object.}
+}
+\value{
+A tibble with topic vector embeddings, with `topic_top2vec` as the first column.
 }
 \description{
 Topic Vector Embeddings

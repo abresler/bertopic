@@ -13,16 +13,24 @@ transformer_representation(
 )
 }
 \arguments{
-\item{model}{A transformers pipeline that should be initialized as "text-generation" for gpt-like models or "text2text-generation" for T5-like models. For example, pipeline('text-generation', model='gpt2'). If a string is passed, "text-generation" will be selected by default.}
+\item{model}{Character. Transformers model name (e.g., `"gpt2"`). Default `"gpt2"`.}
 
-\item{prompt}{The prompt to be used in the model. If no prompt is given, self.default_prompt_ is used instead. NOTE: Use "[KEYWORDS]" and "[DOCUMENTS]" in the prompt to decide where the keywords and documents need to be inserted.}
+\item{prompt}{Character or `NULL`. Prompt template for the model. Use `[KEYWORDS]` and `[DOCUMENTS]` placeholders.}
 
-\item{pipeline_kwargs}{Kwargs that you can pass to the transformers.pipeline when it is called.}
+\item{pipeline_kwargs}{List or `NULL`. Keyword arguments to pass to `transformers.pipeline`.}
 
-\item{random_state}{A random state to be passed to transformers.set_seed}
+\item{random_state}{Integer. Random seed for transformers. Default `42`.}
 
-\item{obj}{}
+\item{obj}{BERTopic object or `NULL`.}
+}
+\value{
+A Python TextGeneration representation object with representation_method and input_parameters attributes.
 }
 \description{
 Text2Text or text generation with transformers
+}
+\examples{
+\dontrun{
+repr <- transformer_representation(model = "gpt2")
+}
 }

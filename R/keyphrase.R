@@ -1,12 +1,12 @@
-#' Import Keyphrase
+#' Import Keyphrase Vectorizers
 #'
-#' @param assign_to_environment
-#' @param path
+#' @param assign_to_environment Logical. If `TRUE`, assigns the keyphrase module to the global environment. Default `TRUE`.
+#' @param path Character. Optional path to Python executable. If `NULL`, uses default Python.
 #'
-#' @return
+#' @returns A Python keyphrase_vectorizers module object.
 #' @export
 #'
-#' @examples
+
 import_keyphrase <-
   function(assign_to_environment = T,
            path = NULL) {
@@ -22,26 +22,24 @@ import_keyphrase <-
 
 #' Build a Keyphrase Vectorizer
 #'
-#' @param obj keyphrase modeule object
-#' @param language stop words language; default is `English`
-#' @param exclude_stop_words if `TRUE` excludes stopwords
-#' @param extra_stop_words if `TRUE` other stopwords to exclude
-#' @param is_lower_case  Whether the returned keyphrases should be converted to lowercase.
-#' @param spacy_exclude
-#' @param max_df During fitting ignore keyphrases that have a document frequency strictly higher than the given threshold. Default `NULL`
-#' @param min_df During fitting ignore keyphrases that have a document frequency strictly lower than the given threshold. This value is also called cut-off in the literature.  Default `NULL`
-#' @param workers How many workers to use for spaCy part-of-speech tagging. If set to -1, use all available worker threads of the machine. SpaCy uses the specified number of cores to tag documents with part-of-speech. Depending on the platform, starting many processes with multiprocessing can add a lot of overhead. In particular, the default start method spawn used in macOS/OS X (as of Python 3.8) and in Windows can be slow. Therefore, carefully consider whether this option is really necessary.
-#' @param pos_pattern Position Pattern defaults to `pos_pattern = "<J.*>*<N.*>+"`
-#' @param spacy_pipeline A list of spaCy \itemize{
-#' \item \href{https://spacy.io/usage/processing-pipelines#built-in}{Spacy Pipeline options}
-#' } components that should be excluded during the POS-tagging. Removing not needed pipeline components can sometimes make a big difference and improve loading and inference speed.
-#' @param custom_pos_tagger  A callable function which expects a list of strings in a ‘raw_documents’ parameter and returns a list of (word token, POS-tag) tuples. If this parameter is not None, the custom tagger function is used to tag words with parts-of-speech, while the spaCy pipeline is ignored.
-#' @param binary If True, all non zero counts are set to 1. This is useful for discrete probabilistic models that model binary events rather than integer counts.
-#' @param stopword_package_sources list of stopwords sources from `stopwords` packages
-#' @param decay
-#' @param delete_min_df
+#' @param obj Keyphrase module object. If `NULL`, imports automatically.
+#' @param language Character. Stopwords language. Default `"english"`.
+#' @param exclude_stop_words Logical. If `TRUE`, excludes stopwords. Default `TRUE`.
+#' @param extra_stop_words Character vector. Additional stopwords to exclude. Default `NULL`.
+#' @param is_lower_case Logical. If `TRUE`, converts keyphrases to lowercase. Default `TRUE`.
+#' @param spacy_exclude List. spaCy pipeline components to exclude. Default `list('parser', 'attribute_ruler', 'lemmatizer', 'ner')`.
+#' @param max_df Integer or `NULL`. Maximum document frequency threshold. Default `NULL`.
+#' @param min_df Integer or `NULL`. Minimum document frequency threshold. Default `NULL`.
+#' @param workers Integer. Number of spaCy workers. Default `1`.
+#' @param pos_pattern Character. POS pattern for keyphrase extraction. Default `"<J.*>*<N.*>+"`.
+#' @param spacy_pipeline Character. spaCy model. Default `"en_core_web_sm"`.
+#' @param custom_pos_tagger Callable or `NULL`. Custom POS tagger function. Default `NULL`.
+#' @param binary Logical. If `TRUE`, all non-zero counts are set to 1. Default `FALSE`.
+#' @param stopword_package_sources Character vector. External stopword sources. Default `NULL`.
+#' @param decay Numeric or `NULL`. Decay parameter. Default `NULL`.
+#' @param delete_min_df Logical or `NULL`. Delete min_df parameter. Default `NULL`.
 #'
-#' @return
+#' @returns A Python KeyphraseCountVectorizer object configured with specified parameters.
 #' @export
 #'
 #' @examples
@@ -105,28 +103,28 @@ keyphrase_vectorizer <-
     vectorizer_model
   }
 
-#' Keyphrase TFIDF
+#' Keyphrase TF-IDF Vectorizer
 #'
-#' @param obj
-#' @param language
-#' @param exclude_stop_words
-#' @param extra_stop_words
-#' @param is_lower_case
-#' @param spacy_exclude
-#' @param max_df
-#' @param min_df
-#' @param workers
-#' @param pos_pattern
-#' @param spacy_pipeline
-#' @param custom_pos_tagger
-#' @param norm
-#' @param use_idf
-#' @param smooth_idf
-#' @param sublinear_tf
-#' @param binary
-#' @param stopword_package_sources
+#' @param obj Keyphrase module object. If `NULL`, imports automatically.
+#' @param language Character. Stopwords language. Default `"english"`.
+#' @param exclude_stop_words Logical. If `TRUE`, excludes stopwords. Default `TRUE`.
+#' @param extra_stop_words Character vector. Additional stopwords. Default `NULL`.
+#' @param is_lower_case Logical. If `TRUE`, converts keyphrases to lowercase. Default `TRUE`.
+#' @param spacy_exclude List. spaCy pipeline components to exclude. Default `NULL`.
+#' @param max_df Integer or `NULL`. Maximum document frequency. Default `NULL`.
+#' @param min_df Integer or `NULL`. Minimum document frequency. Default `NULL`.
+#' @param workers Integer. Number of spaCy workers. Default `1L`.
+#' @param pos_pattern Character. POS pattern. Default `"<J.*>*<N.*>+"`.
+#' @param spacy_pipeline Character. spaCy model. Default `"en_core_web_sm"`.
+#' @param custom_pos_tagger Callable or `NULL`. Custom POS tagger. Default `NULL`.
+#' @param norm Character. Norm type for TF-IDF. Default `"l2"`.
+#' @param use_idf Logical. If `TRUE`, enables inverse document frequency re-weighting. Default `TRUE`.
+#' @param smooth_idf Logical. If `TRUE`, adds one to document frequencies. Default `TRUE`.
+#' @param sublinear_tf Logical. If `TRUE`, applies sublinear TF scaling. Default `FALSE`.
+#' @param binary Logical. If `TRUE`, all non-zero counts are set to 1. Default `FALSE`.
+#' @param stopword_package_sources Character vector. External stopword sources. Default `NULL`.
 #'
-#' @return
+#' @returns A Python KeyphraseTfidfVectorizer object configured with specified parameters.
 #' @export
 #'
 #' @examples
@@ -190,13 +188,13 @@ keyphrase_tf_idf <-
     vectorizer_model
   }
 
-#' Keyphrase TFIDF to Tibble
+#' Keyphrase TF-IDF to Tibble
 #'
-#' @param tfidf
-#' @param docs
-#' @param return_wide
+#' @param tfidf Python KeyphraseTfidfVectorizer object.
+#' @param docs Character vector of documents to vectorize.
+#' @param return_wide Logical. If `TRUE`, returns wide format; if `FALSE`, returns long format. Default `TRUE`.
 #'
-#' @return
+#' @returns A tibble with columns: `number_document`, `text`, and keyphrase TF-IDF scores (wide or long format).
 #' @export
 #'
 #' @examples

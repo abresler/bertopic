@@ -14,15 +14,18 @@ tbl_unite_features(
 )
 }
 \arguments{
-\item{data}{a `tibble`}
+\item{data}{A tibble to unite features in.}
 
-\item{unite_columns}{vector of columns to unite}
+\item{unite_columns}{Character vector of column names to unite.}
 
-\item{new_column}{name of new column.  If `NULL` concats the unite coljumns}
+\item{new_column}{Character. Name of new united column. If `NULL`, concatenates the column names.}
 
-\item{sep}{default `@`}
+\item{sep}{Character. Separator between united values. Default `"@"`.}
 
-\item{remove}{if `TRUE` removes original columns}
+\item{remove}{Logical. If `TRUE`, removes original columns. Default `FALSE`.}
+}
+\value{
+A tibble with united columns. If `to_factor = TRUE`, also includes an `id_*` column with numeric encoding.
 }
 \description{
 Unite Features

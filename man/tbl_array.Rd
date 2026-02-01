@@ -7,14 +7,14 @@
 tbl_array(data, output_type = NULL, number_zeros = 3)
 }
 \arguments{
-\item{data}{A matrix or array to convert.}
+\item{data}{Matrix or array to convert.}
 
-\item{output_type}{Output type prefix for columns. If NULL, uses default names.}
+\item{output_type}{Character. Prefix for column names. If `NULL`, uses default names. Default `NULL`.}
 
-\item{number_zeros}{Padding for zeros in column names. Default 3.}
+\item{number_zeros}{Integer. Padding for zeros in column names. Default `3`.}
 }
 \value{
-A tibble with the converted array data.
+A tibble with the converted array data and optionally prefixed column names.
 }
 \description{
 Convert a matrix or array to a tibble with optional column naming.

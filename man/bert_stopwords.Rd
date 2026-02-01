@@ -12,7 +12,16 @@ bert_stopwords(
 )
 }
 \arguments{
-\item{stopword_package_sources}{}
+\item{language}{Character. Language code. Default `"english"`.}
+
+\item{is_lower_case}{Logical. If `TRUE`, converts stopwords to lowercase. Default `TRUE`.}
+
+\item{stopword_package_sources}{Character vector. External stopword sources to combine. Default `NULL`.}
+
+\item{extra_stop_words}{Character vector. Additional stopwords to include. Default `NULL`.}
+}
+\value{
+A character vector of unique stopwords.
 }
 \description{
 Stopword List Generator

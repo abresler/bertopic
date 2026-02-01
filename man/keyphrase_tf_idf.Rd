@@ -2,7 +2,7 @@
 % Please edit documentation in R/keyphrase.R
 \name{keyphrase_tf_idf}
 \alias{keyphrase_tf_idf}
-\title{Keyphrase TFIDF}
+\title{Keyphrase TF-IDF Vectorizer}
 \usage{
 keyphrase_tf_idf(
   obj = NULL,
@@ -26,10 +26,47 @@ keyphrase_tf_idf(
 )
 }
 \arguments{
-\item{stopword_package_sources}{}
+\item{obj}{Keyphrase module object. If `NULL`, imports automatically.}
+
+\item{language}{Character. Stopwords language. Default `"english"`.}
+
+\item{stopword_package_sources}{Character vector. External stopword sources. Default `NULL`.}
+
+\item{exclude_stop_words}{Logical. If `TRUE`, excludes stopwords. Default `TRUE`.}
+
+\item{extra_stop_words}{Character vector. Additional stopwords. Default `NULL`.}
+
+\item{is_lower_case}{Logical. If `TRUE`, converts keyphrases to lowercase. Default `TRUE`.}
+
+\item{spacy_exclude}{List. spaCy pipeline components to exclude. Default `NULL`.}
+
+\item{max_df}{Integer or `NULL`. Maximum document frequency. Default `NULL`.}
+
+\item{min_df}{Integer or `NULL`. Minimum document frequency. Default `NULL`.}
+
+\item{workers}{Integer. Number of spaCy workers. Default `1L`.}
+
+\item{pos_pattern}{Character. POS pattern. Default `"<J.*>*<N.*>+"`.}
+
+\item{spacy_pipeline}{Character. spaCy model. Default `"en_core_web_sm"`.}
+
+\item{custom_pos_tagger}{Callable or `NULL`. Custom POS tagger. Default `NULL`.}
+
+\item{norm}{Character. Norm type for TF-IDF. Default `"l2"`.}
+
+\item{use_idf}{Logical. If `TRUE`, enables inverse document frequency re-weighting. Default `TRUE`.}
+
+\item{smooth_idf}{Logical. If `TRUE`, adds one to document frequencies. Default `TRUE`.}
+
+\item{sublinear_tf}{Logical. If `TRUE`, applies sublinear TF scaling. Default `FALSE`.}
+
+\item{binary}{Logical. If `TRUE`, all non-zero counts are set to 1. Default `FALSE`.}
+}
+\value{
+A Python KeyphraseTfidfVectorizer object configured with specified parameters.
 }
 \description{
-Keyphrase TFIDF
+Keyphrase TF-IDF Vectorizer
 }
 \examples{
 docs <- c('This is the first document.', 'This document is the second document.', 'And this is the third one.', 'Is this the first document?')

@@ -6,6 +6,9 @@
 \usage{
 import_fuzz()
 }
+\value{
+A Python RapidFuzz fuzz module object for string matching algorithms.
+}
 \description{
 Import RapidFuzz Fuzz Options
 }

@@ -2,10 +2,18 @@
 % Please edit documentation in R/embeddings.R
 \name{flair_embeddings}
 \alias{flair_embeddings}
-\title{Title}
+\title{Access Flair Embeddings}
 \usage{
 flair_embeddings()
 }
+\value{
+The Flair embeddings module object.
+}
 \description{
-Title
+Access Flair Embeddings
+}
+\examples{
+\dontrun{
+embeddings <- flair_embeddings()
+}
 }

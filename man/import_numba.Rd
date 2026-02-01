@@ -7,7 +7,12 @@
 import_numba(assign_to_environment = T, path = NULL)
 }
 \arguments{
-\item{path}{}
+\item{assign_to_environment}{Logical. If `TRUE` assigns the Numba module to the global environment.}
+
+\item{path}{Character. Path to Python environment if not using the default.}
+}
+\value{
+A Python Numba module object.
 }
 \description{
 Import Numba

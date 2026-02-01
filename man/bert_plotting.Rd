@@ -6,6 +6,9 @@
 \usage{
 bert_plotting()
 }
+\value{
+A Python BERTopic plotting module object.
+}
 \description{
 Bertopic Plotting
 }

@@ -2,13 +2,20 @@
 % Please edit documentation in R/polyfuzz.R
 \name{polyfuzz_fit}
 \alias{polyfuzz_fit}
-\title{Title}
+\title{Fit PolyFuzz Model}
 \usage{
 polyfuzz_fit(obj, from_list = NULL, to_list = NULL)
 }
 \arguments{
-\item{to_list}{}
+\item{obj}{A PolyFuzz model object.}
+
+\item{from_list}{Character vector. Words to match from.}
+
+\item{to_list}{Character vector. Words to match to, or `NULL`.}
+}
+\value{
+The PolyFuzz model object (invisibly) after fitting to the provided lists.
 }
 \description{
-Title
+Fit PolyFuzz Model
 }

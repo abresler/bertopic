@@ -13,7 +13,18 @@ bert_load(
 )
 }
 \arguments{
-\item{use_token_parallel}{}
+\item{model_path}{Character. File path where the BERTopic model is stored.}
+
+\item{obj}{BERTopic module object. If `NULL`, imports BERTopic automatically.}
+
+\item{numba_threads}{Integer. Number of Numba threads to use. Default `1`.}
+
+\item{use_token_parallel}{Logical. Whether to use token-level parallelization. Default `TRUE`.}
+
+\item{embedding_model}{Character or callable. Embedding model to use. If `NULL`, uses model's default.}
+}
+\value{
+The loaded BERTopic model object.
 }
 \description{
 Load BERTopic Model

@@ -2,13 +2,23 @@
 % Please edit documentation in R/base_modules.R
 \name{import_nltk}
 \alias{import_nltk}
-\title{import NLTK}
+\title{Import NLTK}
 \usage{
 import_nltk(assign_to_environment = T, path = NULL)
 }
 \arguments{
-\item{path}{}
+\item{assign_to_environment}{Logical. If `TRUE`, assigns module to global environment.}
+
+\item{path}{Character. Path to Python installation directory.}
+}
+\value{
+The Python NLTK module object, invisibly.
 }
 \description{
-import NLTK
+Import NLTK
+}
+\examples{
+\dontrun{
+nltk <- import_nltk(assign_to_environment = FALSE)
+}
 }

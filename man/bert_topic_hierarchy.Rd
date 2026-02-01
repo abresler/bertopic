@@ -14,17 +14,20 @@ bert_topic_hierarchy(
 )
 }
 \arguments{
-\item{obj}{Topic Model Object}
+\item{obj}{A BERTopic model object.}
 
-\item{docs}{Vector of documents}
+\item{docs}{Character vector. Vector of documents, or `NULL`.}
 
-\item{linkage_function}{The linkage function to use. Default is: lambda x: sch.linkage(x, 'ward', optimal_ordering=True)}
+\item{linkage_function}{A Python function for hierarchical clustering, or `NULL` for default (ward linkage).}
 
-\item{distance_function}{The distance function to use on the c-TF-IDF matrix. Default is: lambda x: 1 - cosine_similarity(x)}
+\item{distance_function}{A Python function for distance calculation, or `NULL` for default (1 - cosine similarity).}
 
-\item{tight_layout}{Whether to use a tight layout (narrow width) for easier readability if you have hundreds of topics.}
+\item{tight_layout}{Logical. If `TRUE` uses tight layout for readability with many topics. Default is `FALSE`.}
 
-\item{print_tree}{If `TRUE` prints tree}
+\item{print_tree}{Logical. If `TRUE` prints the topic tree. Default is `FALSE`.}
+}
+\value{
+A Python hierarchical topics object containing the topic hierarchy structure.
 }
 \description{
 To create this hierarchy, BERTopic needs to be already fitted once. Then, a hierarchy is calculated on the distance matrix of the c-TF-IDF representation using scipy.cluster.hierarchy.linkage.

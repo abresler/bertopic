@@ -12,19 +12,30 @@ part_of_speech_representation(
 )
 }
 \arguments{
-\item{model}{The Spacy model to use}
+\item{model}{Character. The Spacy model to use. Default `"en_core_web_sm"`.}
 
-\item{top_n_words}{The top n words to extract.  Default `10`}
+\item{top_n_words}{Integer. The top n words to extract. Default `10`.}
 
-\item{pos_patterns}{Patterns for Spacy to use. See https://spacy.io/usage/rule-based-matching and https://demos.explosion.ai/matcher and https://www.kaggle.com/code/curiousprogrammer/entity-extraction-and-classification-using-spacy for more and alsohttps://spacy.io/usage/rule-based-matching}
+\item{pos_patterns}{List or `NULL`. Patterns for Spacy to use for matching. See Spacy documentation for pattern structure.}
 
-\item{obj}{}
+\item{obj}{BERTopic object or `NULL`.}
+}
+\value{
+A Python PartOfSpeech representation object with representation_method and input_parameters attributes.
 }
 \description{
 Extract Topic Keywords based on their Part-of-Speech
 }
 \examples{
+\dontrun{
 library(bertopic)
-part_of_speech_representation(pos_patterns = list(list(list('POS' = 'ADJ'), list('POS' = 'NOUN')), list(list('POS' = 'NOUN')), list(list('POS' = 'ADJ'))))
+part_of_speech_representation(
+  pos_patterns = list(
+    list(list('POS' = 'ADJ'), list('POS' = 'NOUN')),
+    list(list('POS' = 'NOUN')),
+    list(list('POS' = 'ADJ'))
+  )
+)
+}
 
 }

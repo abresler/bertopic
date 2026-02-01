@@ -7,11 +7,14 @@
 bert_topic_keywords(obj, bert_topics = NULL, return_full_data = FALSE)
 }
 \arguments{
-\item{obj}{Topic Model Object}
+\item{obj}{A BERTopic model object.}
 
-\item{bert_topics}{if not `NULL` specific topics}
+\item{bert_topics}{Integer vector. Specific topic numbers, or `NULL` for all topics.}
 
-\item{return_full_data}{If True, returns all different forms of topic representations for each topic, including aspects}
+\item{return_full_data}{Logical. If `TRUE` returns all forms of topic representations including aspects. Default is `FALSE`.}
+}
+\value{
+A tibble containing topic keywords with columns: `topic_bert`, `label_bertopic`, `word`, `score_c_tfidf`, `length_ngram`, and `is_outlier_bert_topic`.
 }
 \description{
 Returns keywords for the topics

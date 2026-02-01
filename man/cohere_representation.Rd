@@ -13,16 +13,24 @@ cohere_representation(
 )
 }
 \arguments{
-\item{client}{A cohere.Client}
+\item{client}{Python Cohere client object or `NULL`.}
 
-\item{model}{Model to use within Cohere, defaults to "xlarge".}
+\item{model}{Character. Model to use within Cohere. Default `"xlarge"`.}
 
-\item{prompt}{Example Prompt `'I have topic that contains the following documents: [DOCUMENTS]. The topic is described by the following keywords: [KEYWORDS]. Based on the above information, can you give a short label of the topic?'`}
+\item{prompt}{Character or `NULL`. Custom prompt template. Use `[DOCUMENTS]` and `[KEYWORDS]` placeholders.}
 
-\item{delay_in_seconds}{}
+\item{delay_in_seconds}{Numeric or `NULL`. Delay between API calls in seconds.}
 
-\item{obj}{BERTopic Object}
+\item{obj}{BERTopic object or `NULL`.}
+}
+\value{
+A Python Cohere representation object with representation_method and input_parameters attributes.
 }
 \description{
 Cohere Representation
+}
+\examples{
+\dontrun{
+repr <- cohere_representation(model = "xlarge")
+}
 }

@@ -14,15 +14,18 @@ tbl_bert_topic_per_class(
 )
 }
 \arguments{
-\item{data}{Data with text and features}
+\item{data}{A tibble or data frame containing documents and class assignments.}
 
-\item{topic_model}{BERT topic model object}
+\item{topic_model}{BERTopic model object.}
 
-\item{document_name}{name of the text feature}
+\item{document_name}{Character. Name of the text feature column.}
 
-\item{class_name}{name of the class feature(s)}
+\item{class_name}{Character vector. Name(s) of the class feature column(s).}
 
-\item{global_tuning}{Fine-tune each topic representation for class c t by averaging its c-TF-IDF matrix with the global c-TF-IDF matrix. Turn this off if you want to prevent words in topic representations that could not be found in the documents for class c.  Default `TRUE`}
+\item{global_tuning}{Logical. Fine-tune each topic representation for class by averaging its c-TF-IDF matrix with the global c-TF-IDF matrix. Default `TRUE`.}
+}
+\value{
+A tibble with topic assignments per class, including `topic_bert`, `label_bertopic`, class columns, and word representations.
 }
 \description{
 Find Topics from Class via Tibble

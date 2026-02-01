@@ -1,16 +1,16 @@
 # Document handling functions
 
-#' Bertopic Documents
+#' BERTopic Documents
 #'
-#' @param obj Topic model object
-#' @param docs vector of documents
-#' @param document_name If not `NULL` name of the text document column
-#' @param exclude_list_columns
+#' @param obj BERTopic model object.
+#' @param docs Character vector of documents.
+#' @param document_name Character. If not `NULL`, name for the text document column.
+#' @param exclude_list_columns Logical. If `TRUE`, excludes list columns from output. Default `TRUE`.
 #'
-#' @return
+#' @returns A tibble with document information including topic assignments and representative documents.
 #' @export
 #'
-#' @examples
+
 bert_document_info <-
   function(obj,
            docs,
@@ -94,7 +94,7 @@ bert_document_info <-
 #' @param documents Character vector of documents to transform.
 #' @param embeddings If not NULL, matrix or dataframe of pre-computed embeddings.
 #'
-#' @return A tibble with topic assignments and info for each document.
+#' @returns A tibble with topic assignments and info for each document.
 #' @export
 #'
 #' @examples
@@ -120,15 +120,15 @@ bert_transform_documents <-
 
 #' Transform Documents from Tibble
 #'
-#' @param data
-#' @param topic_model
-#' @param document_name
-#' @param embeddings
+#' @param data A tibble or data frame containing documents to transform.
+#' @param topic_model BERTopic model object.
+#' @param document_name Character. Name of the column containing documents.
+#' @param embeddings Logical or matrix. Pre-computed embeddings. If `TRUE`, computes embeddings. Default `TRUE`.
 #'
-#' @return
+#' @returns A tibble containing original data with added topic assignments and related information.
 #' @export
 #'
-#' @examples
+
 tbl_bert_transform_documents <-
   function(data,
            topic_model,
@@ -159,15 +159,15 @@ tbl_bert_transform_documents <-
 
 #' Topics Per Structured Class
 #'
-#' @param obj BERTopic Object
-#' @param docs Vector of texts
-#' @param classes vector of classes
-#' @param global_tuning Fine-tune each topic representation for class c t by averaging its c-TF-IDF matrix with the global c-TF-IDF matrix. Turn this off if you want to prevent words in topic representations that could not be found in the documents for class c. Default `TRUE`
+#' @param obj BERTopic model object.
+#' @param docs Character vector of documents.
+#' @param classes Character vector of class assignments, one per document.
+#' @param global_tuning Logical. Fine-tune each topic representation for class by averaging its c-TF-IDF matrix with the global c-TF-IDF matrix. Default `TRUE`.
 #'
-#' @return
+#' @returns A tibble with topic assignments per class, including `topic_bert`, `label_bertopic`, `class`, and word representations.
 #' @export
 #'
-#' @examples
+
 bert_topic_per_class <-
   function(obj,
            docs = NULL,
@@ -208,16 +208,16 @@ bert_topic_per_class <-
 
 #' Find Topics from Class via Tibble
 #'
-#' @param data Data with text and features
-#' @param topic_model BERT topic model object
-#' @param document_name name of the text feature
-#' @param class_name name of the class feature(s)
-#' @param global_tuning Fine-tune each topic representation for class c t by averaging its c-TF-IDF matrix with the global c-TF-IDF matrix. Turn this off if you want to prevent words in topic representations that could not be found in the documents for class c.  Default `TRUE`
+#' @param data A tibble or data frame containing documents and class assignments.
+#' @param topic_model BERTopic model object.
+#' @param document_name Character. Name of the text feature column.
+#' @param class_name Character vector. Name(s) of the class feature column(s).
+#' @param global_tuning Logical. Fine-tune each topic representation for class by averaging its c-TF-IDF matrix with the global c-TF-IDF matrix. Default `TRUE`.
 #'
-#' @return
+#' @returns A tibble with topic assignments per class, including `topic_bert`, `label_bertopic`, class columns, and word representations.
 #' @export
 #'
-#' @examples
+
 tbl_bert_topic_per_class <-
   function(data,
            topic_model,
@@ -282,20 +282,20 @@ tbl_bert_topic_per_class <-
     dat
   }
 
-#' Extract Berttopics from output
+#' Extract BERTopic Assignments from Output
 #'
-#' @param obj
-#' @param docs
-#' @param id_columns
-#' @param sort_by_topic
-#' @param text_column
-#' @param include_labels
-#' @param label_words
+#' @param obj BERTopic model object.
+#' @param docs Character vector of documents. If `NULL`, returns only topic probabilities.
+#' @param id_columns Character vector. Column names to parse from document names/IDs.
+#' @param text_column Character. Name for the text column in output. If `NULL`, defaults to `text`.
+#' @param include_labels Logical. If `TRUE`, includes topic labels in output. Default `TRUE`.
+#' @param number_words Integer. Number of words per topic label. Default `4L`.
+#' @param arrange_topics Logical. If `TRUE`, arranges output by topic and probability. Default `FALSE`.
 #'
-#' @return
+#' @returns A tibble with columns: `topic_bert`, `pct_probability_topic_bert`, and optional `label_bertopic` and text columns.
 #' @export
 #'
-#' @examples
+
 extract_bert_topics <-
   function(obj,
            docs = NULL,
@@ -367,16 +367,16 @@ extract_bert_topics <-
     data
   }
 
-#' Pull Text and Name It for bertopic
+#' Pull Text and Name It for BERTopic
 #'
-#' @param data
-#' @param id_columns
-#' @param text_column
+#' @param data A tibble or data frame containing text and ID columns.
+#' @param id_columns Character vector. Column names to use for creating unique IDs.
+#' @param text_column Character. Name of the column containing text.
 #'
-#' @return
+#' @returns A named character vector where names are IDs and values are text documents.
 #' @export
 #'
-#' @examples
+
 tbl_bert_text_features <-
   function(data,
            id_columns = NULL,

@@ -7,8 +7,18 @@
 import_flair(assign_to_environment = T, path = NULL)
 }
 \arguments{
-\item{path}{}
+\item{assign_to_environment}{Logical. If `TRUE`, assigns module to global environment.}
+
+\item{path}{Character. Path to Python installation directory.}
+}
+\value{
+The Python Flair module object, invisibly.
 }
 \description{
 Flair module \url{https://flair.readthedocs.io/en/latest/modules.html}
+}
+\examples{
+\dontrun{
+flair <- import_flair(assign_to_environment = FALSE)
+}
 }

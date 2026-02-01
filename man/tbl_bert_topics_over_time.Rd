@@ -2,8 +2,7 @@
 % Please edit documentation in R/bert-analysis.R
 \name{tbl_bert_topics_over_time}
 \alias{tbl_bert_topics_over_time}
-\title{Extract BERT Topics Over Time from a Tibble
-Get Topics Over Time from Tibble}
+\title{Extract BERT Topics Over Time from a Tibble}
 \usage{
 tbl_bert_topics_over_time(
   data,
@@ -18,28 +17,31 @@ tbl_bert_topics_over_time(
 )
 }
 \arguments{
-\item{data}{A data frame containing documents and timestamps.}
+\item{data}{Data frame containing documents and timestamps.}
 
-\item{topic_model}{A BERTopic model object.}
+\item{topic_model}{BERTopic model object.}
 
 \item{document_name}{Character. Name of the column containing documents.}
 
 \item{time_feature}{Character. Name of the column containing timestamps.}
 
-\item{nr_bins}{Integer. Number of time bins. Default NULL.}
+\item{nr_bins}{Integer. Number of time bins. Default `NULL`.}
 
-\item{datetime_format}{Character. Format string for datetime parsing. Default NULL.}
+\item{datetime_format}{Character. Format string for datetime parsing. Default `NULL`.}
 
-\item{evolution_tuning}{Logical. Enable evolution tuning. Default TRUE.}
+\item{evolution_tuning}{Logical. Enable evolution tuning. Default `TRUE`.}
 
-\item{global_tuning}{Logical. Enable global tuning. Default TRUE.}
+\item{global_tuning}{Logical. Enable global tuning. Default `TRUE`.}
 
-\item{return_tibble}{Logical. Return as tibble. Default TRUE.}
+\item{return_tibble}{Logical. If `TRUE`, returns tibble format. Default `TRUE`.}
 }
 \value{
 A tibble with topics over time analysis.
 }
 \description{
+Get Topics Over Time from a data frame input.
+}
+\details{
 Analyze how topics evolve over time from a data frame input.
 }
 \examples{

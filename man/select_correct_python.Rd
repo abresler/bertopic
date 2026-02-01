@@ -7,7 +7,10 @@
 select_correct_python(path = "/opt/miniconda3/bin/python3.12")
 }
 \arguments{
-\item{path}{}
+\item{path}{Character. Path to Python executable. If `NULL`, uses default Python.}
+}
+\value{
+Called for side effects; returns invisibly.
 }
 \description{
 Select Correct Python

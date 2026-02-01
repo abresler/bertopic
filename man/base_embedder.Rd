@@ -7,9 +7,12 @@
 base_embedder(embedding_model = NULL, word_embedding_model = NULL)
 }
 \arguments{
-\item{embedding_model}{The main embedding model to be used for extracting document and word embedding default `NULL`}
+\item{embedding_model}{Python embedding model or `NULL`. The main embedding model to be used for extracting document and word embeddings. Default `NULL`.}
 
-\item{word_embedding_model}{The embedding model used for extracting word embeddings only. If this model is selected, then the embedding_model is purely used for creating document embeddings. Default `NULL`}
+\item{word_embedding_model}{Python embedding model or `NULL`. The embedding model used for extracting word embeddings only. If this model is selected, then the `embedding_model` is purely used for creating document embeddings. Default `NULL`.}
+}
+\value{
+A Python BaseEmbedder model object.
 }
 \description{
 The Base Embedder used for creating embedding models

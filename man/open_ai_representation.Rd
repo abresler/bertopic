@@ -20,34 +20,38 @@ open_ai_representation(
 )
 }
 \arguments{
-\item{model}{Open AI model NAME}
+\item{model}{Character. OpenAI model name (e.g., `"gpt-3.5-turbo"`). Default `"gpt-3.5-turbo"`.}
 
-\item{open_ai_key}{API key}
+\item{open_ai_key}{Character or `NULL`. OpenAI API key. If `NULL`, uses `OPENAI_API_KEY` environment variable.}
 
-\item{prompt}{Set this to True if a GPT-3.5 model is used."  For example: `I have a topic that contains the following documents: [DOCUMENTS]The topic is described by the following keywords: [KEYWORDS]Based on the information above, extract a short topic label in the following format:topic: <topic label>`}
+\item{prompt}{Character or `NULL`. Custom prompt template. Use `[DOCUMENTS]` and `[KEYWORDS]` placeholders.}
 
-\item{generator_kwargs}{Kwargs passed to `openai.Completion.create}
+\item{generator_kwargs}{List or `NULL`. Keyword arguments to pass to `openai.Completion.create`.}
 
-\item{delay_in_seconds}{How Long to Wait?}
+\item{delay_in_seconds}{Integer. Delay between API calls in seconds. Default `10`.}
 
-\item{exponential_backoff}{Retry requests with a random exponential backoff}
+\item{exponential_backoff}{Logical. If `TRUE`, retries requests with random exponential backoff. Default `FALSE`.}
 
-\item{chat}{If `TRUE` enter chat mode.}
+\item{chat}{Logical. If `TRUE`, uses chat mode. Default `FALSE`.}
 
-\item{nr_docs}{The number of documents to pass to OpenAI if a prompt.}
+\item{nr_docs}{Integer. Number of documents to pass to OpenAI. Default `4L`.}
 
-\item{diversity}{The diversity of documents to pass to OpenAI.  Accepts values between 0 and 1. A higher values results in passing more diverse documents whereas lower values passes more similar documents.}
+\item{diversity}{Numeric or `NULL`. Diversity of documents (0-1). Higher values pass more diverse documents.}
 
-\item{doc_length}{The maximum length of each document. If a document is longer, it will be truncated. If None, the entire document is passed..}
+\item{doc_length}{Integer or `NULL`. Maximum length of each document. If exceeded, document is truncated.}
 
-\item{tokenizer}{The tokenizer used to calculate to split the document into segments" used to count the length of a document.
-If tokenizer is 'char', then the document is split up into characters which are counted to adhere to `doc_length`
- If tokenizer is 'whitespace', the document is split up into words separated by whitespaces. These words are counted and truncated depending on `doc_length`
-If tokenizer is 'vectorizer', then the internal CountVectorizer is used to tokenize the document. These tokens are counted and trunctated depending on `doc_length`
-If tokenizer is a callable, then that callable is used to tokenize the document. These tokens are counted and truncated depending on `doc_length`}
+\item{tokenizer}{Character or `NULL`. Tokenizer for document length calculation. Options: `"char"`, `"whitespace"`, `"vectorizer"`, or callable.}
 
-\item{obj}{BERTopic Object}
+\item{obj}{BERTopic object or `NULL`.}
+}
+\value{
+A Python OpenAI representation object with representation_method and input_parameters attributes.
 }
 \description{
-See \href{https://maartengr.github.io/BERTopic/getting_started/representation/representation.html#chatgpt}{API Example} and  \href{https://maartengr.github.io/BERTopic/changelog.html#version-0141}{Change Log Example}
+See \href{https://maartengr.github.io/BERTopic/getting_started/representation/representation.html#chatgpt}{API Example} and \href{https://maartengr.github.io/BERTopic/changelog.html#version-0141}{Change Log Example}
+}
+\examples{
+\dontrun{
+repr <- open_ai_representation(model = "gpt-3.5-turbo", open_ai_key = "sk-...")
+}
 }

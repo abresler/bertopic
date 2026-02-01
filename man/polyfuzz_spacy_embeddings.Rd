@@ -13,13 +13,18 @@ polyfuzz_spacy_embeddings(
 )
 }
 \arguments{
-\item{min_similarity}{The minimum similarity between strings, otherwise return 0 similarity}
+\item{embedding_model}{A Spacy model. Can be either a string or model object.}
 
-\item{top_n}{The number of best matches you want returned}
+\item{min_similarity}{Numeric. Minimum similarity between strings, otherwise return 0. Default is 0.5.}
 
-\item{cosine_method}{The method/package for calculating the cosine similarity. Options: `sparse` `sklearn` and `knn`.  Default is `sparse`}
+\item{top_n}{Integer. The number of best matches to return.}
 
-\item{model_id}{model id}
+\item{cosine_method}{Character. Method for calculating cosine similarity. Options: `sparse`, `sklearn`, `knn`. Default is `sparse`.}
+
+\item{model_id}{Character. Name of the model instance.}
+}
+\value{
+A Python PolyFuzz SpacyEmbeddings model object.
 }
 \description{
 Spacy Embedder

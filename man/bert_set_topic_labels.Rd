@@ -2,13 +2,18 @@
 % Please edit documentation in R/bert-topic-modify.R
 \name{bert_set_topic_labels}
 \alias{bert_set_topic_labels}
-\title{Set Topic Labals}
+\title{Set Topic Labels}
 \usage{
 bert_set_topic_labels(obj, topic_labels)
 }
 \arguments{
-\item{topic_labels}{}
+\item{obj}{BERTopic model object.}
+
+\item{topic_labels}{Character vector or list. Custom labels for topics.}
+}
+\value{
+The updated BERTopic model object with custom labels set.
 }
 \description{
-Set Topic Labals
+Set Topic Labels
 }

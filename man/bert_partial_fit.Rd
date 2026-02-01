@@ -7,13 +7,16 @@
 bert_partial_fit(obj, documents, embeddings = NULL, y = NULL)
 }
 \arguments{
-\item{obj}{Topic Model Object}
+\item{obj}{A BERTopic model object created by `bert_topic()`.}
 
-\item{documents}{A list of documents to fit on}
+\item{documents}{Character vector. A list of documents to fit on.}
 
-\item{embeddings}{Pre-trained document embeddings. These can be used instead of the sentence-transformer model}
+\item{embeddings}{Numeric matrix or `NULL`. Pre-trained document embeddings. These can be used instead of the sentence-transformer model. Default `NULL`.}
 
-\item{y}{The target class for (semi)-supervised modeling. Use -1 if no class for a specific instance is specified}
+\item{y}{Integer vector or `NULL`. The target class for (semi)-supervised modeling. Use `-1` if no class for a specific instance is specified. Default `NULL`.}
+}
+\value{
+The BERTopic model object updated with partial fit results.
 }
 \description{
 Fit BERTopic on a subset of the data and perform online learning with batch-like data.

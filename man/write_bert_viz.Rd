@@ -7,16 +7,16 @@
 write_bert_viz(viz, base_path = NULL, viz_name = NULL, browse_url = T)
 }
 \arguments{
-\item{viz}{A BERTopic visualization object.}
+\item{viz}{BERTopic visualization object.}
 
-\item{base_path}{Base directory path for output. If NULL, shows in browser.}
+\item{base_path}{Character. Base directory path for output. If `NULL`, shows in browser. Default `NULL`.}
 
-\item{viz_name}{Name for the visualization folder.}
+\item{viz_name}{Character. Name for the visualization folder.}
 
-\item{browse_url}{Logical. If TRUE, opens in browser after writing. Default TRUE.}
+\item{browse_url}{Logical. If `TRUE`, opens in browser after writing. Default `TRUE`.}
 }
 \value{
-Invisible NULL. Side effect: writes HTML file.
+Called for side effects (writes HTML file); returns invisible `NULL`.
 }
 \description{
 Write a BERTopic visualization to HTML file.

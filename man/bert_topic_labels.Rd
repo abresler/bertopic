@@ -16,21 +16,24 @@ bert_topic_labels(
 )
 }
 \arguments{
-\item{obj}{topic model object}
+\item{obj}{A BERTopic model object.}
 
-\item{number_words}{Top n words per topic to use.  Default is 4}
+\item{number_words}{Integer. Top n words per topic to use. Default is 4.}
 
-\item{separator}{The string with which the words and topic prefix will be separated. Underscores are the default but a nice alternative is ", ".  Default `_`}
+\item{separator}{Character. String separating words and topic prefix. Default is `"_"`.}
 
-\item{word_length}{The maximum length of each word in the topic label. Some words might be relatively long and setting this value helps to make sure that all labels have relatively similar lengths.}
+\item{word_length}{Integer. Maximum length of each word in the label, or `NULL` for no limit.}
 
-\item{update_topic_model_labels}{if `TRUE` updates new label into a custom field}
+\item{update_topic_model_labels}{Logical. If `TRUE` updates the model with new labels. Default is `FALSE`.}
 
-\item{append_number_words}{Append the number of words}
+\item{append_number_words}{Logical. If `TRUE` appends the number of words to column names. Default is `FALSE`.}
 
-\item{topic_prefix}{Whether to use the topic ID as a prefix. If set to True, the topic ID will be separated using the separator}
+\item{topic_prefix}{Logical. If `TRUE` uses the topic ID as a prefix. Default is `FALSE`.}
 
-\item{aspect}{The aspect from which to generate topic labels when not `NULL`}
+\item{aspect}{Character. Aspect name from which to generate labels, or `NULL` for default.}
+}
+\value{
+A tibble containing generated labels with columns: `topic_bert`, `label_bertopic`, and `is_outlier_bert_topic`.
 }
 \description{
 Generate BERT Topic Labels

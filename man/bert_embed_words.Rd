@@ -7,12 +7,22 @@
 bert_embed_words(obj, words, return_tibble = T, verbose = TRUE)
 }
 \arguments{
-\item{obj}{Topic Model Object}
+\item{obj}{BERTopic topic model object.}
 
-\item{words}{Vector of Words}
+\item{words}{Character vector. Words to embed.}
 
-\item{verbose}{if `TRUE` verbose}
+\item{return_tibble}{Logical. If `TRUE`, returns a tibble; if `FALSE`, returns a matrix. Default `TRUE`.}
+
+\item{verbose}{Logical. If `TRUE`, displays verbose output. Default `TRUE`.}
+}
+\value{
+A tibble (if `return_tibble = TRUE`) or matrix with embeddings for each word. Columns include embedding dimensions and a `word` column.
 }
 \description{
 Embed Vector of Words
+}
+\examples{
+\dontrun{
+embeddings <- bert_embed_words(obj = topic_model, words = c("hello", "world"))
+}
 }

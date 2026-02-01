@@ -9,8 +9,17 @@ spacy_matching_pattern_dict_to_list(
 )
 }
 \arguments{
-\item{pattern}{}
+\item{pattern}{Character. A Spacy matching pattern as a string to convert to R list format.}
+}
+\value{
+A list representation of the Spacy matching pattern.
 }
 \description{
 Convert Spacy Matching Pattern to Dictionary
+}
+\examples{
+\dontrun{
+pattern <- "[{'POS': 'ADJ'}, {'POS': 'NOUN'}]"
+spacy_matching_pattern_dict_to_list(pattern = pattern)
+}
 }

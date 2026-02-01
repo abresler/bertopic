@@ -2,7 +2,7 @@
 % Please edit documentation in R/bert-documents.R
 \name{bert_document_info}
 \alias{bert_document_info}
-\title{Bertopic Documents}
+\title{BERTopic Documents}
 \usage{
 bert_document_info(
   obj,
@@ -13,14 +13,17 @@ bert_document_info(
 )
 }
 \arguments{
-\item{obj}{Topic model object}
+\item{obj}{BERTopic model object.}
 
-\item{docs}{vector of documents}
+\item{docs}{Character vector of documents.}
 
-\item{document_name}{If not `NULL` name of the text document column}
+\item{document_name}{Character. If not `NULL`, name for the text document column.}
 
-\item{exclude_list_columns}{}
+\item{exclude_list_columns}{Logical. If `TRUE`, excludes list columns from output. Default `TRUE`.}
+}
+\value{
+A tibble with document information including topic assignments and representative documents.
 }
 \description{
-Bertopic Documents
+BERTopic Documents
 }

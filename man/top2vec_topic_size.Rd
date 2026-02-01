@@ -2,13 +2,18 @@
 % Please edit documentation in R/top2vec.R
 \name{top2vec_topic_size}
 \alias{top2vec_topic_size}
-\title{Textop2vecec Topic Size}
+\title{Top2Vec Topic Size}
 \usage{
 top2vec_topic_size(obj, reduced = F)
 }
 \arguments{
-\item{reduced}{}
+\item{obj}{Top2Vec model object.}
+
+\item{reduced}{Logical. Whether to return reduced topics. Default `FALSE`.}
+}
+\value{
+A tibble with columns: `topic_top2vec` and `count_documents`.
 }
 \description{
-Textop2vecec Topic Size
+Top2Vec Topic Size
 }

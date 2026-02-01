@@ -2,15 +2,18 @@
 % Please edit documentation in R/bertopic.R
 \name{set_bert_attributes}
 \alias{set_bert_attributes}
-\title{Set BERTopic Model Attriubtes}
+\title{Set BERTopic Model Attributes}
 \usage{
 set_bert_attributes(obj, representation_model = NULL)
 }
 \arguments{
-\item{obj}{BERTopic Object}
+\item{obj}{A BERTopic model object created by `bert_topic()`.}
 
-\item{representation_model}{If not `NULL` representation model}
+\item{representation_model}{Python representation model object or `NULL`.}
+}
+\value{
+The BERTopic model object with attached attributes for base, HDBSCAN, C-TF-IDF, UMAP, and representation parameters.
 }
 \description{
-Set BERTopic Model Attriubtes
+Set BERTopic Model Attributes
 }

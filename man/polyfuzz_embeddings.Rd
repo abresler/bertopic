@@ -13,15 +13,18 @@ polyfuzz_embeddings(
 )
 }
 \arguments{
-\item{embedding_method}{list of Flair embeddings to use Default is NULL}
+\item{embedding_method}{A Flair embeddings object or `NULL` for default.}
 
-\item{min_similarity}{The minimum similarity between strings, otherwise return 0 similarity}
+\item{min_similarity}{Numeric. Minimum similarity between strings, otherwise return 0. Default is 0.75.}
 
-\item{top_n}{The number of best matches you want returned}
+\item{top_n}{Integer. The number of best matches to return.}
 
-\item{cosine_method}{The method/package for calculating the cosine similarity. Options: `sparse` `sklearn` and `knn`.  Default is `sparse`}
+\item{cosine_method}{Character. Method for calculating cosine similarity. Options: `sparse`, `sklearn`, `knn`. Default is `sparse`.}
 
-\item{model_id}{model id}
+\item{model_id}{Character. Name of the model instance.}
+}
+\value{
+A Python PolyFuzz Embeddings model object.
 }
 \description{
 Embedding Method

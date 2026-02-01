@@ -12,13 +12,22 @@ hugging_face_transformers(
 )
 }
 \arguments{
-\item{model}{model name options
-\itemize{
-\item \href{https://huggingface.co/models}{hugging face models}
-}}
+\item{obj}{Transformers module object or `NULL`. If `NULL`, imports the module.}
 
-\item{...}{}
+\item{task}{Character. The task for the pipeline. Default `"feature-extraction"`.}
+
+\item{model}{Character. Model name from Hugging Face. Default `"distilbert-base-cased"`. See \href{https://huggingface.co/models}{Hugging Face models} for other options.}
+
+\item{...}{Additional arguments passed to `pipeline()`.}
+}
+\value{
+A Python transformers pipeline object for the specified task and model.
 }
 \description{
 Hugging Face Transformers
+}
+\examples{
+\dontrun{
+pipeline <- hugging_face_transformers(task = "feature-extraction", model = "distilbert-base-cased")
+}
 }

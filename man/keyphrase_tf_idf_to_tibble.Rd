@@ -2,15 +2,22 @@
 % Please edit documentation in R/keyphrase.R
 \name{keyphrase_tf_idf_to_tibble}
 \alias{keyphrase_tf_idf_to_tibble}
-\title{Keyphrase TFIDF to Tibble}
+\title{Keyphrase TF-IDF to Tibble}
 \usage{
 keyphrase_tf_idf_to_tibble(tfidf, docs, return_wide = T)
 }
 \arguments{
-\item{return_wide}{}
+\item{tfidf}{Python KeyphraseTfidfVectorizer object.}
+
+\item{docs}{Character vector of documents to vectorize.}
+
+\item{return_wide}{Logical. If `TRUE`, returns wide format; if `FALSE`, returns long format. Default `TRUE`.}
+}
+\value{
+A tibble with columns: `number_document`, `text`, and keyphrase TF-IDF scores (wide or long format).
 }
 \description{
-Keyphrase TFIDF to Tibble
+Keyphrase TF-IDF to Tibble
 }
 \examples{
 docs <- c('This is the first document.', 'This document is the second document.', 'And this is the third one.', 'Is this the first document?')

@@ -3,13 +3,13 @@
 
 #' Import Top2Vec
 #'
-#' @param assign_to_environment
-#' @param path
+#' @param assign_to_environment Logical. If `TRUE`, assigns the imported Top2Vec module to the global environment. Default `TRUE`.
+#' @param path Character. Optional path to Python executable. If `NULL`, uses default Python.
 #'
-#' @return
+#' @returns A Python Top2Vec module object.
 #' @export
 #'
-#' @examples
+
 import_top2vec <-
   function(assign_to_environment = T,
            path = NULL) {
@@ -69,19 +69,19 @@ import_top2vec <-
 #' Setting use_corpus_file to True can sometimes provide speedup for large datasets when multiple worker threads are available. Documents are still passed to the model as a list of str, the model will create a temporary corpus file for training.
 #' @param document_ids  A unique value per document that will be used for referring to documents in search results. If ids are not given to the model, the index of each document in the original corpus will become the id.  Default is `NULL`
 #' @param keep_documents If set to False documents will only be used for training and not saved as part of the model. This will reduce model size. When using search functions only document ids will be returned, not the actual documents. Default is `TRUE`
-#' @param workers The amount of worker threads to be used in training the model. Larger amount will lead to faster training.
-#' @param tokenizer Override the default tokenization method. If None then gensim.utils.simple_preprocess will be used. Tokenizer must take a document and return a list of tokens.
-#' @param use_embedding_model_tokenizer  If using an embedding model other than doc2vec, use the model’s tokenizer for document embedding. If set to True the tokenizer, either default or passed callable will be used to tokenize the text to extract the vocabulary for word embedding.  Default `FALSE`
-#' @param umap_args Pass custom arguments to UMAP.  Default `NULL`
-#' @param hdbscan_args Pass custom arguments to HDBSCAN.  Default `TRUE`
-#' @param verbose Whether to print status data during training.
-#' @param obj top2vec object.  If `NULL` initiates a new top2vec model
-#' @param assign_to_environment If `TRUE` assigns output to environment
+#' @param workers Integer. The amount of worker threads to be used in training the model. Larger amount will lead to faster training.
+#' @param tokenizer Optional callable. Override the default tokenization method. If `NULL`, gensim.utils.simple_preprocess will be used. Tokenizer must take a document and return a list of tokens.
+#' @param use_embedding_model_tokenizer Logical. If using an embedding model other than doc2vec, use the model's tokenizer for document embedding. If set to `TRUE`, the tokenizer, either default or passed callable will be used to tokenize the text to extract the vocabulary for word embedding. Default `FALSE`.
+#' @param umap_args List. Pass custom arguments to UMAP. Default `NULL`.
+#' @param hdbscan_args List. Pass custom arguments to HDBSCAN. Default `NULL`.
+#' @param verbose Logical. Whether to print status data during training.
+#' @param obj Top2Vec object. If `NULL`, initiates a new Top2Vec model.
+#' @param assign_to_environment Logical. If `TRUE`, assigns output to global environment. Default `TRUE`.
 #'
-#' @return
+#' @returns A Python Top2Vec model object.
 #' @export
 #'
-#' @examples
+
 top2vec_model <-
   function(docs = NULL,
            min_count = 50L,
@@ -164,15 +164,15 @@ top2vec_model <-
 
 # topics ------------------------------------------------------------------
 
-#' Textop2vecec Topic Size
+#' Top2Vec Topic Size
 #'
-#' @param obj
-#' @param reduced
+#' @param obj Top2Vec model object.
+#' @param reduced Logical. Whether to return reduced topics. Default `FALSE`.
 #'
-#' @return
+#' @returns A tibble with columns: `topic_top2vec` and `count_documents`.
 #' @export
 #'
-#' @examples
+
 top2vec_topic_size <-
   function(obj, reduced = F) {
     out <- obj$get_topic_sizes(reduced = F)
@@ -193,12 +193,12 @@ top2vec_topic_size <-
 
 #' Topic Vector Embeddings
 #'
-#' @param obj
+#' @param obj Top2Vec model object.
 #'
-#' @return
+#' @returns A tibble with topic vector embeddings, with `topic_top2vec` as the first column.
 #' @export
 #'
-#' @examples
+
 top2vec_topic_embeddings <-
   function(obj){
     data <- obj$topic_vectors |> as_tibble() |>
@@ -209,14 +209,14 @@ top2vec_topic_embeddings <-
   }
 
 
-#' Textop2vecec Topic Words
+#' Top2Vec Topic Words
 #'
-#' @param obj textop2vecec object
+#' @param obj Top2Vec model object.
 #'
-#' @return
+#' @returns A tibble with topic words, with columns for document number and topic words across topics.
 #' @export
 #'
-#' @examples
+
 tbl_top_2_vec_words_topics <-
   function(obj) {
     data <- as_tibble(obj$topic_words)
@@ -233,14 +233,14 @@ tbl_top_2_vec_words_topics <-
 
   }
 
-#' Top Textop2vecec Documents
+#' Top2Vec Documents
 #'
-#' @param obj
+#' @param obj Top2Vec model object.
 #'
-#' @return
+#' @returns A tibble with columns: `number_document`, `id_document`, `topic_top2vec`, and `distance`.
 #' @export
 #'
-#' @examples
+
 top2vec_document_topics <-
   function(obj) {
     tibble(id_document = obj$document_ids,
@@ -283,19 +283,19 @@ top2vec_document_topics <-
 
   }
 
-#' Textop2vecec Similar Words
+#' Top2Vec Similar Words
 #'
-#' @param keywords
-#' @param obj
-#' @param keywords_exclude
-#' @param number_words
-#' @param use_index
-#' @param ef
+#' @param keywords Character vector of keywords to find similar words for.
+#' @param obj Top2Vec model object.
+#' @param keywords_exclude Character vector. Keywords to exclude from results. Default `NULL`.
+#' @param number_words Integer. Number of similar words to return per keyword. Default `10L`.
+#' @param use_index Logical. Whether to use index for search. Default `FALSE`.
+#' @param ef Integer or `NULL`. HNSW search parameter.
 #'
-#' @return
+#' @returns A tibble with columns: `keyword_search`, `similar_words_top2vec`, and `score_top2vec`.
 #' @export
 #'
-#' @examples
+
 top2vec_similar_words <-
   function(keywords = NULL, obj = NULL, keywords_exclude = NULL, number_words = 10L, use_index = FALSE, ef = NULL) {
 

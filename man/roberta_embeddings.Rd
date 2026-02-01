@@ -7,8 +7,18 @@
 roberta_embeddings(obj = NULL, is_token_embedding = T)
 }
 \arguments{
-\item{obj}{}
+\item{obj}{Flair module object or `NULL`. If `NULL`, imports the module.}
+
+\item{is_token_embedding}{Logical. If `TRUE`, uses token-level embeddings. Default `TRUE`.}
+}
+\value{
+A Python TransformerDocumentEmbeddings object for RoBERTa embeddings.
 }
 \description{
 Roberta Embeddings
+}
+\examples{
+\dontrun{
+roberta <- roberta_embeddings()
+}
 }

@@ -7,8 +7,18 @@
 import_nltk_corpus(assign_to_environment = T, path = NULL)
 }
 \arguments{
-\item{path}{}
+\item{assign_to_environment}{Logical. If `TRUE`, assigns module to global environment.}
+
+\item{path}{Character. Path to Python installation directory.}
+}
+\value{
+The Python NLTK corpus module object, invisibly.
 }
 \description{
 Import NLTK Corpus
+}
+\examples{
+\dontrun{
+nltk_corpus <- import_nltk_corpus(assign_to_environment = FALSE)
+}
 }

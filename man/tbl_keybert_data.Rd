@@ -7,7 +7,14 @@
 tbl_keybert_data(out, use_future = FALSE, return_message = FALSE, slug = NULL)
 }
 \arguments{
-\item{return_message}{}
+\item{out}{Python KeyBERT output object containing extracted keywords.}
+
+\item{use_future}{Logical. If `TRUE`, uses parallel processing. Default `FALSE`.}
+
+\item{return_message}{Logical. If `TRUE`, prints processing messages. Default `FALSE`.}
+}
+\value{
+A tibble with columns: `number_document`, `keyword_keybert`, and `score_keybert`.
 }
 \description{
 Extract Keybert Keywords from Output

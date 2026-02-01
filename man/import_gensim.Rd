@@ -7,10 +7,20 @@
 import_gensim(assign_to_environment = T, path = NULL)
 }
 \arguments{
-\item{path}{}
+\item{assign_to_environment}{Logical. If `TRUE`, assigns module to global environment.}
+
+\item{path}{Character. Path to Python installation directory.}
+}
+\value{
+The Python Gensim module object, invisibly.
 }
 \description{
 \itemize{
 \item \href{https://radimrehurek.com/gensim/}{GENSIM}
+}
+}
+\examples{
+\dontrun{
+gensim <- import_gensim(assign_to_environment = FALSE)
 }
 }

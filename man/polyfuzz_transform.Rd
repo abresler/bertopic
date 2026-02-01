@@ -7,9 +7,12 @@
 polyfuzz_transform(obj, from_list)
 }
 \arguments{
-\item{obj}{Polyfuzz Model Object}
+\item{obj}{A PolyFuzz model object.}
 
-\item{from_list}{Vector of Unseen Words}
+\item{from_list}{Character vector of unseen words to transform.}
+}
+\value{
+A tibble with transformed matches including `from`, `to`, and `similarity` columns, plus `type_model` column.
 }
 \description{
 Transform Unseen List

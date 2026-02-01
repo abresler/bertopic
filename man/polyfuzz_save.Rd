@@ -7,11 +7,14 @@
 polyfuzz_save(obj, model_path = NULL, file_name = "polyfuzz")
 }
 \arguments{
-\item{obj}{Polyfuzz Object}
+\item{obj}{A PolyFuzz model object.}
 
-\item{model_path}{Path to save}
+\item{model_path}{Character. Path to directory where model will be saved.}
 
-\item{file_name}{Name of the file.  Defaults to polyfuzz}
+\item{file_name}{Character. Name of the file. Defaults to polyfuzz.}
+}
+\value{
+Called for side effects; returns invisibly. Saves model to specified path.
 }
 \description{
 Save Polyfuzz Model

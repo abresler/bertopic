@@ -17,23 +17,26 @@ polyfuzz_match(
 )
 }
 \arguments{
-\item{obj}{Polyfuzz Object}
+\item{obj}{A PolyFuzz model object.}
 
-\item{from_list}{The list from which you want mappings. If you want to map items within a list, and not map the items to themselves, you can supply only the from_list and ignore the to_list.}
+\item{from_list}{Character vector. The list from which you want mappings. If mapping items within a list, supply only `from_list` and ignore `to_list`.}
 
-\item{to_list}{The list where you want to map to}
+\item{to_list}{Character vector. The list where you want to map to, or `NULL`.}
 
-\item{top_n_matches}{The number of matches you want returned. This is currently only implemented for polyfuzz.models.TFIDF and polyfuzz.models.Embeddings as they can computationally handle more comparisons.}
+\item{top_n_matches}{Integer. The number of matches to return. Currently implemented for TFIDF and Embeddings methods. Default is 1.}
 
-\item{group_model}{you can choose one of the models in polyfuzz.models to be used as a grouper default `NONE`}
+\item{group_model}{A PolyFuzz grouper model or `NULL` for no grouping.}
 
-\item{link_min_similarity}{If not `NULL` the minimum similarity between strings before they are grouped in a single linkage fashion.  Default `.75`}
+\item{link_min_similarity}{Numeric. Minimum similarity for linkage-based grouping. Default is 0.75.}
 
-\item{group_all_strings}{if you want to compare a list of strings with itself and then cluster those strings, set this to True. Otherwise, only the strings that were mapped To are clustered.}
+\item{group_all_strings}{Logical. If `TRUE` compares a list with itself and clusters strings; otherwise only clusters strings that were mapped to.}
 
-\item{model_id}{the model id of the model if you have specified multiple models}
+\item{model_id}{Character. The model ID if multiple models are specified, or `NULL`.}
 
-\item{exclude_unmatched}{If `TRUE` excludes unmatched}
+\item{exclude_unmatched}{Logical. If `TRUE` excludes unmatched strings.}
+}
+\value{
+A tibble containing fuzzy matches with columns: `from`, `to`, `similarity`, and `has_match`.
 }
 \description{
 Match Lists of Words

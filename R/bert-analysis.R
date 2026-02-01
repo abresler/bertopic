@@ -4,12 +4,12 @@
 
 #' List to Tuple
 #'
-#' @param obj
+#' @param obj List object to convert to a Python tuple.
 #'
-#' @return
+#' @returns A Python tuple object.
 #' @export
 #'
-#' @examples
+
 list_to_tuple <-
   function(obj) {
     reticulate::tuple(obj)
@@ -17,13 +17,13 @@ list_to_tuple <-
 
 #' Unite Features
 #'
-#' @param data a `tibble`
-#' @param unite_columns vector of columns to unite
-#' @param new_column  name of new column.  If `NULL` concats the unite coljumns
-#' @param sep default `@`
-#' @param remove if `TRUE` removes original columns
+#' @param data A tibble to unite features in.
+#' @param unite_columns Character vector of column names to unite.
+#' @param new_column Character. Name of new united column. If `NULL`, concatenates the column names.
+#' @param sep Character. Separator between united values. Default `"@"`.
+#' @param remove Logical. If `TRUE`, removes original columns. Default `FALSE`.
 #'
-#' @return
+#' @returns A tibble with united columns. If `to_factor = TRUE`, also includes an `id_*` column with numeric encoding.
 #' @export
 #'
 #' @examples
@@ -69,16 +69,16 @@ tbl_unite_features <-
 
 #' Find topics most similar to Search Terms
 #'
-#' @param obj BERTopic Ojbect
-#' @param terms Vector of Terms to search
-#' @param top_n_terms the number of topics to return.  Default is 10
-#' @param nest_data if `TRUE` Nests data
-#' @param return_message
+#' @param obj BERTopic model object.
+#' @param terms Character vector of search terms to find similar topics for.
+#' @param top_n_terms Integer. Number of most similar topics to return per term. Default `10L`.
+#' @param nest_data Logical. If `TRUE`, nests data by term. Default `FALSE`.
+#' @param return_message Logical. If `TRUE`, prints processing messages. Default `TRUE`.
 #'
-#' @return
+#' @returns A tibble with columns: `term`, `topic_bert`, `similarity`, `is_outlier_bert_topic`, and topic information joined from `bert_topic_info()`.
 #' @export
 #'
-#' @examples
+
 bert_similar_terms_topics <-
   function(obj,
            terms = NULL,
@@ -125,15 +125,15 @@ bert_similar_terms_topics <-
 
 #' Bert Embeddings
 #'
-#' @param embeddings
-#' @param docs
-#' @param id_columns
-#' @param text_column
+#' @param embeddings Numeric matrix or array of embeddings.
+#' @param docs Character vector of documents corresponding to embeddings. Default `NULL`.
+#' @param id_columns Character vector. Names to create from document IDs. Default `NULL`.
+#' @param text_column Character. Name for the text/document column. Default `NULL`.
 #'
-#' @return
+#' @returns A tibble with embeddings converted to numeric columns, optionally with ID and text columns.
 #' @export
 #'
-#' @examples
+
 bert_embeddings <-
   function(embeddings,
            docs = NULL,
@@ -175,13 +175,13 @@ bert_embeddings <-
 
 #' Extract UMAP from Object
 #'
-#' @param obj
-#' @param data
+#' @param obj BERTopic model object with UMAP embeddings.
+#' @param data Optional tibble to bind UMAP coordinates to. Default `NULL`.
 #'
-#' @return
+#' @returns A tibble with UMAP coordinates (columns named `umap_00`, `umap_01`, etc.), `pct_dbscan_prob`, and optionally bound to the input data.
 #' @export
 #'
-#' @examples
+
 extract_bert_umap <-
   function(obj,
            data = NULL,
@@ -218,18 +218,18 @@ extract_bert_umap <-
 
 #' Extract UMAP for Visualization
 #'
-#' @param obj
-#' @param n_components
-#' @param metric
-#' @param random_state
-#' @param min_dist
-#' @param learning_rate
-#' @param exclude_outlier
+#' @param obj BERTopic model object.
+#' @param n_components Integer. Number of UMAP dimensions. Default `2L`.
+#' @param metric Character. Distance metric for UMAP. Default `"cosine"`.
+#' @param random_state Integer. Random seed for reproducibility. Default `42L`.
+#' @param min_dist Numeric. Minimum distance parameter for UMAP. Default `0.1`.
+#' @param learning_rate Integer. Learning rate for UMAP. Default `1L`.
+#' @param exclude_outlier Logical. If `TRUE`, excludes outlier topic. Default `FALSE`.
 #'
-#' @return
+#' @returns A tibble with topic frequencies and UMAP coordinates for visualization.
 #' @export
 #'
-#' @examples
+
 tbl_bert_umap_label_level <-
   function(obj,
            exclude_outlier = FALSE,
@@ -274,17 +274,17 @@ tbl_bert_umap_label_level <-
     freq_df
   }
 
-#' BERT Cosine Simiarity
+#' BERT Cosine Similarity
 #'
-#' @param obj topic model object
-#' @param exclude_outlier if `TRUE` excludes outlier topic
-#' @param include_topic_number if `TRUE` includes topic number
-#' @param return_tibble if `TRUE` returns tibble
+#' @param obj BERTopic model object.
+#' @param exclude_outlier Logical. If `TRUE`, excludes outlier topic. Default `FALSE`.
+#' @param include_topic_number Logical. If `TRUE`, includes topic number in feature names. Default `TRUE`.
+#' @param return_tibble Logical. If `TRUE`, returns tibble; otherwise returns matrix. Default `FALSE`.
 #'
-#' @return
+#' @returns A tibble (if `return_tibble = TRUE`) or matrix with cosine similarity scores between topics, with columns: `feature_01`, `feature_02` (or separated into topic and label columns), and `cosine_similarity`.
 #' @export
 #'
-#' @examples
+
 tbl_bert_label_cosine_similarity <-
   function(obj,
            exclude_outlier = FALSE,
@@ -401,17 +401,15 @@ tbl_bert_label_cosine_similarity <-
 
 # vector_stuff ------------------------------------------------------------
 
-#' Extract Document Word Coutns
-#'
 #' Extract Document Word Counts
 #'
 #' Extract word counts from documents using the vectorizer model.
 #'
 #' @param obj BERTopic model object with vectorizer_model.
-#' @param docs Character vector of documents.
-#' @param filter_zero Logical. If TRUE, filters out zero counts. Default TRUE.
+#' @param docs Character vector of documents to analyze.
+#' @param filter_zero Logical. If `TRUE`, filters out zero counts. Default `TRUE`.
 #'
-#' @return A tibble with document number, word, and count columns.
+#' @returns A tibble with columns: `number_document`, `word`, and `count`.
 #' @export
 #'
 #' @examples
@@ -450,12 +448,12 @@ extract_document_word_counts <-
 #'
 #' Write a BERTopic visualization to HTML file.
 #'
-#' @param viz A BERTopic visualization object.
-#' @param base_path Base directory path for output. If NULL, shows in browser.
-#' @param viz_name Name for the visualization folder.
-#' @param browse_url Logical. If TRUE, opens in browser after writing. Default TRUE.
+#' @param viz BERTopic visualization object.
+#' @param base_path Character. Base directory path for output. If `NULL`, shows in browser. Default `NULL`.
+#' @param viz_name Character. Name for the visualization folder.
+#' @param browse_url Logical. If `TRUE`, opens in browser after writing. Default `TRUE`.
 #'
-#' @return Invisible NULL. Side effect: writes HTML file.
+#' @returns Called for side effects (writes HTML file); returns invisible `NULL`.
 #' @export
 #'
 #' @examples
@@ -495,11 +493,11 @@ write_bert_viz <-
 #'
 #' Convert a matrix or array to a tibble with optional column naming.
 #'
-#' @param data A matrix or array to convert.
-#' @param output_type Output type prefix for columns. If NULL, uses default names.
-#' @param number_zeros Padding for zeros in column names. Default 3.
+#' @param data Matrix or array to convert.
+#' @param output_type Character. Prefix for column names. If `NULL`, uses default names. Default `NULL`.
+#' @param number_zeros Integer. Padding for zeros in column names. Default `3`.
 #'
-#' @return A tibble with the converted array data.
+#' @returns A tibble with the converted array data and optionally prefixed column names.
 #' @export
 #'
 #' @examples
@@ -534,13 +532,13 @@ tbl_array <-
 #' @param obj BERTopic model object.
 #' @param docs Character vector of documents.
 #' @param timestamps Vector of timestamps corresponding to documents.
-#' @param nr_bins Integer. Number of time bins. Default NULL.
-#' @param datetime_format Character. Format string for datetime. Default NULL.
-#' @param evolution_tuning Logical. Enable evolution tuning. Default TRUE.
-#' @param global_tuning Logical. Enable global tuning. Default TRUE.
-#' @param return_tibble Logical. Return as tibble. Default TRUE.
+#' @param nr_bins Integer. Number of time bins. Default `NULL`.
+#' @param datetime_format Character. Format string for datetime. Default `NULL`.
+#' @param evolution_tuning Logical. Enable evolution tuning. Default `TRUE`.
+#' @param global_tuning Logical. Enable global tuning. Default `TRUE`.
+#' @param return_tibble Logical. If `TRUE`, returns tibble format. Default `TRUE`.
 #'
-#' @return Topics over time data, as tibble if return_tibble is TRUE.
+#' @returns Topics over time data, as tibble if `return_tibble = TRUE`.
 #' @export
 #'
 #' @examples
@@ -585,21 +583,22 @@ bert_topics_over_time <-
   }
 
 #' Extract BERT Topics Over Time from a Tibble
-#' Get Topics Over Time from Tibble
+#'
+#' Get Topics Over Time from a data frame input.
 #'
 #' Analyze how topics evolve over time from a data frame input.
 #'
-#' @param data A data frame containing documents and timestamps.
-#' @param topic_model A BERTopic model object.
+#' @param data Data frame containing documents and timestamps.
+#' @param topic_model BERTopic model object.
 #' @param document_name Character. Name of the column containing documents.
 #' @param time_feature Character. Name of the column containing timestamps.
-#' @param nr_bins Integer. Number of time bins. Default NULL.
-#' @param datetime_format Character. Format string for datetime parsing. Default NULL.
-#' @param evolution_tuning Logical. Enable evolution tuning. Default TRUE.
-#' @param global_tuning Logical. Enable global tuning. Default TRUE.
-#' @param return_tibble Logical. Return as tibble. Default TRUE.
+#' @param nr_bins Integer. Number of time bins. Default `NULL`.
+#' @param datetime_format Character. Format string for datetime parsing. Default `NULL`.
+#' @param evolution_tuning Logical. Enable evolution tuning. Default `TRUE`.
+#' @param global_tuning Logical. Enable global tuning. Default `TRUE`.
+#' @param return_tibble Logical. If `TRUE`, returns tibble format. Default `TRUE`.
 #'
-#' @return A tibble with topics over time analysis.
+#' @returns A tibble with topics over time analysis.
 #' @export
 #'
 #' @examples
@@ -635,9 +634,9 @@ tbl_bert_topics_over_time <-
 #' Transform topics over time output into a tidy tibble format.
 #'
 #' @param data Output from bert_topics_over_time function.
-#' @param topic_model Optional BERTopic model to add topic labels.
+#' @param topic_model BERTopic model object to add topic labels. Default `NULL`.
 #'
-#' @return A tibble with cleaned topics over time data.
+#' @returns A tibble with cleaned topics over time data, with columns: `topic_bert`, `words`, `count`, `date_time`, `date`, and optionally topic labels from the model.
 #' @export
 #'
 #' @examples
@@ -669,10 +668,10 @@ munge_bert_topics_over_time <-
 #' Transform topics per class output into a tidy tibble format.
 #'
 #' @param data Output from bert_topic_per_class function.
-#' @param class_name Optional character. Custom name for the class column.
-#' @param topic_model Optional BERTopic model to add topic labels.
+#' @param class_name Character. Custom name for the class column. Default `NULL`.
+#' @param topic_model BERTopic model object to add topic labels. Default `NULL`.
 #'
-#' @return A tibble with cleaned topics per class data.
+#' @returns A tibble with cleaned topics per class data, with columns: `topic_bert`, `words`, `count`, `class` (or custom named column), and optionally topic labels from the model.
 #' @export
 #'
 #' @examples
@@ -703,24 +702,24 @@ munge_bert_topics_per_class <-
   }
 # approx_distribution -----------------------------------------------------
 
-#' Get a string representation of the current object.
-#' ¶
+#' Approximate Topic Distribution
+#'
 #' A post-hoc approximation of topic distributions across documents.
 #'
-#' In order to perform this approximation, each document is split into tokens according to the provided tokenizer in the CountVectorizer. Then, a sliding window is applied on each document creating subsets of the document. For example, with a window size of 3 and stride of 1, the sentence:
+#' In order to perform this approximation, each document is split into tokens according to the provided tokenizer in the CountVectorizer. Then, a sliding window is applied on each document creating subsets of the document. For example, with a window size of 3 and stride of 1, the sentence: "I love pizza" becomes ["I love", "love pizza"].
 #'
-#' @param obj Topic Model Object
-#' @param docs Vector of Documents
-#' @param window Size of the moving window which indicates the number of tokens being considered.  Default `4`
-#' @param stride How far the window should move at each step.  Default `1`.
-#' @param min_similarity The minimum similarity of a document's tokenset with respect to the topics.  Default `.1`
-#' @param batch_size The number of documents to process at a time. If None, then all documents are processed at once. NOTE: With a large number of documents, it is not advised to process all documents at once.    Default `1000`
-#' @param padding  Whether to pad the beginning and ending of a document with empty tokens.  Default `FALSE`
-#' @param use_embedding_model Whether to use the topic model's embedding model to calculate the similarity between tokensets and topics instead of using c-TF-IDF.  Default `FALSE`
-#' @param calculate_tokens Calculate the similarity of tokens with all topics. NOTE: This is computation-wise more expensive and can require more memory. Using this over batches of documents might be preferred.  Default `FALSE`
-#' @param separator  The separator used to merge tokens into tokensets.
+#' @param obj BERTopic model object.
+#' @param docs Character vector of documents.
+#' @param window Integer. Size of the moving window which indicates the number of tokens being considered. Default `4`.
+#' @param stride Integer. How far the window should move at each step. Default `1`.
+#' @param min_similarity Numeric. The minimum similarity of a document's tokenset with respect to the topics. Default `0.1`.
+#' @param batch_size Integer. The number of documents to process at a time. If `NULL`, all documents are processed at once. NOTE: With a large number of documents, it is not advised to process all documents at once. Default `1000`.
+#' @param padding Logical. Whether to pad the beginning and ending of a document with empty tokens. Default `FALSE`.
+#' @param use_embedding_model Logical. Whether to use the topic model's embedding model to calculate the similarity between tokensets and topics instead of using c-TF-IDF. Default `FALSE`.
+#' @param calculate_tokens Logical. If `TRUE`, calculates the similarity of tokens with all topics. NOTE: This is computation-wise more expensive and can require more memory. Default `FALSE`.
+#' @param separator Character. The separator used to merge tokens into tokensets. Default `" "`.
 #'
-#' @return A list containing approximate topic distributions for documents.
+#' @returns A list containing approximate topic distributions for documents.
 #' @export
 #'
 #' @examples
@@ -760,11 +759,11 @@ bert_approximate_distribution <-
 #'
 #' Transforms approximate distribution output into a tidy tibble format.
 #'
-#' @param out Approximate Distribution Output from bert_approximate_distribution.
-#' @param obj Bertopic Object. If provided, adds topic labels to output.
-#' @param return_wide Logical. If TRUE, returns wide format. Default FALSE.
+#' @param out Approximate distribution output from bert_approximate_distribution.
+#' @param obj BERTopic model object. If provided, adds topic labels to output. Default `NULL`.
+#' @param return_wide Logical. If `TRUE`, returns wide format; otherwise returns long format. Default `FALSE`.
 #'
-#' @return A tibble with document topic probability distributions in long or wide format.
+#' @returns A tibble with document topic probability distributions in long or wide format. Long format has columns: `number_document`, `label_topic_bert`, `pct_probability_topic_bert`. Wide format has columns for each topic.
 #' @export
 #'
 #' @examples

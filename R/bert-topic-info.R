@@ -2,18 +2,18 @@
 
 #' BERT Topic Model Info
 #'
-#' @param obj
-#' @param topic_number
-#' @param assign_to_environment
-#' @param concatenator
-#' @param remove_list_columns
-#' @param return_summary
-#' @param top_n_aspect_words
+#' @param obj A BERTopic model object.
+#' @param topic_number Integer. Specific topic number to retrieve, or `NULL` for all topics.
+#' @param assign_to_environment Logical. If `TRUE` assigns results to global environment. Default is `TRUE`.
+#' @param concatenator Character. String to concatenate multiple values. Default is ". ".
+#' @param remove_list_columns Logical. If `TRUE` removes list-type columns. Default is `TRUE`.
+#' @param return_summary Logical. If `TRUE` returns summary format. Default is `TRUE`.
+#' @param top_n_aspect_words Integer. Number of top aspect words to include, or `NULL` for all.
 #'
-#' @return
+#' @returns A tibble containing topic information with columns: `topic_bert`, `label_bertopic`, `is_outlier_bert_topic`, and additional topic metadata.
 #' @export
 #'
-#' @examples
+
 bert_topic_info <-
   function(obj,
            topic_number = NULL,
@@ -183,19 +183,19 @@ bert_topic_info <-
 
 #' Generate BERT Topic Labels
 #'
-#' @param obj topic model object
-#' @param number_words Top n words per topic to use.  Default is 4
-#' @param separator The string with which the words and topic prefix will be separated. Underscores are the default but a nice alternative is ", ".  Default `_`
-#' @param word_length The maximum length of each word in the topic label. Some words might be relatively long and setting this value helps to make sure that all labels have relatively similar lengths.
-#' @param topic_prefix  Whether to use the topic ID as a prefix. If set to True, the topic ID will be separated using the separator
-#' @param append_number_words Append the number of words
-#' @param update_topic_model_labels if `TRUE` updates new label into a custom field
-#' @param aspect The aspect from which to generate topic labels when not `NULL`
+#' @param obj A BERTopic model object.
+#' @param number_words Integer. Top n words per topic to use. Default is 4.
+#' @param separator Character. String separating words and topic prefix. Default is `"_"`.
+#' @param word_length Integer. Maximum length of each word in the label, or `NULL` for no limit.
+#' @param topic_prefix Logical. If `TRUE` uses the topic ID as a prefix. Default is `FALSE`.
+#' @param append_number_words Logical. If `TRUE` appends the number of words to column names. Default is `FALSE`.
+#' @param update_topic_model_labels Logical. If `TRUE` updates the model with new labels. Default is `FALSE`.
+#' @param aspect Character. Aspect name from which to generate labels, or `NULL` for default.
 #'
-#' @return
+#' @returns A tibble containing generated labels with columns: `topic_bert`, `label_bertopic`, and `is_outlier_bert_topic`.
 #' @export
 #'
-#' @examples
+
 bert_topic_labels <-
   function(obj,
            number_words = 4L,
@@ -274,13 +274,18 @@ bert_topic_labels <-
 
 #' Topic Counts
 #'
-#' @param obj bertopic object
-#' @param topic_number if not `NULL` the number of the topic.  If `NULL` returns all topics.
+#' @param obj A BERTopic model object.
+#' @param topic_number Integer. Specific topic number, or `NULL` to return all topics.
+#' @param include_representative_documents Logical. If `TRUE` includes representative documents. Default is `FALSE`.
+#' @param join_labels Logical. If `TRUE` joins topic labels. Default is `TRUE`.
+#' @param only_label Logical. If `TRUE` includes only label column. Default is `TRUE`.
+#' @param include_parameters Logical. If `TRUE` includes model parameters. Default is `FALSE`.
+#' @param parameter_filters List of parameter filters to apply, or `NULL`.
 #'
-#' @return
+#' @returns A tibble containing topic frequency counts with columns: `topic_bert`, `frequency`, `label_bertopic`, and `is_outlier_bert_topic`.
 #' @export
 #'
-#' @examples
+
 bert_topic_count <-
   function(obj,
            topic_number = NULL,
@@ -369,13 +374,17 @@ bert_topic_count <-
 
 #' Topic's Representative Documents
 #'
-#' @param obj Topic Model Object
-#' @param topic_number If not `NULL` number of topic
+#' @param obj A BERTopic model object.
+#' @param topic_number Integer. Specific topic number, or `NULL` to return all topics.
+#' @param include_labels Logical. If `TRUE` includes topic labels. Default is `TRUE`.
+#' @param number_words Integer. Number of top words to use in labels. Default is 5.
+#' @param top_n_documents Integer. Maximum number of documents to return per topic, or `NULL` for all.
+#' @param sep Character. Separator for label construction. Default is `"_"`.
 #'
-#' @return
+#' @returns A tibble containing representative documents with columns: `number_document_topic`, `topic_bert`, `label_bertopic`, `text`, and `is_outlier_bert_topic`.
 #' @export
 #'
-#' @examples
+
 bert_representative_documents <-
   function(obj,
            topic_number = NULL,
@@ -439,17 +448,17 @@ bert_representative_documents <-
 #'
 #' To create this hierarchy, BERTopic needs to be already fitted once. Then, a hierarchy is calculated on the distance matrix of the c-TF-IDF representation using scipy.cluster.hierarchy.linkage.
 #'
-#' @param obj Topic Model Object
-#' @param docs Vector of documents
-#' @param linkage_function  The linkage function to use. Default is: lambda x: sch.linkage(x, 'ward', optimal_ordering=True)
-#' @param distance_function The distance function to use on the c-TF-IDF matrix. Default is: lambda x: 1 - cosine_similarity(x)
-#' @param tight_layout Whether to use a tight layout (narrow width) for easier readability if you have hundreds of topics.
-#' @param print_tree If `TRUE` prints tree
+#' @param obj A BERTopic model object.
+#' @param docs Character vector. Vector of documents, or `NULL`.
+#' @param linkage_function A Python function for hierarchical clustering, or `NULL` for default (ward linkage).
+#' @param distance_function A Python function for distance calculation, or `NULL` for default (1 - cosine similarity).
+#' @param tight_layout Logical. If `TRUE` uses tight layout for readability with many topics. Default is `FALSE`.
+#' @param print_tree Logical. If `TRUE` prints the topic tree. Default is `FALSE`.
 #'
-#' @return
+#' @returns A Python hierarchical topics object containing the topic hierarchy structure.
 #' @export
 #'
-#' @examples
+
 bert_topic_hierarchy <-
   function(obj,
            docs = NULL,
@@ -483,15 +492,15 @@ bert_topic_hierarchy <-
 
 #' Print Bertopic Tree
 #'
-#' @param obj Bertopic Model
-#' @param hierarchy  Output from `bert_topic_hierarchy`
-#' @param tight_layout Whether to use a tight layout (narrow width) for easier readability if you have hundreds of topics.  Default `FALSE`
-#' @param max_distance The maximum distance between two topics. This value is based on the Distance column in hier_topics.  Default `NULL`
+#' @param obj A BERTopic model object.
+#' @param hierarchy Output from `bert_topic_hierarchy`. A hierarchical topics object.
+#' @param tight_layout Logical. If `TRUE` uses tight layout for readability with many topics. Default is `FALSE`.
+#' @param max_distance Numeric. Maximum distance between topics, or `NULL` for no limit. Default is `NULL`.
 #'
-#' @return
+#' @returns Called for side effects; prints the topic tree to console.
 #' @export
 #'
-#' @examples
+
 print_bert_topic_tree <-
   function(obj,
            hierarchy,
@@ -507,15 +516,15 @@ print_bert_topic_tree <-
 
 #' Returns Topic Tree Text
 #'
-#' @param obj Bertopic Model
-#' @param hierarchy  Output from `bert_topic_hierarchy`
-#' @param tight_layout Whether to use a tight layout (narrow width) for easier readability if you have hundreds of topics.  Default `FALSE`
-#' @param max_distance The maximum distance between two topics. This value is based on the Distance column in hier_topics.  Default `NULL`
+#' @param obj A BERTopic model object.
+#' @param hierarchy Output from `bert_topic_hierarchy`. A hierarchical topics object.
+#' @param tight_layout Logical. If `TRUE` uses tight layout for readability with many topics. Default is `FALSE`.
+#' @param max_distance Numeric. Maximum distance between topics, or `NULL` for no limit. Default is `NULL`.
 #'
-#' @return
+#' @returns Character. A string containing the formatted topic tree structure.
 #' @export
 #'
-#' @examples
+
 bert_topic_tree_text <-
   function(obj,
            hierarchy,
@@ -535,16 +544,14 @@ bert_topic_tree_text <-
 
 #' Returns keywords for the topics
 #'
-#' @param obj Topic Model Object
-#' @param bert_topics if not `NULL` specific topics
-#' @param return_full_data  If True, returns all different forms of topic representations for each topic, including aspects
-
-
+#' @param obj A BERTopic model object.
+#' @param bert_topics Integer vector. Specific topic numbers, or `NULL` for all topics.
+#' @param return_full_data Logical. If `TRUE` returns all forms of topic representations including aspects. Default is `FALSE`.
 #'
-#' @return
+#' @returns A tibble containing topic keywords with columns: `topic_bert`, `label_bertopic`, `word`, `score_c_tfidf`, `length_ngram`, and `is_outlier_bert_topic`.
 #' @export
 #'
-#' @examples
+
 bert_topic_keywords <-
   function(obj,
            bert_topics = NULL,

@@ -2,13 +2,16 @@
 % Please edit documentation in R/top2vec.R
 \name{tbl_top_2_vec_words_topics}
 \alias{tbl_top_2_vec_words_topics}
-\title{Textop2vecec Topic Words}
+\title{Top2Vec Topic Words}
 \usage{
 tbl_top_2_vec_words_topics(obj)
 }
 \arguments{
-\item{obj}{textop2vecec object}
+\item{obj}{Top2Vec model object.}
+}
+\value{
+A tibble with topic words, with columns for document number and topic words across topics.
 }
 \description{
-Textop2vecec Topic Words
+Top2Vec Topic Words
 }

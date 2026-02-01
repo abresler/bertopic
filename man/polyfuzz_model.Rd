@@ -14,17 +14,20 @@ polyfuzz_model(
 )
 }
 \arguments{
-\item{method}{the method(s) used for matching. For quick selection of models select one of the following: `EditDistance`, `TF-IDF` or `Embeddings`. If you want more control over the models above, pass in a model from polyfuzz.models. For examples, see usage below.  Default `TF-iDF`}
+\item{method}{Character. The method used for matching. Options: `EditDistance`, `TF-IDF`, or `Embeddings`. Default is `TF-IDF`.}
 
-\item{model_object}{A pretrained model object}
+\item{model_object}{A pretrained model object from polyfuzz or `NULL` for default.}
 
-\item{obj}{Polyfuzz Object}
+\item{obj}{A PolyFuzz module object or `NULL` for default import.}
 
-\item{verbose}{If `TRUE` prints results}
+\item{verbose}{Logical. If `TRUE` prints results during fitting.}
 
-\item{from_list}{If not `NULL` vector of from list}
+\item{from_list}{Character vector. Words to match from, or `NULL`.}
 
-\item{to_list}{If not `NULL` vector of to list}
+\item{to_list}{Character vector. Words to match to, or `NULL`.}
+}
+\value{
+A Python PolyFuzz model object.
 }
 \description{
 Polyfuzz Model
