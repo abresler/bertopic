@@ -197,6 +197,8 @@ keybert_keywords <-
     }
     if (length(obj) == 0) {
       obj <- keybert_model(model = model)
+    } else if (!reticulate::py_has_attr(obj, "extract_keywords")) {
+      obj <- obj$KeyBERT(model = model)
     }
     if (use_key_phrase_vectorizer) {
       "Using keyphrase vectorizer" |> message()
@@ -408,6 +410,8 @@ keybert_embeddings <-
     }
     if (length(obj) == 0) {
       obj <- keybert_model(model = model)
+    } else if (!reticulate::py_has_attr(obj, "extract_keywords")) {
+      obj <- obj$KeyBERT(model = model)
     }
     if (use_key_phrase_vectorizer) {
       "Using keyphrase vectorizer" |> message()
