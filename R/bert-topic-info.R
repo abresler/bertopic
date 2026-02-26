@@ -403,13 +403,11 @@ bert_representative_documents <-
     }
     rep_docs <-
       obj$get_representative_docs(topic = topic_number)
-    data <- seq_along(rep_docs) |>
-      map_dfr(function(x) {
-        topic_no <- names(rep_docs[x]) |> readr::parse_number()
-        tibble(text = rep_docs[[x]]) |>
-          mutate(topic_bert = topic_no) |>
-          select(topic_bert, everything())
-      }) |>
+    topic_nos <- names(rep_docs) |> readr::parse_number()
+    data <- tibble(
+      topic_bert = rep(topic_nos, lengths(rep_docs)),
+      text       = unlist(rep_docs, use.names = FALSE)
+    ) |>
       arrange(topic_bert)
 
     if (include_labels) {
@@ -559,21 +557,22 @@ bert_topic_keywords <-
     topics <- obj$get_topics(full = return_full_data)
 
     if (!return_full_data) {
-      data <-
-        seq_along(topics) |>
-        map_dfr(function(x) {
-          topic_number <- x - 1
-          all_values <- topics[[x]] |> unlist()
-          word <- all_values[c(T, F)]
-          score <- all_values[c(F, T)] |> readr::parse_number()
-          tibble(word, score_c_tfidf = score) |>
-            mutate(
-              topic_bert = topic_number,
-              length_ngram = word |> str_count("\\ ")
-            ) |>
-            select(topic_bert, everything()) |>
-            mutate(is_outlier_bert_topic = topic_bert == -1)
-        })
+      all_values_list <- lapply(topics, unlist, use.names = FALSE)
+      n_words_per_topic <- lengths(all_values_list) %/% 2L
+      topic_numbers <- seq_along(topics) - 1L
+      all_flat <- unlist(all_values_list, use.names = FALSE)
+      odd_idx  <- seq(1L, length(all_flat), by = 2L)
+      even_idx <- seq(2L, length(all_flat), by = 2L)
+      word_vec  <- all_flat[odd_idx]
+      score_vec <- readr::parse_number(all_flat[even_idx])
+      topic_rep <- rep(topic_numbers, n_words_per_topic)
+      data <- tibble(
+        topic_bert            = topic_rep,
+        word                  = word_vec,
+        score_c_tfidf         = score_vec,
+        length_ngram          = str_count(word_vec, "\\ "),
+        is_outlier_bert_topic = topic_rep == -1L
+      )
     }
 
     if (return_full_data) {

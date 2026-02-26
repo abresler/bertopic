@@ -197,8 +197,6 @@ keybert_keywords <-
     }
     if (length(obj) == 0) {
       obj <- keybert_model(model = model)
-    } else {
-      obj <- obj$KeyBERT(model = model)
     }
     if (use_key_phrase_vectorizer) {
       "Using keyphrase vectorizer" |> message()
@@ -871,50 +869,19 @@ tbl_keybert_data <-
            use_future = FALSE,
            return_message = FALSE,
            slug = NULL) {
-    total_documents <- length(out)
-    if (!use_future) {
-      dat <-
-        1:length(out) |>
-        map_dfr(function(x) {
-          if (return_message) {
-            glue::glue("Document {x} of {total_documents}")
-          }
-          values <- unlist(out[[x]])
-          keywords <- values[c(T, F)]
-          scores <-  values[c(F, T)] |> as.numeric()
-          tibble(
-            number_document = x,
-            keyword_keybert = keywords,
-            score_keybert = scores
-          )
-        })
+    if (return_message) {
+      glue::glue("Parsing {length(out)} documents") |> message()
     }
-
-    if (use_future) {
-      options(future.globals.maxSize = 999999 * 1024^12)
-      cores <- round(parallelly::availableCores() * .8)
-      future::plan(future::cluster, workers = cores)
-      dat <-
-        1:length(out) |>
-        furrr::future_map_dfr(function(x) {
-          if (return_message) {
-            glue::glue("Document {x} of {total_documents}")
-          }
-          values <- out[[x]] |> unlist()
-          keywords <- values[c(T, F)]
-          scores <-  values[c(F, T)] |> as.numeric()
-          tibble(
-            number_document = x,
-            keyword_keybert = keywords,
-            score_keybert = scores
-          )
-        })
-      closeAllConnections()
-      gc()
-    }
-
-    dat
-
+    all_values <- lapply(out, unlist, use.names = FALSE)
+    n_kw_per_doc <- lengths(all_values) %/% 2L
+    all_flat <- unlist(all_values, use.names = FALSE)
+    odd_idx  <- seq(1L, length(all_flat), by = 2L)
+    even_idx <- seq(2L, length(all_flat), by = 2L)
+    tibble(
+      number_document = rep(seq_along(out), n_kw_per_doc),
+      keyword_keybert = all_flat[odd_idx],
+      score_keybert   = as.numeric(all_flat[even_idx])
+    )
   }
 
 #' Gather Keybert Generated Keywords
