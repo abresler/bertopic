@@ -191,7 +191,8 @@ keybert_keywords <-
            delete_min_df = NULL,
            workers = 1L,
            spacy_pipeline = "en_core_web_sm",
-           custom_pos_tagger = NULL) {
+           custom_pos_tagger = NULL,
+           chunk_size = NULL) {
     if (length(docs) == 0) {
       "Enter documents"
     }
@@ -274,33 +275,86 @@ keybert_keywords <-
       .extract_document_keywords_safe <-
         purrr::possibly(.extract_document_keywords, list())
 
-      out <-
-        seq_along(docs) |>
-        map(function(x) {
-          if (return_message) {
-            glue("Extracting Keywords from Document # {x}") |> message()
-          }
-          .extract_document_keywords_safe(
-            obj = obj,
-            doc = docs[[x]],
-            candidates = candidates,
-            keyphrase_ngram_range = keyphrase_ngram_range,
-            stop_words = stop_words,
-            top_n_words = top_n_words,
-            min_df = min_df,
-            use_maxsum = use_maxsum,
-            word_embeddings = word_embeddings,
-            doc_embeddings = doc_embeddings,
-            seed_keywords = seed_keywords,
-            highlight = highlight,
-            vectorizer_model = vectorizer_model,
-            use_mmr = use_mmr,
-            diversity = diversity,
-            nr_candidates = nr_candidates,
-            threshold = threshold
-          )
+      .batch_extract <- function(batch_docs) {
+        obj$extract_keywords(
+          docs = batch_docs,
+          candidates = candidates,
+          keyphrase_ngram_range = reticulate::tuple(keyphrase_ngram_range),
+          stop_words = stop_words,
+          top_n = as.integer(top_n_words),
+          min_df = min_df,
+          use_maxsum = use_maxsum,
+          word_embeddings = word_embeddings,
+          doc_embeddings = doc_embeddings,
+          seed_keywords = seed_keywords,
+          highlight = highlight,
+          vectorizer = vectorizer_model,
+          use_mmr = use_mmr,
+          diversity = diversity,
+          nr_candidates = nr_candidates
+        )
+      }
 
-        })
+      if (!is.null(chunk_size) && chunk_size > 1L) {
+        # Chunked batch mode: fast batching with per-chunk fallback on error
+        chunks <- split(seq_along(docs), ceiling(seq_along(docs) / chunk_size))
+        out <- vector("list", length(docs))
+        for (chunk_idx in chunks) {
+          if (return_message) {
+            glue("Processing docs #{min(chunk_idx)}-#{max(chunk_idx)} of {length(docs)}") |> message()
+          }
+          chunk_result <- tryCatch(
+            .batch_extract(docs[chunk_idx]),
+            error = function(e) NULL
+          )
+          if (!is.null(chunk_result)) {
+            for (i in seq_along(chunk_idx)) out[[chunk_idx[[i]]]] <- chunk_result[[i]]
+          } else {
+            if (return_message) glue("Chunk failed, retrying individually") |> message()
+            for (i in seq_along(chunk_idx)) {
+              out[[chunk_idx[[i]]]] <- .extract_document_keywords_safe(
+                obj = obj, doc = docs[[chunk_idx[[i]]]],
+                candidates = candidates,
+                keyphrase_ngram_range = keyphrase_ngram_range,
+                stop_words = stop_words, top_n_words = top_n_words,
+                min_df = min_df, use_maxsum = use_maxsum,
+                word_embeddings = word_embeddings, doc_embeddings = doc_embeddings,
+                seed_keywords = seed_keywords, highlight = highlight,
+                vectorizer_model = vectorizer_model, use_mmr = use_mmr,
+                diversity = diversity, nr_candidates = nr_candidates,
+                threshold = threshold
+              )
+            }
+          }
+        }
+      } else {
+        out <-
+          seq_along(docs) |>
+          map(function(x) {
+            if (return_message) {
+              glue("Extracting Keywords from Document # {x}") |> message()
+            }
+            .extract_document_keywords_safe(
+              obj = obj,
+              doc = docs[[x]],
+              candidates = candidates,
+              keyphrase_ngram_range = keyphrase_ngram_range,
+              stop_words = stop_words,
+              top_n_words = top_n_words,
+              min_df = min_df,
+              use_maxsum = use_maxsum,
+              word_embeddings = word_embeddings,
+              doc_embeddings = doc_embeddings,
+              seed_keywords = seed_keywords,
+              highlight = highlight,
+              vectorizer_model = vectorizer_model,
+              use_mmr = use_mmr,
+              diversity = diversity,
+              nr_candidates = nr_candidates,
+              threshold = threshold
+            )
+          })
+      }
     }
 
 
@@ -520,6 +574,7 @@ keybert_embeddings <-
                                   workers = 6L,
                                   spacy_pipeline = "en_core_web_sm",
                                   custom_pos_tagger = NULL,
+                                  chunk_size = NULL,
                                   nest_data = F) {
   if (length(document_column) == 0) {
     "Enter Document Column" |> message()
@@ -568,7 +623,8 @@ keybert_embeddings <-
     delete_min_df = delete_min_df,
     spacy_pipeline = spacy_pipeline,
     custom_pos_tagger = custom_pos_tagger,
-    threshold =  threshold
+    threshold = threshold,
+    chunk_size = chunk_size
   )
 
   if (return_summary) {
@@ -714,6 +770,7 @@ tbl_keybert_keywords <- function(data,
                                  workers = 6L,
                                  spacy_pipeline = "en_core_web_sm",
                                  custom_pos_tagger = NULL,
+                                 chunk_size = NULL,
                                  nest_data = F) {
   if (!include_both_vectorizers) {
     data <-
@@ -754,8 +811,9 @@ tbl_keybert_keywords <- function(data,
         delete_min_df = delete_min_df,
         spacy_pipeline = spacy_pipeline,
         custom_pos_tagger = custom_pos_tagger,
+        chunk_size = chunk_size,
         nest_data = nest_data,
-        threshold =  threshold
+        threshold = threshold
       )
 
     return(data)
@@ -795,8 +853,9 @@ tbl_keybert_keywords <- function(data,
       highlight = highlight,
       return_summary = return_summary,
       join_to_original_data = join_to_original_data,
+      chunk_size = chunk_size,
       nest_data = nest_data,
-      threshold =  threshold
+      threshold = threshold
     )
 
   tbl_sk <-
@@ -833,8 +892,9 @@ tbl_keybert_keywords <- function(data,
       highlight = highlight,
       return_summary = return_summary,
       join_to_original_data = join_to_original_data,
+      chunk_size = chunk_size,
       nest_data = nest_data,
-      threshold =  threshold
+      threshold = threshold
     )
 
   join_vars <-

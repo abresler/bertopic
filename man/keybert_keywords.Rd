@@ -40,7 +40,8 @@ keybert_keywords(
   delete_min_df = NULL,
   workers = 1L,
   spacy_pipeline = "en_core_web_sm",
-  custom_pos_tagger = NULL
+  custom_pos_tagger = NULL,
+  chunk_size = NULL
 )
 }
 \arguments{

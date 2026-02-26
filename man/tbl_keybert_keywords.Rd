@@ -44,6 +44,7 @@ tbl_keybert_keywords(
   workers = 6L,
   spacy_pipeline = "en_core_web_sm",
   custom_pos_tagger = NULL,
+  chunk_size = NULL,
   nest_data = F
 )
 }
