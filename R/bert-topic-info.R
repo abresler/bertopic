@@ -312,7 +312,7 @@ bert_topic_count <-
         if (only_label) {
           tbl_labels <- obj |>
             bert_topic_info() |>
-            select(1:2)
+            select(topic_bert, label_bertopic)
         }
 
 
