@@ -116,7 +116,7 @@
           dat <- tbl_aspect |>
             filter(type == x) |>
             select(-type) |>
-            unnest()
+            tidyr::unnest(cols = !!sym(aspect_column))
 
           dat <- dat |> filter(!(!!sym(aspect_column)) == "")
           return(dat)
@@ -127,8 +127,8 @@
             tbl_aspect |>
             filter(type == x) |>
             select(-type) |>
-            unnest() |>
-            unnest()
+            tidyr::unnest(cols = !!sym(aspect_column)) |>
+            tidyr::unnest(cols = !!sym(aspect_column))
 
           dat <- dat |> filter(!(!!sym(aspect_column)) == "")
           return(dat)
@@ -154,14 +154,14 @@
     has_no_int <-
       tbl_aspect |>
         filter(type %in% c("integer", "numeric")) |>
-        unnest() |>
+        tidyr::unnest(cols = !!sym(aspect_column)) |>
         nrow() == 0
 
     if (has_no_int) {
       dat <-
         tbl_aspect |>
         filter(!type %in% c("integer", "numeric")) |>
-        unnest() |>
+        tidyr::unnest(cols = !!sym(aspect_column)) |>
         select(-type) |>
         rename(word := !!sym(aspect_column)) |>
         select(-id) |>
@@ -176,11 +176,12 @@
       dat <-
         tbl_aspect |>
         filter(type %in% c("integer", "numeric")) |>
-        unnest() |>
+        tidyr::unnest(cols = !!sym(aspect_column)) |>
         select(-type) |>
         rename(value := !!sym(aspect_column)) |>
         left_join(
-          tbl_aspect |> filter(!type %in% c("integer", "numeric")) |> unnest() |>
+          tbl_aspect |> filter(!type %in% c("integer", "numeric")) |>
+            tidyr::unnest(cols = !!sym(aspect_column)) |>
             select(-type) |> rename(word := !!sym(aspect_column)),
           by = c("topic_bert", "label_bertopic", "id")
         ) |>
@@ -243,9 +244,9 @@
     dat <-
       data |>
       select(topic_bert, label_bertopic, !!sym(rep_column)) |>
-      unnest() |>
+      tidyr::unnest(cols = !!sym(rep_column)) |>
       mutate(id = 1:n()) |>
-      unnest() |>
+      tidyr::unnest(cols = !!sym(rep_column)) |>
       rename(word := !!sym(rep_column)) |>
       select(-id) |>
       filter(word != "")

@@ -57,11 +57,7 @@ bert_topic_info <-
       select(matches("aspect")) |>
       names()
 
-    list_cols <-
-      data |>
-      map(class) |>
-      flatten_chr() %in% c("list")
-    aspect_cols <- names(data)[list_cols]
+    aspect_cols <- data |> select_if(is.list) |> names()
 
     if (length(aspect_cols) > 0) {
       tbl_aspect <-
@@ -117,7 +113,7 @@ bert_topic_info <-
       tbl_docs <-
         data |>
         select(topic_bert, label_bertopic, representative_docs) |>
-        unnest() |>
+        tidyr::unnest(representative_docs) |>
         group_by(topic_bert, label_bertopic) |>
         summarise(
           text_representative_documents = unique(representative_docs) |> str_squish() |> str_c(collapse = ".  ")

@@ -50,7 +50,7 @@ bert_document_info <-
       tbl_docs <-
         data |>
         select(topic_bert, label_bertopic, representative_documents) |>
-        unnest() |>
+        tidyr::unnest(representative_documents) |>
         group_by(topic_bert, label_bertopic) |>
         summarise(
           text_representative_documents = unique(representative_documents) |> str_squish() |> str_c(collapse = ".  ")
