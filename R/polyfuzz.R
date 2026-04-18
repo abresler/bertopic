@@ -219,7 +219,7 @@ polyfuzz_match <-
     tbl_from <- dat |> distinct(from)
     dat <-
       tbl_from |> left_join(dat |>
-                              tidyr::unnest(), by = "from") |>
+                              tidyr::unnest(cols = where(is.list)), by = "from") |>
       mutate(has_match = !is.na(similarity))
 
     if (exclude_unmatched) {

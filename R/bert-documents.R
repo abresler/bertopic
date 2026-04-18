@@ -322,7 +322,11 @@ extract_bert_topics <-
       return(data)
     }
 
-    data <- tibble(id = names(docs), text = docs)
+    doc_ids <- names(docs)
+    if (is.null(doc_ids)) {
+      doc_ids <- as.character(seq_along(docs))
+    }
+    data <- tibble(id = doc_ids, text = docs)
 
     if (length(id_columns) > 0) {
       data <-

@@ -201,7 +201,9 @@
     if (length(top_n_aspect_words) > 0) {
       dat <- dat |>
         group_by(topic_bert, label_bertopic) |>
+        mutate(number_word = dplyr::row_number()) |>
         filter(number_word <= top_n_aspect_words) |>
+        select(-number_word) |>
         ungroup()
     }
 
@@ -260,7 +262,9 @@
     if (length(top_n_aspect_words) > 0) {
       dat <- dat |>
         group_by(topic_bert, label_bertopic) |>
+        mutate(number_word = dplyr::row_number()) |>
         filter(number_word <= top_n_aspect_words) |>
+        select(-number_word) |>
         ungroup()
     }
 

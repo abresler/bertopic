@@ -105,7 +105,7 @@ bert_reduce_outliers <-
       ) |>
       left_join(dat_old, by = "number_document") |>
       mutate(
-        is_reduced_topic = label_bertopic_reduced != label_bertopic,
+        is_reduced_topic = dplyr::coalesce(label_bertopic_reduced != label_bertopic, FALSE),
         .after = "strategy"
       )
 
