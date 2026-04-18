@@ -386,7 +386,6 @@ import_bertopic <-
     obj <- reticulate::import("bertopic")
     os <- reticulate::import("os")
     os$environ["TOKENIZERS_PARALLELISM"] = as.character(use_token_parallel)
-    ! 'bertopic' %>% exists() & assign_to_environment
     if (assign_to_environment) {
       assign('bertopic', obj, envir = .GlobalEnv)
     }
@@ -408,7 +407,6 @@ import_numba <-
            path = NULL) {
     select_correct_python(path = path)
     obj <- reticulate::import("numba")
-    ! 'numba' %>% exists() & assign_to_environment
     if (assign_to_environment) {
       assign('numba', obj, envir = .GlobalEnv)
     }
@@ -439,7 +437,7 @@ set_bert_attributes <-
     attr(obj, "hdbscan_parameters") <- hdbscan_params
 
     ctfidf_params <-
-      obj$ctfidf_model$get_params() |> flatten_df() |>  tbl_bert_parameter_features_to_attribute()
+      obj$ctfidf_model$get_params() |> dplyr::bind_rows() |>  tbl_bert_parameter_features_to_attribute()
 
     attr(obj, "cftfidf_parameters") <- ctfidf_params
 
@@ -657,7 +655,7 @@ bert_topic <-
         top_n_words = as.integer(top_n_words),
         n_gram_range = n_gram_range,
         min_topic_size = as.integer(min_topic_size),
-        nr_topics = as.integer(nr_topics),
+        nr_topics = if (is.null(nr_topics) || identical(nr_topics, "auto")) nr_topics else as.integer(nr_topics),
         low_memory = low_memory,
         calculate_probabilities = calculate_probabilities,
         seed_topic_list = seed_topic_list,
@@ -837,7 +835,7 @@ bert_parameters <-
         })
     } else {
       out <-
-        out |> purrr::flatten_df()
+        out |> dplyr::bind_rows()
 
     }
 
@@ -871,10 +869,10 @@ tbl_bert_attributes <-
     }
 
     if (length(out) == 0) {
-      message("No attrbutes") |> message()
+      message("No attributes")
     }
 
-    dat <- out[names(out)[!names(out) %in% "class"]] |> flatten_df()
+    dat <- out[names(out)[!names(out) %in% "class"]] |> dplyr::bind_rows()
 
     if (!return_clean) {
       return(dat)
@@ -887,7 +885,7 @@ tbl_bert_attributes <-
           values <-
             dat[[x]] |>
             str_split("\\|") |>
-            flatten_chr()
+            list_c()
           d <- tibble(value = values) |>
             tidyr::separate(
               value ,
@@ -1162,11 +1160,11 @@ online_count_vectorizer <- function(decay = NULL,
                                     use_token_parallel = F,
                                     obj = NULL,
                                     ...) {
-  if (length(obj) == 0)   {
+  if (length(obj) == 0) {
     obj <- import_bertopic(
       assign_to_environment = F,
-      numba_threads = ,
-      use_token_parallel =
+      numba_threads = numba_threads,
+      use_token_parallel = use_token_parallel
     )
   }
   obj <- obj$vectorizers$OnlineCountVectorizer(

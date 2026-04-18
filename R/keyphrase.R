@@ -12,7 +12,6 @@ import_keyphrase <-
            path = NULL) {
     select_correct_python(path = path)
     obj <- reticulate::import("keyphrase_vectorizers")
-    ! 'keyphrase' %>% exists() & assign_to_environment
     if (assign_to_environment) {
       assign('keyphrase', obj, envir = .GlobalEnv)
     }
@@ -76,8 +75,8 @@ keyphrase_vectorizer <-
 
 
     vectorizer_model$lowercase <- is_lower_case
-    vectorizer_model$max_df <- as.integer(max_df)
-    vectorizer_model$min_df <- as.integer(min_df)
+    if (!is.null(max_df)) vectorizer_model$max_df <- as.integer(max_df)
+    if (!is.null(min_df)) vectorizer_model$min_df <- as.integer(min_df)
     vectorizer_model$workers <- as.integer(workers)
     vectorizer_model$spacy_pipeline <- spacy_pipeline
     vectorizer_model$pos_pattern <- pos_pattern
@@ -160,8 +159,8 @@ keyphrase_tf_idf <-
 
 
     vectorizer_model$lowercase <- is_lower_case
-    vectorizer_model$max_df <- as.integer(max_df)
-    vectorizer_model$min_df <- as.integer(min_df)
+    if (!is.null(max_df)) vectorizer_model$max_df <- as.integer(max_df)
+    if (!is.null(min_df)) vectorizer_model$min_df <- as.integer(min_df)
     vectorizer_model$workers <- as.integer(workers)
     vectorizer_model$spacy_pipeline <- spacy_pipeline
     vectorizer_model$pos_pattern <- pos_pattern
@@ -217,7 +216,11 @@ keyphrase_tf_idf_to_tibble <-
 
     if (!return_wide) {
       data <- data |>
-        gather(phrase, score, -c(number_document, text)) |>
+        tidyr::pivot_longer(
+          cols = -c(number_document, text),
+          names_to = "phrase",
+          values_to = "score"
+        ) |>
         filter(score != 0)
     }
 

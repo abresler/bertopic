@@ -31,15 +31,11 @@ bert_load <-
     }
 
     oldwd <- getwd()
-
+    on.exit(setwd(oldwd), add = TRUE)
     setwd("~")
 
     out <-
       obj$BERTopic$load(path = model_path, embedding_model = embedding_model)
-
-    if (oldwd != getwd()) {
-      setwd(oldwd)
-    }
 
     out
   }
@@ -69,7 +65,7 @@ bert_save <-
     }
 
     oldwd <- getwd()
-
+    on.exit(setwd(oldwd), add = TRUE)
     setwd("~")
 
     model_path <- model_path |> str_remove_all("/$")
@@ -82,10 +78,6 @@ bert_save <-
       save_embedding_model = save_embedding_model,
       serialization = serialization
     )
-
-    if (getwd() != oldwd) {
-      setwd(oldwd)
-    }
 
     glue::glue("Saved {file_name} BERTopic Model to {model_path}") |> message()
 
@@ -133,7 +125,7 @@ stopwords_sources <-
         out <- stopwords::stopwords(source = sources[x])
         out
       }) |>
-      flatten_chr() |>
+      list_c() |>
       unique()
   }
 

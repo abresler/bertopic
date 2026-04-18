@@ -62,7 +62,7 @@
     aspect_num_slug <-
       aspect_column |>
       str_extract_all("[0-9]") |>
-      flatten_chr() |>
+      list_c() |>
       .pad_zeros(number_zeros = 3)
 
     if (length(aspect_num_slug) > 0) {
@@ -85,7 +85,7 @@
     if (other_aspect == "") {
       dat_slug <-
         glue("data_aspect_{aspect_num_slug}")
-      aspect_slug <- aspect_slug
+      aspect_slug <- aspect_num_slug
     }
 
     if (other_aspect != "") {
@@ -201,7 +201,9 @@
     if (length(top_n_aspect_words) > 0) {
       dat <- dat |>
         group_by(topic_bert, label_bertopic) |>
+        mutate(number_word = dplyr::row_number()) |>
         filter(number_word <= top_n_aspect_words) |>
+        select(-number_word) |>
         ungroup()
     }
 
@@ -260,7 +262,9 @@
     if (length(top_n_aspect_words) > 0) {
       dat <- dat |>
         group_by(topic_bert, label_bertopic) |>
+        mutate(number_word = dplyr::row_number()) |>
         filter(number_word <= top_n_aspect_words) |>
+        select(-number_word) |>
         ungroup()
     }
 
@@ -303,7 +307,7 @@
 
     tibble(
       topic_bert = similar_topics[[1]],
-      score_c_tfidf = similar_topics[[2]] |> flatten_dbl()
+      score_c_tfidf = similar_topics[[2]] |> list_c()
     ) |>
       mutate(term) |>
       select(term, everything()) |>

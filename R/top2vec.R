@@ -15,7 +15,6 @@ import_top2vec <-
            path = NULL) {
     select_correct_python(path = path)
     obj <- reticulate::import("top2vec")
-    ! 'top2vec' %>% exists() & assign_to_environment
     if (assign_to_environment) {
       assign('top2vec', obj, envir = .GlobalEnv)
     }
@@ -136,7 +135,7 @@ top2vec_model <-
       split_documents = split_documents,
       document_chunker = document_chunker,
       chunk_length = as.integer(chunk_length),
-      max_num_chunks = as.integer(max_num_chunks),
+      max_num_chunks = if (is.null(max_num_chunks)) NULL else as.integer(max_num_chunks),
       chunk_overlap_ratio = chunk_overlap_ratio,
       chunk_len_coverage_ratio = chunk_len_coverage_ratio,
       sentencizer = sentencizer,

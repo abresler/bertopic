@@ -33,7 +33,6 @@ import_keybert <-
 
     os$environ["TOKENIZERS_PARALLELISM"] = as.character(str_to_lower(use_token_parallel))
     obj <- reticulate::import("keybert")
-    ! 'keybert' %>% exists() & assign_to_environment
     if (assign_to_environment) {
       assign('keybert', obj, envir = .GlobalEnv)
     }
@@ -194,7 +193,7 @@ keybert_keywords <-
            custom_pos_tagger = NULL,
            chunk_size = NULL) {
     if (length(docs) == 0) {
-      "Enter documents"
+      stop("Enter documents")
     }
     if (length(obj) == 0) {
       obj <- keybert_model(model = model)
@@ -460,7 +459,7 @@ keybert_embeddings <-
            min_df = 1L,
            max_df = 1L) {
     if (length(docs) == 0) {
-      "Enter documents"
+      stop("Enter documents")
     }
     if (length(obj) == 0) {
       obj <- keybert_model(model = model)
@@ -577,8 +576,7 @@ keybert_embeddings <-
                                   chunk_size = NULL,
                                   nest_data = F) {
   if (length(document_column) == 0) {
-    "Enter Document Column" |> message()
-    return(data)
+    stop("Enter Document Column")
   }
 
   data <-
@@ -778,7 +776,7 @@ tbl_keybert_keywords <- function(data,
         data = data,
         document_column = document_column,
         obj = obj,
-        model = obj,
+        model = model,
         iterate_individually = iterate_individually,
         exclude_stop_words = exclude_stop_words,
         use_future = use_future,
@@ -972,7 +970,7 @@ gather_keybert_keywords <-
     keyword_cols <- data |> select(matches("^keywords")) |> names()
     data <-
       data |> select(id_column,
-                     one_of(other_join_columns),
+                     any_of(other_join_columns),
                      matches(keyword_cols)) |>
       pivot_longer(
         cols = keyword_cols,

@@ -288,14 +288,17 @@ open_ai_representation <-
            obj = NULL) {
     open_ai <- import_openai()
     client <- open_ai$OpenAI
-    if (length(open_ai_key) == 0) {
+    if (length(open_ai_key) == 0 || !nzchar(open_ai_key)) {
       open_ai_key <- Sys.getenv("OPENAI_API_KEY")
+    }
+    if (!nzchar(open_ai_key)) {
+      rlang::abort("OPENAI_API_KEY not set. Pass `open_ai_key` or set environment variable.")
     }
     client <- client(api_key = open_ai_key)
     obj <- bertopic_representations(obj = obj)
     out <-
       obj$OpenAI(
-        client = cleint,
+        client = client,
         model = model,
         prompt = prompt,
         generator_kwargs = generator_kwargs,
@@ -501,25 +504,7 @@ langchain_representation <-
 
 
 # langchain ---------------------------------------------------------------
-
-function(prompt = "What are these documents about? Please give a single label.",
-         temperature = 0,
-         openai_api_key = NULL,
-         chain_type = "stuff") {
-  lc <- reticulate::import("langchain")
-  load_qa_chain <-
-    lc$chains$question_answering$load_qa_chain
-  langchain <-
-    reticulate::import("langchain.chains.question_answering")
-  OpenAI <- lc$llms$openai$OpenAI
-
-  chain <-
-    load_qa_chain(
-      OpenAI(temperature = 0, openai_api_key = "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"),
-      chain_type = "stuff"
-    )
-  bert_rep <- bertopic_representations()
-
-  representation_model = bert_rep$LangChain(chain, prompt = prompt)
-
-}
+# Removed 2026-04-18 (RFORGE C003): anonymous unreachable function containing a
+# hardcoded live OpenAI API key. Credential has been flagged for rotation.
+# If LangChain integration is needed, add a properly named, exported function
+# that reads the key from Sys.getenv("OPENAI_API_KEY") with nzchar() validation.
