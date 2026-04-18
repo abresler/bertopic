@@ -1,0 +1,4 @@
+SKIP: 'test-PACKAGE.R:2:1' ------------------------
+Reason: empty test
+
+[ FAIL 0 | WARN 0 | SKIP 1 | PASS 178 ]
