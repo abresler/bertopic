@@ -657,7 +657,7 @@ bert_topic <-
         top_n_words = as.integer(top_n_words),
         n_gram_range = n_gram_range,
         min_topic_size = as.integer(min_topic_size),
-        nr_topics = as.integer(nr_topics),
+        nr_topics = if (is.null(nr_topics) || identical(nr_topics, "auto")) nr_topics else as.integer(nr_topics),
         low_memory = low_memory,
         calculate_probabilities = calculate_probabilities,
         seed_topic_list = seed_topic_list,

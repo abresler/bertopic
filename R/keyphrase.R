@@ -76,8 +76,8 @@ keyphrase_vectorizer <-
 
 
     vectorizer_model$lowercase <- is_lower_case
-    vectorizer_model$max_df <- as.integer(max_df)
-    vectorizer_model$min_df <- as.integer(min_df)
+    if (!is.null(max_df)) vectorizer_model$max_df <- as.integer(max_df)
+    if (!is.null(min_df)) vectorizer_model$min_df <- as.integer(min_df)
     vectorizer_model$workers <- as.integer(workers)
     vectorizer_model$spacy_pipeline <- spacy_pipeline
     vectorizer_model$pos_pattern <- pos_pattern
@@ -160,8 +160,8 @@ keyphrase_tf_idf <-
 
 
     vectorizer_model$lowercase <- is_lower_case
-    vectorizer_model$max_df <- as.integer(max_df)
-    vectorizer_model$min_df <- as.integer(min_df)
+    if (!is.null(max_df)) vectorizer_model$max_df <- as.integer(max_df)
+    if (!is.null(min_df)) vectorizer_model$min_df <- as.integer(min_df)
     vectorizer_model$workers <- as.integer(workers)
     vectorizer_model$spacy_pipeline <- spacy_pipeline
     vectorizer_model$pos_pattern <- pos_pattern

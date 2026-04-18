@@ -136,7 +136,7 @@ top2vec_model <-
       split_documents = split_documents,
       document_chunker = document_chunker,
       chunk_length = as.integer(chunk_length),
-      max_num_chunks = as.integer(max_num_chunks),
+      max_num_chunks = if (is.null(max_num_chunks)) NULL else as.integer(max_num_chunks),
       chunk_overlap_ratio = chunk_overlap_ratio,
       chunk_len_coverage_ratio = chunk_len_coverage_ratio,
       sentencizer = sentencizer,
