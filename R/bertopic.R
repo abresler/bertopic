@@ -1162,11 +1162,11 @@ online_count_vectorizer <- function(decay = NULL,
                                     use_token_parallel = F,
                                     obj = NULL,
                                     ...) {
-  if (length(obj) == 0)   {
+  if (length(obj) == 0) {
     obj <- import_bertopic(
       assign_to_environment = F,
-      numba_threads = ,
-      use_token_parallel =
+      numba_threads = numba_threads,
+      use_token_parallel = use_token_parallel
     )
   }
   obj <- obj$vectorizers$OnlineCountVectorizer(

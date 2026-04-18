@@ -83,9 +83,8 @@ import_nltk_corpus <-
            path = NULL) {
     select_correct_python(path = path)
     obj <- reticulate::import("nltk.corpus")
-    ! 'nltk_corpus' %>% exists() & assign_to_environment
     if (assign_to_environment) {
-      assign('nltk_corpus', nltk_cobjorpus, envir = .GlobalEnv)
+      assign('nltk_corpus', obj, envir = .GlobalEnv)
     }
     obj
   }

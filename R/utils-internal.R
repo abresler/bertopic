@@ -85,7 +85,7 @@
     if (other_aspect == "") {
       dat_slug <-
         glue("data_aspect_{aspect_num_slug}")
-      aspect_slug <- aspect_slug
+      aspect_slug <- aspect_num_slug
     }
 
     if (other_aspect != "") {
