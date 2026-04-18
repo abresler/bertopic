@@ -23,6 +23,8 @@ tbl_bert_topic_per_class(
 \item{class_name}{Character vector. Name(s) of the class feature column(s).}
 
 \item{global_tuning}{Logical. Fine-tune each topic representation for class by averaging its c-TF-IDF matrix with the global c-TF-IDF matrix. Default `TRUE`.}
+
+\item{sort_by_topic}{Logical. If TRUE, arranges output by label_bertopic descending then count descending. Default FALSE.}
 }
 \value{
 A tibble with topic assignments per class, including `topic_bert`, `label_bertopic`, class columns, and word representations.

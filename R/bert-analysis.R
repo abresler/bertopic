@@ -21,14 +21,17 @@ list_to_tuple <-
 #' @param unite_columns Character vector of column names to unite.
 #' @param new_column Character. Name of new united column. If `NULL`, concatenates the column names.
 #' @param sep Character. Separator between united values. Default `"@"`.
+#' @param to_factor Logical. If TRUE, converts the united column to a factor. Default FALSE.
 #' @param remove Logical. If `TRUE`, removes original columns. Default `FALSE`.
 #'
 #' @returns A tibble with united columns. If `to_factor = TRUE`, also includes an `id_*` column with numeric encoding.
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' library(tidyverse)
 #' tbl_unite_features(diamonds, unite_columns = c("cut", "color", "clarity"))
+#' }
 tbl_unite_features <-
   function(data,
            unite_columns = NULL,
@@ -73,6 +76,7 @@ tbl_unite_features <-
 #' @param terms Character vector of search terms to find similar topics for.
 #' @param top_n_terms Integer. Number of most similar topics to return per term. Default `10L`.
 #' @param nest_data Logical. If `TRUE`, nests data by term. Default `FALSE`.
+#' @param image Optional. Embedding-image input passed through to .bert_similar_term_topics(). Default NULL.
 #' @param return_message Logical. If `TRUE`, prints processing messages. Default `TRUE`.
 #'
 #' @returns A tibble with columns: `term`, `topic_bert`, `similarity`, `is_outlier_bert_topic`, and topic information joined from `bert_topic_info()`.
@@ -180,6 +184,7 @@ bert_embeddings <-
 #'
 #' @param obj BERTopic model object with UMAP embeddings.
 #' @param data Optional tibble to bind UMAP coordinates to. Default `NULL`.
+#' @param number_zeros Integer. Zero-padding width for UMAP dimension column names (e.g. umap_0001). Default 4.
 #'
 #' @returns A tibble with UMAP coordinates (columns named `umap_00`, `umap_01`, etc.), `pct_dbscan_prob`, and optionally bound to the input data.
 #' @export
@@ -285,6 +290,8 @@ tbl_bert_umap_label_level <-
 #' @param obj BERTopic model object.
 #' @param exclude_outlier Logical. If `TRUE`, excludes outlier topic. Default `FALSE`.
 #' @param include_topic_number Logical. If `TRUE`, includes topic number in feature names. Default `TRUE`.
+#' @param distinct_matches Logical. If TRUE, deduplicates label pairs to unique combinations. Default FALSE.
+#' @param separate_data Logical. If TRUE, separates label columns into nested tibbles before computing similarity. Default FALSE.
 #' @param return_tibble Logical. If `TRUE`, returns tibble; otherwise returns matrix. Default `FALSE`.
 #'
 #' @returns A tibble (if `return_tibble = TRUE`) or matrix with cosine similarity scores between topics, with columns: `feature_01`, `feature_02` (or separated into topic and label columns), and `cosine_similarity`.

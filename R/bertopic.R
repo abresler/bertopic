@@ -521,12 +521,14 @@ set_bert_attributes <-
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' import_bertopic()
 #' data <- sklearn::sk_datasets()
 #' docs_all <-  data$fetch_20newsgroups(subset = 'all', remove = reticulate::tuple('headers', 'footers', 'quotes'))
 #' docs <- docs_all["data"]
 #' tm <- bert_topic()
 #' topic_model <- tm$fit_transform(documents = docs)
+#' }
 #'
 #'
 

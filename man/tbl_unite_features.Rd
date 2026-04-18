@@ -22,6 +22,8 @@ tbl_unite_features(
 
 \item{sep}{Character. Separator between united values. Default `"@"`.}
 
+\item{to_factor}{Logical. If TRUE, converts the united column to a factor. Default FALSE.}
+
 \item{remove}{Logical. If `TRUE`, removes original columns. Default `FALSE`.}
 }
 \value{
@@ -31,6 +33,8 @@ A tibble with united columns. If `to_factor = TRUE`, also includes an `id_*` col
 Unite Features
 }
 \examples{
+\dontrun{
 library(tidyverse)
 tbl_unite_features(diamonds, unite_columns = c("cut", "color", "clarity"))
+}
 }

@@ -87,6 +87,8 @@ keybert_keywords(
 
 \item{candidates}{Candidate keywords/keyphrases to use instead of extracting them from the document(s) NOTE: This is not used if you passed a vectorizer.  If you already have a specific list of words or phrases you think might be keywords, you can give that list to KeyBERT here. KeyBERT will then only choose the best keywords from your provided list that are relevant to your document.}
 
+\item{threshold}{Numeric or NULL. Minimum cosine-similarity threshold for returned keywords. Default NULL (no filter).}
+
 \item{use_yake_candidates}{if `TRUE` uses Yake Keyword Extractor.  Default  `FALSE`}
 
 \item{language}{Language to use.  Default `english`}
@@ -114,6 +116,8 @@ keybert_keywords(
 \item{spacy_pipeline}{Character. Spacy pipeline to use for POS tagging. Default `"en_core_web_sm"`.}
 
 \item{custom_pos_tagger}{Custom POS tagger function. Default `NULL`.}
+
+\item{chunk_size}{Integer or NULL. If set, processes docs in chunks of this size for memory/speed tuning. Default NULL.}
 }
 \value{
 A tibble containing extracted keywords with columns: `number_document`, `number_keyword`, `keyword_keybert_*` (varies by vectorizer), and `score_keybert_*`.

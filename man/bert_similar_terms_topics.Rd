@@ -22,6 +22,8 @@ bert_similar_terms_topics(
 
 \item{nest_data}{Logical. If `TRUE`, nests data by term. Default `FALSE`.}
 
+\item{image}{Optional. Embedding-image input passed through to .bert_similar_term_topics(). Default NULL.}
+
 \item{return_message}{Logical. If `TRUE`, prints processing messages. Default `TRUE`.}
 }
 \value{

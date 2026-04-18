@@ -13,4 +13,4 @@ BugReports: https://github.com/abresler/bertopic/issues
 LazyData: true
 Suggests: testthat
 RoxygenNote: 7.3.3
-Imports: purrr, reticulate, tibble, dplyr, glue, stringr, janitor, furrr, future, parallelly, tidyr
+Imports: purrr, reticulate, tibble, dplyr, glue, stringr, janitor, furrr, future, parallelly, tidyr, readr, rlang, stopwords

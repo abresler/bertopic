@@ -16,6 +16,7 @@
 #' Import Keybert Module
 #'
 #' @param assign_to_environment Logical. If `TRUE` assigns to environment.
+#' @param use_token_parallel Logical. If TRUE, sets TOKENIZERS_PARALLELISM=true env var. Default TRUE.
 #' @param path Character. Python path to use for imports.
 #'
 #' @returns A Python KeyBERT module object.
@@ -143,6 +144,8 @@ keybert_model <-
 #' @param workers Integer. Number of parallel workers. Default `1L`.
 #' @param spacy_pipeline Character. Spacy pipeline to use for POS tagging. Default `"en_core_web_sm"`.
 #' @param custom_pos_tagger Custom POS tagger function. Default `NULL`.
+#' @param threshold Numeric or NULL. Minimum cosine-similarity threshold for returned keywords. Default NULL (no filter).
+#' @param chunk_size Integer or NULL. If set, processes docs in chunks of this size for memory/speed tuning. Default NULL.
 #'
 #' @returns A tibble containing extracted keywords with columns: `number_document`, `number_keyword`, `keyword_keybert_*` (varies by vectorizer), and `score_keybert_*`.
 #' @export
@@ -724,6 +727,8 @@ keybert_embeddings <-
 #' @param workers Integer. Number of parallel workers for processing. Default `6L`.
 #' @param spacy_pipeline Character. Spacy pipeline for POS tagging. Default `"en_core_web_sm"`.
 #' @param custom_pos_tagger Custom POS tagger function. Default `NULL`.
+#' @param threshold Numeric or NULL. Minimum cosine-similarity threshold for returned keywords. Default NULL (no filter).
+#' @param chunk_size Integer or NULL. If set, processes docs in chunks of this size for memory/speed tuning. Default NULL.
 #'
 #' @returns A tibble containing keywords extracted from the documents, with columns: `number_document`, `number_keyword`, keyword and score columns (names vary by vectorizer), and optionally joined to original data if `join_to_original_data = TRUE`.
 #' @export
@@ -921,6 +926,7 @@ tbl_keybert_keywords <- function(data,
 #' @param out Python KeyBERT output object containing extracted keywords.
 #' @param use_future Logical. If `TRUE`, uses parallel processing. Default `FALSE`.
 #' @param return_message Logical. If `TRUE`, prints processing messages. Default `FALSE`.
+#' @param slug Character. String slug for naming the assigned tibble in the global environment. Default NULL.
 #'
 #' @returns A tibble with columns: `number_document`, `keyword_keybert`, and `score_keybert`.
 #' @export

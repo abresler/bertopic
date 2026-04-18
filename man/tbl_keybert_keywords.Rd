@@ -103,6 +103,8 @@ tbl_keybert_keywords(
 
 \item{nr_candidates}{The number of candidates to consider default `20L`}
 
+\item{threshold}{Numeric or NULL. Minimum cosine-similarity threshold for returned keywords. Default NULL (no filter).}
+
 \item{seed_keywords}{Seed keywords that may guide the extraction of keywords by steering the similarities towards the seeded keywords. Default `NULL`}
 
 \item{doc_embeddings}{The embeddings of each document. Default `NULL`}
@@ -124,6 +126,8 @@ tbl_keybert_keywords(
 \item{spacy_pipeline}{Character. Spacy pipeline for POS tagging. Default `"en_core_web_sm"`.}
 
 \item{custom_pos_tagger}{Custom POS tagger function. Default `NULL`.}
+
+\item{chunk_size}{Integer or NULL. If set, processes docs in chunks of this size for memory/speed tuning. Default NULL.}
 
 \item{nest_data}{if `TRUE` nests data}
 }

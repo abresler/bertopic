@@ -13,6 +13,8 @@ import_keybert(
 \arguments{
 \item{assign_to_environment}{Logical. If `TRUE` assigns to environment.}
 
+\item{use_token_parallel}{Logical. If TRUE, sets TOKENIZERS_PARALLELISM=true env var. Default TRUE.}
+
 \item{path}{Character. Python path to use for imports.}
 }
 \value{

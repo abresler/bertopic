@@ -6,6 +6,7 @@
 #' @param docs Character vector of documents.
 #' @param document_name Character. If not `NULL`, name for the text document column.
 #' @param exclude_list_columns Logical. If `TRUE`, excludes list columns from output. Default `TRUE`.
+#' @param assign_to_environment Logical. If TRUE, assigns result tibble to global environment. Default FALSE.
 #'
 #' @returns A tibble with document information including topic assignments and representative documents.
 #' @export
@@ -213,6 +214,7 @@ bert_topic_per_class <-
 #' @param document_name Character. Name of the text feature column.
 #' @param class_name Character vector. Name(s) of the class feature column(s).
 #' @param global_tuning Logical. Fine-tune each topic representation for class by averaging its c-TF-IDF matrix with the global c-TF-IDF matrix. Default `TRUE`.
+#' @param sort_by_topic Logical. If TRUE, arranges output by label_bertopic descending then count descending. Default FALSE.
 #'
 #' @returns A tibble with topic assignments per class, including `topic_bert`, `label_bertopic`, class columns, and word representations.
 #' @export

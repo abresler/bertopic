@@ -12,6 +12,8 @@ tbl_keybert_data(out, use_future = FALSE, return_message = FALSE, slug = NULL)
 \item{use_future}{Logical. If `TRUE`, uses parallel processing. Default `FALSE`.}
 
 \item{return_message}{Logical. If `TRUE`, prints processing messages. Default `FALSE`.}
+
+\item{slug}{Character. String slug for naming the assigned tibble in the global environment. Default NULL.}
 }
 \value{
 A tibble with columns: `number_document`, `keyword_keybert`, and `score_keybert`.

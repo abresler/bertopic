@@ -20,6 +20,8 @@ bert_document_info(
 \item{document_name}{Character. If not `NULL`, name for the text document column.}
 
 \item{exclude_list_columns}{Logical. If `TRUE`, excludes list columns from output. Default `TRUE`.}
+
+\item{assign_to_environment}{Logical. If TRUE, assigns result tibble to global environment. Default FALSE.}
 }
 \value{
 A tibble with document information including topic assignments and representative documents.

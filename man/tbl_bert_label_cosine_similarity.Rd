@@ -20,6 +20,10 @@ tbl_bert_label_cosine_similarity(
 
 \item{include_topic_number}{Logical. If `TRUE`, includes topic number in feature names. Default `TRUE`.}
 
+\item{distinct_matches}{Logical. If TRUE, deduplicates label pairs to unique combinations. Default FALSE.}
+
+\item{separate_data}{Logical. If TRUE, separates label columns into nested tibbles before computing similarity. Default FALSE.}
+
 \item{return_tibble}{Logical. If `TRUE`, returns tibble; otherwise returns matrix. Default `FALSE`.}
 }
 \value{

@@ -33,8 +33,12 @@
       return(invisible())
     }
     .build_folder <-
-      function(path = "Desktop/abresler.github.io/trelliscopes/jinkie/otr/kaute") {
+      function(path = NULL) {
+        if (length(path) == 0) {
+          return(invisible())
+        }
         oldwd <- getwd()
+        on.exit(setwd(oldwd), add = TRUE)
         setwd("~")
 
         folder_exists <-

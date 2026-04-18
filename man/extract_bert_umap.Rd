@@ -10,6 +10,8 @@ extract_bert_umap(obj, data = NULL, number_zeros = 4)
 \item{obj}{BERTopic model object with UMAP embeddings.}
 
 \item{data}{Optional tibble to bind UMAP coordinates to. Default `NULL`.}
+
+\item{number_zeros}{Integer. Zero-padding width for UMAP dimension column names (e.g. umap_0001). Default 4.}
 }
 \value{
 A tibble with UMAP coordinates (columns named `umap_00`, `umap_01`, etc.), `pct_dbscan_prob`, and optionally bound to the input data.
