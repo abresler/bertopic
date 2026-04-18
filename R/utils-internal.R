@@ -62,7 +62,7 @@
     aspect_num_slug <-
       aspect_column |>
       str_extract_all("[0-9]") |>
-      flatten_chr() |>
+      list_c() |>
       .pad_zeros(number_zeros = 3)
 
     if (length(aspect_num_slug) > 0) {
@@ -303,7 +303,7 @@
 
     tibble(
       topic_bert = similar_topics[[1]],
-      score_c_tfidf = similar_topics[[2]] |> flatten_dbl()
+      score_c_tfidf = similar_topics[[2]] |> list_c()
     ) |>
       mutate(term) |>
       select(term, everything()) |>

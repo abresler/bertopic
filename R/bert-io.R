@@ -133,7 +133,7 @@ stopwords_sources <-
         out <- stopwords::stopwords(source = sources[x])
         out
       }) |>
-      flatten_chr() |>
+      list_c() |>
       unique()
   }
 

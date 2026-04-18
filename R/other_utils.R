@@ -47,7 +47,7 @@
 
         parts <- path %>%
           str_split("/") %>%
-          flatten_chr()
+          list_c()
 
         seq_along(parts) %>%
           map(function(x) {

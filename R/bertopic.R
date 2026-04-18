@@ -439,7 +439,7 @@ set_bert_attributes <-
     attr(obj, "hdbscan_parameters") <- hdbscan_params
 
     ctfidf_params <-
-      obj$ctfidf_model$get_params() |> flatten_df() |>  tbl_bert_parameter_features_to_attribute()
+      obj$ctfidf_model$get_params() |> list_rbind() |>  tbl_bert_parameter_features_to_attribute()
 
     attr(obj, "cftfidf_parameters") <- ctfidf_params
 
@@ -837,7 +837,7 @@ bert_parameters <-
         })
     } else {
       out <-
-        out |> purrr::flatten_df()
+        out |> purrr::list_rbind()
 
     }
 
@@ -874,7 +874,7 @@ tbl_bert_attributes <-
       message("No attrbutes") |> message()
     }
 
-    dat <- out[names(out)[!names(out) %in% "class"]] |> flatten_df()
+    dat <- out[names(out)[!names(out) %in% "class"]] |> list_rbind()
 
     if (!return_clean) {
       return(dat)
@@ -887,7 +887,7 @@ tbl_bert_attributes <-
           values <-
             dat[[x]] |>
             str_split("\\|") |>
-            flatten_chr()
+            list_c()
           d <- tibble(value = values) |>
             tidyr::separate(
               value ,
