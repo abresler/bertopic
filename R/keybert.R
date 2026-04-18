@@ -970,7 +970,7 @@ gather_keybert_keywords <-
     keyword_cols <- data |> select(matches("^keywords")) |> names()
     data <-
       data |> select(id_column,
-                     one_of(other_join_columns),
+                     any_of(other_join_columns),
                      matches(keyword_cols)) |>
       pivot_longer(
         cols = keyword_cols,

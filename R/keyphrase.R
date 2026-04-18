@@ -216,7 +216,11 @@ keyphrase_tf_idf_to_tibble <-
 
     if (!return_wide) {
       data <- data |>
-        gather(phrase, score, -c(number_document, text)) |>
+        tidyr::pivot_longer(
+          cols = -c(number_document, text),
+          names_to = "phrase",
+          values_to = "score"
+        ) |>
         filter(score != 0)
     }
 

@@ -1,0 +1,50 @@
+  assign("transformers", obj, envir = .GlobalEnv)
+File ‘bertopic/R/keybert.R’:
+  assign("keybert", obj, envir = .GlobalEnv)
+  assign("kb_keyword_extractor", obj, envir = .GlobalEnv)
+File ‘bertopic/R/keyphrase.R’:
+  assign("keyphrase", obj, envir = .GlobalEnv)
+File ‘bertopic/R/polyfuzz.R’:
+  assign("polyfuzz", obj, envir = .GlobalEnv)
+  assign("fuzz", obj, envir = .GlobalEnv)
+  assign("jellyfish", obj, envir = .GlobalEnv)
+File ‘bertopic/R/top2vec.R’:
+  assign("top2vec", obj, envir = .GlobalEnv)
+  assign("top2vec_model", out, envir = .GlobalEnv)
+File ‘bertopic/R/utils-internal.R’:
+  assign(tbl_slug, dat, envir = .GlobalEnv)
+  assign(tbl_slug, dat, envir = .GlobalEnv)
+File ‘bertopic/R/yake.R’:
+  assign("yake", obj, envir = .GlobalEnv)
+  assign("ke", ke, envir = .GlobalEnv)
+
+Found if() conditions comparing class() to string:
+File ‘bertopic/R/bertopic.R’: if (class(zeroshot_topic_list) != "list") ...
+File ‘bertopic/R/bertopic.R’: if (class(models) != "list") ...
+File ‘bertopic/R/top2vec.R’: if (class(keyword) != "list") ...
+Use inherits() (or maybe is()) instead.
+checking Rd line widths ... NOTE
+Rd file 'bert_embed_documents.Rd':
+  \examples lines wider than 100 characters:
+     embeddings <- bert_embed_documents(obj = topic_model, docs = c("First document.", "Second document."))
+
+Rd file 'bert_topic.Rd':
+  \examples lines wider than 100 characters:
+     docs_all <-  data$fetch_20newsgroups(subset = 'all', remove = reticulate::tuple('headers', 'footers', 'quotes'))
+
+Rd file 'keyphrase_tf_idf.Rd':
+  \examples lines wider than 100 characters:
+     docs <- c('This is the first document.', 'This document is the second document.', 'And this is the third one.', 'Is this the first docu ... [TRUNCATED]
+
+Rd file 'keyphrase_tf_idf_to_tibble.Rd':
+  \examples lines wider than 100 characters:
+     docs <- c('This is the first document.', 'This document is the second document.', 'And this is the third one.', 'Is this the first docu ... [TRUNCATED]
+
+Rd file 'keyphrase_vectorizer.Rd':
+  \examples lines wider than 100 characters:
+     docs <- c('This is the first document.', 'This document is the second document.', 'And this is the third one.', 'Is this the first docu ... [TRUNCATED]
+
+These lines will be truncated in the PDF manual.
+checking for detritus in the temp directory ... NOTE
+Found the following files/directories:
+  ‘tmpafxmm5nb’

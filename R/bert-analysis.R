@@ -104,6 +104,9 @@ bert_similar_terms_topics <-
       obj |>
       bert_topic_info(remove_list_columns = T) |>
       rename(count_documents_in_topic = count)
+    if (nrow(tbl_count) == 0) {
+      rlang::abort("bert_topic_info() returned no rows. Model may not be fitted yet.")
+    }
     data <- data |>
       left_join(tbl_count,
         by = c("topic_bert", "is_outlier_bert_topic")
@@ -186,6 +189,9 @@ extract_bert_umap <-
   function(obj,
            data = NULL,
            number_zeros = 4) {
+    if (length(obj$umap_model) == 0 || !reticulate::py_has_attr(obj$umap_model, "embedding_")) {
+      rlang::abort("UMAP model has no `embedding_`. Fit the topic model before calling extract_bert_umap().")
+    }
     df_umap <-
       obj$umap_model$embedding_ |> as_tibble()
     dims <- 1:ncol(df_umap) |> .pz(number_zeros = number_zeros)

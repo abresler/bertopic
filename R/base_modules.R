@@ -23,10 +23,6 @@ import_python_modules <-
   function(modules = NULL,
            python_path = NULL,
            assign_to_environment = FALSE) {
-    if (length(modules) > 1) {
-      assign_to_environment <- T
-    }
-
     modules |>
       walk(function(x) {
         obj <- .import_python_module(module = x, python_path = python_path)
