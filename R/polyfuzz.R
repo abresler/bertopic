@@ -22,7 +22,6 @@ import_polyfuzz <-
            path = NULL) {
     select_correct_python(path = path)
     obj <- reticulate::import("polyfuzz")
-    ! 'polyfuzz' %>% exists() & assign_to_environment
     if (assign_to_environment) {
       assign('polyfuzz', obj, envir = .GlobalEnv)
     }
@@ -45,7 +44,6 @@ import_rapidfuzz <-
            path = NULL) {
     select_correct_python(path = path)
     obj <- reticulate::import("rapidfuzz")
-    ! 'fuzz' %>% exists() & assign_to_environment
     if (assign_to_environment) {
       assign('fuzz', obj, envir = .GlobalEnv)
     }
@@ -80,7 +78,6 @@ import_jellyfish <-
            path = NULL) {
     select_correct_python(path = path)
     obj <- reticulate::import("jellyfish")
-    ! 'jellyfish' %>% exists() & assign_to_environment
     if (assign_to_environment) {
       assign('jellyfish', obj, envir = .GlobalEnv)
     }

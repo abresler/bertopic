@@ -12,7 +12,6 @@ import_keyphrase <-
            path = NULL) {
     select_correct_python(path = path)
     obj <- reticulate::import("keyphrase_vectorizers")
-    ! 'keyphrase' %>% exists() & assign_to_environment
     if (assign_to_environment) {
       assign('keyphrase', obj, envir = .GlobalEnv)
     }

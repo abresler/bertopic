@@ -386,7 +386,6 @@ import_bertopic <-
     obj <- reticulate::import("bertopic")
     os <- reticulate::import("os")
     os$environ["TOKENIZERS_PARALLELISM"] = as.character(use_token_parallel)
-    ! 'bertopic' %>% exists() & assign_to_environment
     if (assign_to_environment) {
       assign('bertopic', obj, envir = .GlobalEnv)
     }
@@ -408,7 +407,6 @@ import_numba <-
            path = NULL) {
     select_correct_python(path = path)
     obj <- reticulate::import("numba")
-    ! 'numba' %>% exists() & assign_to_environment
     if (assign_to_environment) {
       assign('numba', obj, envir = .GlobalEnv)
     }
@@ -871,7 +869,7 @@ tbl_bert_attributes <-
     }
 
     if (length(out) == 0) {
-      message("No attrbutes") |> message()
+      message("No attributes")
     }
 
     dat <- out[names(out)[!names(out) %in% "class"]] |> dplyr::bind_rows()

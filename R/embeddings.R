@@ -20,7 +20,6 @@ import_flair <-
            path = NULL) {
     select_correct_python(path = path)
     obj <- reticulate::import("flair")
-    ! 'obj' %>% exists() & assign_to_environment
     if (assign_to_environment) {
       assign('flair', obj, envir = .GlobalEnv)
     }
@@ -85,7 +84,6 @@ import_sentence_transformers <-
            path = NULL) {
     select_correct_python(path = path)
     obj <- reticulate::import("sentence_transformers")
-    ! 'sentence_transformers' %>% exists() & assign_to_environment
     if (assign_to_environment) {
       assign('sentence_transformers', obj, envir = .GlobalEnv)
     }
@@ -133,7 +131,6 @@ import_transformers <-
            path = NULL) {
     select_correct_python(path = path)
     obj <- reticulate::import("transformers")
-    ! 'transformers' %>% exists() & assign_to_environment
     if (assign_to_environment) {
       assign('transformers', obj, envir = .GlobalEnv)
     }

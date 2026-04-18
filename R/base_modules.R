@@ -58,7 +58,6 @@ import_nltk <-
            path = NULL) {
     select_correct_python(path = path)
     obj <- reticulate::import("nltk")
-    ! 'nltk' %>% exists() & assign_to_environment
     if (assign_to_environment) {
       assign('nltk', obj, envir = .GlobalEnv)
     }
@@ -111,7 +110,6 @@ import_sklearn <-
            path = NULL) {
     select_correct_python(path = path)
     obj <- reticulate::import("sklearn")
-    ! 'obj' %>% exists() & assign_to_environment
     if (assign_to_environment) {
       assign('sklearn', obj, envir = .GlobalEnv)
     }
@@ -223,7 +221,6 @@ import_umap <-
            path = NULL) {
     select_correct_python(path = path)
     obj <- reticulate::import("umap")
-    ! 'obj' %>% exists() & assign_to_environment
     if (assign_to_environment) {
       assign('umap', obj, envir = .GlobalEnv)
     }
@@ -252,7 +249,6 @@ import_hdbscan <-
            path = NULL) {
     select_correct_python(path = path)
     obj <- reticulate::import("hdbscan")
-    ! 'obj' %>% exists() & assign_to_environment
     if (assign_to_environment) {
       assign('hdbscan', obj, envir = .GlobalEnv)
     }
@@ -286,7 +282,6 @@ import_gensim <-
            path = NULL) {
     select_correct_python(path = path)
     obj <- reticulate::import("gensim")
-    ! 'obj' %>% exists() & assign_to_environment
     if (assign_to_environment) {
       assign('gensim', obj, envir = .GlobalEnv)
     }
@@ -313,7 +308,6 @@ import_spacy <-
            path = NULL) {
     select_correct_python(path = path)
     obj <- reticulate::import("spacy")
-    ! 'obj' %>% exists() & assign_to_environment
     if (assign_to_environment) {
       assign('spacy', obj, envir = .GlobalEnv)
     }
@@ -341,7 +335,6 @@ import_use <-
            path = NULL) {
     select_correct_python(path = path)
     obj <- reticulate::import("use")
-    ! 'obj' %>% exists() & assign_to_environment
     if (assign_to_environment) {
       assign('use', obj, envir = .GlobalEnv)
     }
@@ -366,7 +359,6 @@ import_openai <-
            path = NULL) {
     select_correct_python(path = path)
     obj <- reticulate::import("openai")
-    ! 'obj' %>% exists() & assign_to_environment
     if (assign_to_environment) {
       assign('openai', obj, envir = .GlobalEnv)
     }
@@ -390,7 +382,6 @@ import_llama_cpp <-
            path = NULL) {
     select_correct_python(path = path)
     obj <- reticulate::import("llama_cpp")
-    ! 'obj' %>% exists() & assign_to_environment
     if (assign_to_environment) {
       assign('llama_cpp', obj, envir = .GlobalEnv)
     }

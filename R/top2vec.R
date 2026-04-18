@@ -15,7 +15,6 @@ import_top2vec <-
            path = NULL) {
     select_correct_python(path = path)
     obj <- reticulate::import("top2vec")
-    ! 'top2vec' %>% exists() & assign_to_environment
     if (assign_to_environment) {
       assign('top2vec', obj, envir = .GlobalEnv)
     }

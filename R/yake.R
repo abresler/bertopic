@@ -17,7 +17,6 @@ import_yake <-
            path = NULL) {
     select_correct_python(path = path)
     obj <- reticulate::import("yake")
-    ! 'yake' %>% exists() & assign_to_environment
     if (assign_to_environment) {
       assign('yake', obj, envir = .GlobalEnv)
     }
