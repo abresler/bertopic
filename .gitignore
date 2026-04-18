@@ -7,3 +7,4 @@ inst/
 ^dev/
 ^inst/
 ^examples/
+tests/.DS_Store
